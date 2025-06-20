@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\common.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>CustomerRelationshipManagement</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CustomerRelationshipManagement.Domain.Shared\CustomerRelationshipManagement.Domain.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Volo.Abp.Emailing" Version="9.2.0" />
+    <PackageReference Include="Volo.Abp.BackgroundJobs.Domain" Version="9.2.0" />
+    <PackageReference Include="Volo.Abp.AuditLogging.Domain" Version="9.2.0" />
+    <PackageReference Include="Volo.Abp.SettingManagement.Domain" Version="9.2.0" />
+  </ItemGroup>
+
+</Project>

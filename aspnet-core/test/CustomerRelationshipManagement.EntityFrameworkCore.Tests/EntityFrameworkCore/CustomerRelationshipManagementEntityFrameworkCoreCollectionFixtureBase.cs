@@ -1,0 +1,9 @@
+﻿using CustomerRelationshipManagement.EntityFrameworkCore;
+using Xunit;
+
+namespace CustomerRelationshipManagement.EntityFrameworkCore;
+
+public class CustomerRelationshipManagementEntityFrameworkCoreCollectionFixtureBase : ICollectionFixture<CustomerRelationshipManagementEntityFrameworkCoreFixture>
+{
+
+}

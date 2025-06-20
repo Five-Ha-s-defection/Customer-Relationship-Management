@@ -1,0 +1,8 @@
+﻿using Volo.Abp;
+
+namespace CustomerRelationshipManagement.EntityFrameworkCore;
+
+public abstract class CustomerRelationshipManagementEntityFrameworkCoreTestBase : CustomerRelationshipManagementTestBase<CustomerRelationshipManagementEntityFrameworkCoreTestModule>
+{
+
+}

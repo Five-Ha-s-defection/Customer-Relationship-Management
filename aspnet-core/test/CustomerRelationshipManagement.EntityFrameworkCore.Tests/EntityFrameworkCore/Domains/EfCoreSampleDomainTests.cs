@@ -1,0 +1,10 @@
+using CustomerRelationshipManagement.Samples;
+using Xunit;
+
+namespace CustomerRelationshipManagement.EntityFrameworkCore.Domains;
+
+[Collection(CustomerRelationshipManagementTestConsts.CollectionDefinitionName)]
+public class EfCoreSampleDomainTests : SampleDomainTests<CustomerRelationshipManagementEntityFrameworkCoreTestModule>
+{
+
+}

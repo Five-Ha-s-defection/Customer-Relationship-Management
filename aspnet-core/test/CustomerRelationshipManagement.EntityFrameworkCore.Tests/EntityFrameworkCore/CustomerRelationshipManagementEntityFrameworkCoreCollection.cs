@@ -1,0 +1,9 @@
+﻿using Xunit;
+
+namespace CustomerRelationshipManagement.EntityFrameworkCore;
+
+[CollectionDefinition(CustomerRelationshipManagementTestConsts.CollectionDefinitionName)]
+public class CustomerRelationshipManagementEntityFrameworkCoreCollection : ICollectionFixture<CustomerRelationshipManagementEntityFrameworkCoreFixture>
+{
+
+}
