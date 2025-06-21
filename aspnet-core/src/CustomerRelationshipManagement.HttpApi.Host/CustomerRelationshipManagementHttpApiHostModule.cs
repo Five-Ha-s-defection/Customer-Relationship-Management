@@ -1,3 +1,4 @@
+﻿
 using CustomerRelationshipManagement.EntityFrameworkCore;
 using CustomerRelationshipManagement.MultiTenancy;
 using Microsoft.AspNetCore.Builder;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -145,6 +147,13 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "CustomerRelationshipManagement API", Version = "v1" });
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
+
+
+
+                ////就是这里！！！！！！！！！
+                //var basePath = AppDomain.CurrentDomain.BaseDirectory;
+                //var xmlPath = Path.Combine(basePath, "CustomerRelationshipManagement.Application.xml");//这个就是刚刚配置的xml文件名
+                //options.IncludeXmlComments(xmlPath, true);//默认的第二个参数是false，这个是controller的注释，记得修改
             });
     }
 
@@ -208,6 +217,23 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
             var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
             c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
             c.OAuthScopes("CustomerRelationshipManagement");
+
+
+            // 模型的默认扩展深度，设置为 -1 完全隐藏模型
+            c.DefaultModelsExpandDepth(1);
+
+            // API文档仅展开标记
+            c.DocExpansion(DocExpansion.List);
+            c.DefaultModelRendering(ModelRendering.Example);
+            c.DefaultModelExpandDepth(-1);
+
+            //API前缀设置为空
+            c.RoutePrefix = string.Empty;
+
+
+            // API页面Title
+            c.DocumentTitle = "😍我们的客户管理系统接口管理⭐⭐⭐";
+
         });
 
         app.UseAuditing();
