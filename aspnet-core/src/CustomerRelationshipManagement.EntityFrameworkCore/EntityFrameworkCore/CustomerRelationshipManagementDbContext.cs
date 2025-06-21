@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.ClueSources;
+using CustomerRelationshipManagement.Customers;
+using CustomerRelationshipManagement.Industrys;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -14,7 +18,17 @@ public class CustomerRelationshipManagementDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
+    //线索表
+    public DbSet<Clue> Clue { get; set; }
 
+    //线索来源表
+    public DbSet<ClueSource> ClueSource { get; set; }
+
+    //行业表
+    public DbSet<Industry> Industry {  get; set; }
+
+    //客户表
+    public DbSet<Customer> Customer {  get; set; }
 
     public CustomerRelationshipManagementDbContext(DbContextOptions<CustomerRelationshipManagementDbContext> options)
         : base(options)
