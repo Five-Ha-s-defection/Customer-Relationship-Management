@@ -1,5 +1,4 @@
-﻿
-using CustomerRelationshipManagement.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.EntityFrameworkCore;
 using CustomerRelationshipManagement.MultiTenancy;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
@@ -15,12 +14,15 @@ using System.Linq;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
+using Volo.Abp.AspNetCore.Mvc.AntiForgery;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.Caching;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
@@ -35,6 +37,7 @@ namespace CustomerRelationshipManagement;
     typeof(CustomerRelationshipManagementApplicationModule),
     typeof(CustomerRelationshipManagementEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
+   typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
 )]
@@ -55,9 +58,25 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        var configuration = context.Services.GetConfiguration();
-        var hostingEnvironment = context.Services.GetHostingEnvironment();
 
+      
+
+        Configure<AbpAntiForgeryOptions>(options =>
+        {
+            options.TokenCookie.Expiration = TimeSpan.FromDays(365);
+            options.AutoValidate = false;
+        });
+        var configuration = context.Services.GetConfiguration();
+
+
+        // 配置 Redis 连接
+        Configure<AbpDistributedCacheOptions>(options =>
+        {
+            options.KeyPrefix = "CRM:"; // Redis key 前缀，可自定义
+        });
+
+
+        var hostingEnvironment = context.Services.GetHostingEnvironment();
         ConfigureAuthentication(context);
         ConfigureBundles();
         ConfigureUrls(configuration);
@@ -173,12 +192,18 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
+                
             });
+          
         });
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
+
+        // 初始化 CSRedis
+        //RedisHelper.Initialization(new CSRedis.CSRedisClient("10.223.3.246:6379"));
+
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
 

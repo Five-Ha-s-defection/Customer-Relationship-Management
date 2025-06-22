@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.Finance;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 
 namespace CustomerRelationshipManagement.EntityFrameworkCore;
@@ -22,6 +24,8 @@ public class CustomerRelationshipManagementDbContext :
 
     }
 
+    public DbSet<Receivables> Receivables { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -40,5 +44,16 @@ public class CustomerRelationshipManagementDbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+
+
+        builder.Entity<Receivables>(b =>
+        {
+            // 设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Receivables), CustomerRelationshipManagementConsts.DbSchema);
+            // 按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+            // 配置 Name 属性为必填，最大长度 128
+            b.Property(x => x.ReceivablePay).IsRequired().HasMaxLength(128);
+        });
     }
 }
