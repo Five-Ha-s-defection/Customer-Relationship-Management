@@ -1,61 +1,55 @@
-﻿using System;
+﻿using CustomerRelationshipManagement.Clues;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.Application.Dtos;
 
-namespace CustomerRelationshipManagement.Clues
+namespace CustomerRelationshipManagement.Dtos.Clues
 {
-    /// <summary>
-    /// 线索表
-    /// </summary>
-    public class Clue : FullAuditedAggregateRoot<Guid>
+    public class ClueDto:FullAuditedEntityDto<Guid>
     {
         /// <summary>
         /// 线索负责人
         /// </summary>
-        [Required]
         public Guid UserId { get; set; }
 
         /// <summary>
         /// 姓名
         /// </summary>
-        [Required]
-        public string ClueName { get; set; } = string.Empty;
+        public string ClueName { get; set; } 
 
         /// <summary>
         /// 电话
         /// </summary>
-        [Required]
-        public string CluePhone { get; set; } = string.Empty;
+        public string CluePhone { get; set; }
 
         /// <summary>
         /// 线索来源
         /// </summary>
-        [Required]
         public Guid ClueSourceId { get; set; }
 
         /// <summary>
         /// 邮箱
         /// </summary>
-        public string ClueEmail { get; set; } = string.Empty;
+        public string ClueEmail { get; set; }
 
         /// <summary>
         /// 微信号
         /// </summary>
-        public string ClueWechat { get; set; } = string.Empty;
+        public string ClueWechat { get; set; }
 
         /// <summary>
         /// QQ
         /// </summary>
-        public string ClueQQ { get; set; } = string.Empty;
+        public string ClueQQ { get; set; }
 
         /// <summary>
         /// 公司名称
         /// </summary>
-        public string CompanyName { get; set; } = string.Empty;
+        public string CompanyName { get; set; } 
 
         /// <summary>
         /// 行业
@@ -65,12 +59,12 @@ namespace CustomerRelationshipManagement.Clues
         /// <summary>
         /// 地址
         /// </summary>
-        public string Address { get; set; } = string.Empty;
+        public string Address { get; set; } 
 
         /// <summary>
         /// 备注（富文本）
         /// </summary>
-        public string Remark { get; set; } = string.Empty;
+        public string Remark { get; set; }
 
         /// <summary>
         /// 线索状态（枚举）
