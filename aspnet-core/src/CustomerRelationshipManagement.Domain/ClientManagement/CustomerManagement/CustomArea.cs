@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace CustomerRelationshipManagement.ClientManagement.CustomerManagement
 {
     /// <summary>
     /// 客户地区(省市级联操作)
     /// </summary>
-    public class CustomArea
+    public class CustomArea: FullAuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 地区名称

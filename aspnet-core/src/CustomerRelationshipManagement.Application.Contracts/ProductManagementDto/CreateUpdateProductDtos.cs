@@ -3,19 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
 
 namespace CustomerRelationshipManagement.ProductManagement
 {
-    /// <summary>
-    /// 产品管理模块
-    /// </summary>
-    public class Product: FullAuditedAggregateRoot<Guid>
+    public class CreateUpdateProductDtos
     {
         /// <summary>
         /// 产品分类
         /// </summary>
-        public Guid CategoryId { get; set; }=Guid.Empty;
+        public Guid CategoryId { get; set; } = Guid.Empty;
         /// <summary>
         /// 父级分类ID (可为空，顶级分类没有父级)
         /// </summary>
@@ -23,20 +19,20 @@ namespace CustomerRelationshipManagement.ProductManagement
         /// <summary>
         /// 产品图片
         /// </summary>
-        public string ProductImageUrl { get; set; }=string.Empty;
+        public string ProductImageUrl { get; set; } = string.Empty;
         /// <summary>
         /// 门幅
         /// </summary>
-        public string ProductBrand { get; set; }= string.Empty;
+        public string ProductBrand { get; set; } = string.Empty;
         /// <summary>
         //// 供应商
         /// </summary>
-        public string ProductSupplier { get; set; }= string.Empty;
+        public string ProductSupplier { get; set; } = string.Empty;
         /// <summary>
         /// 产品编号
         /// </summary>
         public string ProductCode { get; set; } = string.Empty;
- 
+
         /// <summary>
         /// 产品描述
         /// </summary>
@@ -52,10 +48,10 @@ namespace CustomerRelationshipManagement.ProductManagement
         /// <summary>
         /// 上架未上架
         /// </summary>
-        public bool ProductStatus { get; set; }= false;
+        public bool ProductStatus { get; set; } = false;
         /// <summary>
         /// 成交价
         /// </summary>
-        public decimal? DealPrice { get; set; }=0;
+        public decimal? DealPrice { get; set; } = 0;
     }
 }

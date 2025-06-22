@@ -4,13 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace CustomerRelationshipManagement.ClientManagement.ClueManagement
 {
     /// <summary>
     /// 线索
     /// </summary>
-    public class Clue
+    public class Clue: FullAuditedAggregateRoot<Guid>
     {  /// <summary>
        /// 线索负责人
        /// </summary>

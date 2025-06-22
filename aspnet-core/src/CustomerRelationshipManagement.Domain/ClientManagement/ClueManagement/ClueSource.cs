@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace CustomerRelationshipManagement.ClientManagement.ClueManagement
 {
     /// <summary>
     /// 线索/客户来源
     /// </summary>
-    public class ClueSource
+    public class ClueSource: FullAuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 线索来源名称
@@ -26,6 +27,6 @@ namespace CustomerRelationshipManagement.ClientManagement.ClueManagement
         /// <summary>
         /// 创建时间
         /// </summary>
-        public decimal? CreateTime { get; set; }
+        public DateTime? CreateTime { get; set; }
     }
 }

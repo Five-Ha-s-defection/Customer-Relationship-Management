@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Domain.Entities.Auditing;
 
 namespace CustomerRelationshipManagement.ClientManagement.CustomerContactManagement
 {
     /// <summary>
     /// 联系人
     /// </summary>
-    public class CustomerContact
+    public class CustomerContact: FullAuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 所属客户ID（外键）
