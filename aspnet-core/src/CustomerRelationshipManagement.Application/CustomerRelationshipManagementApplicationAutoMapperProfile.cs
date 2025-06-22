@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using CustomerRelationshipManagement.Contracts;
+using CustomerRelationshipManagement.CrmContracts;
+using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 
 namespace CustomerRelationshipManagement;
 
@@ -9,5 +12,8 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
+
+         CreateMap<CrmContract,AddUpdateCrmContractDto>().ReverseMap();
+         CreateMap<CrmContract,ShowCrmContractDto>().ReverseMap();
     }
 }

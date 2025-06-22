@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.Contracts;
+using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -21,6 +22,13 @@ public class CustomerRelationshipManagementDbContext :
     {
 
     }
+
+    /// <summary>
+    /// 合同表
+    /// </summary>
+    public DbSet<CrmContract> CrmContract { get; set; }
+
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
