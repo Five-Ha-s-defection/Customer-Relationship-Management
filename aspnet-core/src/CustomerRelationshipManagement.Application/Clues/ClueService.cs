@@ -40,6 +40,8 @@ namespace CustomerRelationshipManagement.Clues
             {
                 //将接收到的对象转换成实体
                 var clue = ObjectMapper.Map<CreateUpdateClueDto, Clue>(dto);
+                // 设置UserId为随机 GUID
+                clue.UserId = Guid.NewGuid();
                 //保存到数据库
                 var list=await repository.InsertAsync(clue);
                 //将数据库操作成功后的CLue实体转换为CLueDto对象
@@ -87,20 +89,39 @@ namespace CustomerRelationshipManagement.Clues
                 {
                     cluelist = cluelist.Where(x => x.UserId == pagingInfo.AssignedTo);
                 }
-                //根据时间查询
-                if (pagingInfo.StartTime.HasValue && pagingInfo.EndTime.HasValue)
+                // 时间筛选
+                if (pagingInfo.StartTime.HasValue && pagingInfo.EndTime.HasValue && pagingInfo.TimeType.HasValue)
                 {
                     cluelist = pagingInfo.TimeType switch
                     {
-                        "CreateTime" => cluelist.Where(x => x.CreationTime >= pagingInfo.StartTime && x. CreationTime <=    pagingInfo.EndTime),
-                        "NextContact" => cluelist.Where(x => x.NextContactTime >= pagingInfo.StartTime &&      x.NextContactTime <= pagingInfo.EndTime),
-                        _ => cluelist.Where(x => x.LastFollowTime >= pagingInfo.StartTime && x.LastFollowTime <=       pagingInfo.EndTime)
+                        TimeField.CreateTime => cluelist.Where(x => x.CreationTime >= pagingInfo.StartTime && x.CreationTime <= pagingInfo.EndTime),
+                        TimeField.NextContact => cluelist.Where(x => x.NextContactTime >= pagingInfo.StartTime && x.NextContactTime <= pagingInfo.EndTime),
+                        TimeField.LastFollow => cluelist.Where(x => x.LastFollowTime >= pagingInfo.StartTime && x.LastFollowTime <= pagingInfo.EndTime),
+                        _ => cluelist
+                    };
+                }
+
+                // 排序
+                if (pagingInfo.OrderBy.HasValue)
+                {
+                    cluelist = (pagingInfo.OrderBy.Value, pagingInfo.OrderDesc) switch
+                    {
+                        (TimeField.CreateTime, true) => cluelist.OrderByDescending(x => x.CreationTime),
+                        (TimeField.CreateTime, false) => cluelist.OrderBy(x => x.CreationTime),
+
+                        (TimeField.NextContact, true) => cluelist.OrderByDescending(x => x.NextContactTime),
+                        (TimeField.NextContact, false) => cluelist.OrderBy(x => x.NextContactTime),
+
+                        (TimeField.LastFollow, true) => cluelist.OrderByDescending(x => x.LastFollowTime),
+                        (TimeField.LastFollow, false) => cluelist.OrderBy(x => x.LastFollowTime),
+
+                        _ => cluelist.OrderByDescending(x => x.LastFollowTime)
                     };
                 }
                 //分页
                 var totalCount = cluelist.Count();
                 var totalPage = (int)Math.Ceiling((double)cluelist.Count() / pagingInfo.PageSize);
-                var clues = cluelist.OrderBy(x => x.Id).Skip((pagingInfo.PageIndex - 1) * pagingInfo.PageSize).Take(pagingInfo.PageSize).ToList();
+                var clues = cluelist.Skip((pagingInfo.PageIndex - 1) * pagingInfo.PageSize).Take(pagingInfo.PageSize).ToList();
                 return ApiResult<PageInfoCount<ClueDto>>.Success(ResultCode.Success, new PageInfoCount<ClueDto>
                 {
                     Data = clues.Select(x => ObjectMapper.Map<Clue, ClueDto>(x)).ToList(),
