@@ -1,5 +1,5 @@
-﻿using CustomerRelationshipManagement.UserPermissions;
-using CustomerRelationshipManagement.UserRoles;
+﻿using CustomerRelationshipManagement.RBAC.UserPermissions;
+using CustomerRelationshipManagement.RBAC.UserRoles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Users
+namespace CustomerRelationshipManagement.RBAC.Users
 {
     /// <summary>  
     /// 用户信息  
@@ -24,6 +24,11 @@ namespace CustomerRelationshipManagement.Users
         /// 密码  
         /// </summary>  
         public string Password { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 确定密码
+        /// </summary>
+        public string ConfirmPassword { get; set; } = string.Empty;
 
         /// <summary>  
         /// 邮箱  

@@ -1,4 +1,4 @@
-﻿using CustomerRelationshipManagement.RoleMenus;
+﻿using CustomerRelationshipManagement.RBAC.RoleMenus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Menus
+namespace CustomerRelationshipManagement.RBAC.Menus
 {
     /// <summary>
     /// 菜单信息

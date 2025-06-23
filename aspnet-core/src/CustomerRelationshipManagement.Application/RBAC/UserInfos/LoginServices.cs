@@ -1,6 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Dtos;
-using CustomerRelationshipManagement.Users;
+using CustomerRelationshipManagement.Dtos.Users;
+using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -9,7 +9,7 @@ using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
-namespace CustomerRelationshipManagement.UserInfos
+namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
     public class LoginServices : ApplicationService, ILogServices
     {
@@ -43,7 +43,7 @@ namespace CustomerRelationshipManagement.UserInfos
                     throw new UserFriendlyException("用户不存在");
                 }
                 //密码加密
-                var password = (passwordHasher.VerifyHashedPassword(userInfo, userInfo.Password, loginDto.Password));
+                var password = passwordHasher.VerifyHashedPassword(userInfo, userInfo.Password, loginDto.Password);
                 if (!userInfo.IsActive)
                 {
                     throw new UserFriendlyException("用户已被禁用");

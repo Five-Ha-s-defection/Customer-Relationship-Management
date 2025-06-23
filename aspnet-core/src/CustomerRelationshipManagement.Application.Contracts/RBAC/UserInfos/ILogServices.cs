@@ -1,9 +1,9 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Dtos;
+using CustomerRelationshipManagement.Dtos.Users;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-namespace CustomerRelationshipManagement.UserInfos
+namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
     public interface ILogServices:IApplicationService
     {

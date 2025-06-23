@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using CustomerRelationshipManagement.Dtos;
-using CustomerRelationshipManagement.Users;
+using CustomerRelationshipManagement.Dtos.Users;
+using CustomerRelationshipManagement.RBAC.Users;
 
 namespace CustomerRelationshipManagement;
 
@@ -13,5 +13,6 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
          * into multiple profile classes for a better organization. */
         //用户信息映射
         CreateMap<UserInfo, UserInfoDto>().ReverseMap();
+        CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
     }
 }

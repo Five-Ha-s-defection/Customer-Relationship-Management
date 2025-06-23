@@ -1,5 +1,5 @@
-﻿using CustomerRelationshipManagement.Roles;
-using CustomerRelationshipManagement.Users;
+﻿using CustomerRelationshipManagement.RBAC.Roles;
+using CustomerRelationshipManagement.RBAC.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 
-namespace CustomerRelationshipManagement.UserRoles
+namespace CustomerRelationshipManagement.RBAC.UserRoles
 {
     /// <summary>
     /// 用户角色信息

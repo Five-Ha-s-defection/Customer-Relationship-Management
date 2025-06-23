@@ -1,6 +1,6 @@
-﻿using CustomerRelationshipManagement.RoleMenus;
-using CustomerRelationshipManagement.RolePermissions;
-using CustomerRelationshipManagement.UserRoles;
+﻿using CustomerRelationshipManagement.RBAC.RoleMenus;
+using CustomerRelationshipManagement.RBAC.RolePermissions;
+using CustomerRelationshipManagement.RBAC.UserRoles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Roles
+namespace CustomerRelationshipManagement.RBAC.Roles
 {
     /// <summary>
     /// 角色信息

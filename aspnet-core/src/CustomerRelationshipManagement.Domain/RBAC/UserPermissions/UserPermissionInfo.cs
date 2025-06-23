@@ -1,5 +1,5 @@
-﻿using CustomerRelationshipManagement.Permissions;
-using CustomerRelationshipManagement.Roles;
+﻿using CustomerRelationshipManagement.RBAC.Permissions;
+using CustomerRelationshipManagement.RBAC.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,21 +7,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 
-namespace CustomerRelationshipManagement.RolePermissions
+namespace CustomerRelationshipManagement.RBAC.UserPermissions
 {
     /// <summary>
-    /// 角色权限信息
+    /// 用户权限
     /// </summary>
-    public class RolePermissionInfo:Entity<Guid>
+    public class UserPermissionInfo:Entity<Guid>
     {
         /// <summary>
-        /// 角色Id
+        /// 用户Id
         /// </summary>
-        public Guid RoleId { get; set; }
+        public Guid UserId { get; set; }
         /// <summary>
-        /// 角色导航属性
+        /// 用户导航属性
         /// </summary>
-        public RoleInfo Role { get; set; } = new RoleInfo();
+        public UserInfo User { get; set; }=new UserInfo();
         /// <summary>
         /// 权限Id
         /// </summary>
@@ -29,6 +29,6 @@ namespace CustomerRelationshipManagement.RolePermissions
         /// <summary>
         /// 权限导航属性
         /// </summary>
-        public PermissionInfo Permission { get; set; } = new PermissionInfo();
+        public PermissionInfo Permission { get; set; }=new PermissionInfo();
     }
 }

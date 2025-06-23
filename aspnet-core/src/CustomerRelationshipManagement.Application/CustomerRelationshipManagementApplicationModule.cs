@@ -1,4 +1,4 @@
-﻿using CustomerRelationshipManagement.Users;
+﻿using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.AutoMapper;

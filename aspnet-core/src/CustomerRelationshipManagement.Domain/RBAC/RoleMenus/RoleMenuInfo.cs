@@ -1,5 +1,5 @@
-﻿using CustomerRelationshipManagement.Menus;
-using CustomerRelationshipManagement.Roles;
+﻿using CustomerRelationshipManagement.RBAC.Menus;
+using CustomerRelationshipManagement.RBAC.Roles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 
-namespace CustomerRelationshipManagement.RoleMenus
+namespace CustomerRelationshipManagement.RBAC.RoleMenus
 {
     /// <summary>
     /// 角色菜单关联信息
