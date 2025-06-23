@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.CategoryMangamentDto
 {
-    public class CategoryDtos
+    public class CategoryDtos:FullAuditedEntityDto<Guid>
     {
         /// <summary>
         /// 分类名称
