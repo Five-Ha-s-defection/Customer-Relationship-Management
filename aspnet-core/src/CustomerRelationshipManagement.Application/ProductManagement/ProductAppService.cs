@@ -1,13 +1,19 @@
-﻿using CustomerRelationshipManagement.ErrorCode;
+﻿using CustomerRelationshipManagement.DTOS.UploadFileDto;
+using CustomerRelationshipManagement.ErrorCode;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
+using Volo.Abp.Validation;
 
 namespace CustomerRelationshipManagement.ProductManagement
 {
@@ -15,10 +21,12 @@ namespace CustomerRelationshipManagement.ProductManagement
     public class ProductAppService : ApplicationService, IProductAppService
     {
         private readonly IRepository<Product> productRepository;
+        public IHttpContextAccessor httpContextAccessor;
 
-        public ProductAppService(IRepository<Product> productRepository)
+        public ProductAppService(IRepository<Product> productRepository, IHttpContextAccessor httpContextAccessor)
         {
             this.productRepository = productRepository;
+            this.httpContextAccessor = httpContextAccessor;
         }
         /// <summary>
         /// 新增产品
@@ -141,5 +149,72 @@ namespace CustomerRelationshipManagement.ProductManagement
                 throw;
             }
         }
+        [HttpPost]
+        public async Task<string> UploadImageAsync([FromForm] UploadFileDtos input)
+        {
+            if (input.File == null || input.File.Length == 0)
+            {
+                throw new UserFriendlyException("请选择要上传的图片！");
+            }
+
+            // 生成唯一文件名
+            var fileName = Guid.NewGuid() + Path.GetExtension(input.File.FileName);
+            var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+            var filePath = Path.Combine(folder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await input.File.CopyToAsync(stream);
+            }
+
+            // 返回图片访问路径
+            return $"/uploads/{fileName}";
+        }
+
+        //[HttpPost]
+        //public async Task<Guid> UploadPicPreviewAsync(IFormFile uploadedFile)
+        //{
+        //    var formFileName = uploadedFile.FileName;
+        //    if (!new[] { ".png", ".jpg", ".bmp" }.Any((item) => formFileName.EndsWith(item)))
+        //    {
+        //        throw new AbpValidationException("您上传的文件格式必须为png、jpg、bmp中的一种");
+        //    }
+        //    byte[] bytes;
+        //    using (var bodyStream = uploadedFile.OpenReadStream())
+        //    {
+        //        using (var m = new MemoryStream())
+        //        {
+        //            await bodyStream.CopyToAsync(m);
+        //            bytes = m.ToArray();
+        //        }
+        //    }
+        //    string base64 = Convert.ToBase64String(bytes);
+        //    var bgId = Guid.NewGuid();
+        //    _cache.Set($"{CurrentUser.TenantId}:bg:{bgId}", base64, new DistributedCacheEntryOptions { SlidingExpiration = new TimeSpan(1, 0, 0) });
+        //    return bgId;
+        //}
+
+        ///// <summary>
+        ///// 保存图片，要使用到前置API的预览图片id
+        ///// </summary>
+        ///// <param name="createPictureInput"></param>
+        ///// <returns></returns>
+        //[Route("upload/")]
+        //[HttpPost]
+        //public async Task<bool> UploadPicAsync([FromBody] CreatePictureInput createPictureInput)
+        //{
+        //    var based64 = await _cache.GetAsync($"{CurrentUser.TenantId}:bg:{createPictureInput.PreviewPicId}");
+        //    if (string.IsNullOrEmpty(based64))
+        //        throw new AbpException("Cache Hotmap Picture do not find");
+        //    var model = ObjectMapper.Map<CreatePictureInput, Picture>(createPictureInput);
+        //    model.ProfileId = CurrentUser.TenantId;
+        //    model.BlobStorage = Convert.FromBase64String(based64);
+        //    return await _pictures.InsertAsync(model) != null;
+        //}
+
     }
 }
