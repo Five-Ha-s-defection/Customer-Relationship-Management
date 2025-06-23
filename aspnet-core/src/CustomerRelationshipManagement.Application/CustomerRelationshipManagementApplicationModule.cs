@@ -19,10 +19,10 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
         Configure<AbpAutoMapperOptions>(options =>
         {
             options.AddMaps<CustomerRelationshipManagementApplicationModule>();
-
-
         });
-            // ✅ 注册自定义密码加密器
-            context.Services.AddScoped<IPasswordHasher<UserInfo>, PasswordHasher<UserInfo>>();
+        // ✅ 注册验证码服务
+        context.Services.AddCaptcha(context.Configuration);
+        // ✅ 注册自定义密码加密器
+        context.Services.AddScoped<IPasswordHasher<UserInfo>, PasswordHasher<UserInfo>>();
     }
 }

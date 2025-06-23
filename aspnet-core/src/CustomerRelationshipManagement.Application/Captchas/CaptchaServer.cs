@@ -6,10 +6,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Application.Services;
 
 namespace CustomerRelationshipManagement.Captchas
 {
-    public class CaptchaServer : ICaptchaServer
+    public class CaptchaServer : ApplicationService,ICaptchaServer
     {
         private readonly ICaptcha captcha;
 
