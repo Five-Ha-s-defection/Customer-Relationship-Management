@@ -3,6 +3,8 @@ using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.Customers;
 using CustomerRelationshipManagement.Dtos.Clues;
 using CustomerRelationshipManagement.Dtos.Customers;
+using CustomerRelationshipManagement.Dtos;
+using CustomerRelationshipManagement.Users;
 
 namespace CustomerRelationshipManagement;
 
@@ -21,5 +23,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //客户表
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
+        //用户信息映射
+        CreateMap<UserInfo, UserInfoDto>().ReverseMap();
     }
 }
