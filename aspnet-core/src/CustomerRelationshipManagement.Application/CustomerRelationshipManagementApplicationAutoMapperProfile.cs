@@ -13,7 +13,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
 
-         CreateMap<CrmContract,AddUpdateCrmContractDto>().ReverseMap();
-         CreateMap<CrmContract,ShowCrmContractDto>().ReverseMap();
+        CreateMap<Contracts.CrmContract, AddUpdateCrmContractDto>().ReverseMap();
+        CreateMap<Contracts.CrmContract, ShowCrmContractDto>().ReverseMap();
     }
 }
