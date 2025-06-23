@@ -1,4 +1,4 @@
-﻿using CustomerRelationshipManagement.DTOS.UploadFileDto;
+﻿//using CustomerRelationshipManagement.DTOS.UploadFileDto;
 using CustomerRelationshipManagement.ErrorCode;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -149,31 +149,31 @@ namespace CustomerRelationshipManagement.ProductManagement
                 throw;
             }
         }
-        [HttpPost]
-        public async Task<string> UploadImageAsync([FromForm] UploadFileDtos input)
-        {
-            if (input.File == null || input.File.Length == 0)
-            {
-                throw new UserFriendlyException("请选择要上传的图片！");
-            }
+        //[HttpPost]
+        //public async Task<string> UploadImageAsync([FromForm] UploadFileDtos input)
+        //{
+        //    if (input.File == null || input.File.Length == 0)
+        //    {
+        //        throw new UserFriendlyException("请选择要上传的图片！");
+        //    }
 
-            // 生成唯一文件名
-            var fileName = Guid.NewGuid() + Path.GetExtension(input.File.FileName);
-            var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-            if (!Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
-            var filePath = Path.Combine(folder, fileName);
+        //    // 生成唯一文件名
+        //    var fileName = Guid.NewGuid() + Path.GetExtension(input.File.FileName);
+        //    var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        //    if (!Directory.Exists(folder))
+        //    {
+        //        Directory.CreateDirectory(folder);
+        //    }
+        //    var filePath = Path.Combine(folder, fileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await input.File.CopyToAsync(stream);
-            }
+        //    using (var stream = new FileStream(filePath, FileMode.Create))
+        //    {
+        //        await input.File.CopyToAsync(stream);
+        //    }
 
-            // 返回图片访问路径
-            return $"/uploads/{fileName}";
-        }
+        //    // 返回图片访问路径
+        //    return $"/uploads/{fileName}";
+        //}
 
         //[HttpPost]
         //public async Task<Guid> UploadPicPreviewAsync(IFormFile uploadedFile)
