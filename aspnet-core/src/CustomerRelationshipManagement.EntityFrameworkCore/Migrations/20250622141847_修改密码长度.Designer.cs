@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CustomerRelationshipManagement.Migrations
 {
     [DbContext(typeof(CustomerRelationshipManagementDbContext))]
-    partial class CustomerRelationshipManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250622141847_修改密码长度")]
+    partial class 修改密码长度
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -411,7 +414,7 @@ namespace CustomerRelationshipManagement.Migrations
                         new
                         {
                             Id = new Guid("00000000-0000-0000-0000-000000000000"),
-                            ConcurrencyStamp = "e07622e887f84812aa433729572104a9",
+                            ConcurrencyStamp = "f892a1eed2e04409a3c0fb9e98018f51",
                             CreationTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@admin.com",
                             ExtraProperties = "{}",

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Payments;
+using CustomerRelationshipManagement.Dtos;
+using CustomerRelationshipManagement.Users;
 
 namespace CustomerRelationshipManagement;
 
@@ -20,5 +22,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
 
         CreateMap<Payment, PaymentDTO>().ReverseMap();
         CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
+        //用户信息映射
+        CreateMap<UserInfo, UserInfoDto>().ReverseMap();
     }
 }

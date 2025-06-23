@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CustomerRelationshipManagement.Migrations
 {
     [DbContext(typeof(CustomerRelationshipManagementDbContext))]
-    partial class CustomerRelationshipManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250622132755_RBAC迁移")]
+    partial class RBAC迁移
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -390,8 +393,8 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.Property<string>("PhoneInfo")
                         .IsRequired()
@@ -406,21 +409,6 @@ namespace CustomerRelationshipManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("App_UserInfo", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000000"),
-                            ConcurrencyStamp = "e07622e887f84812aa433729572104a9",
-                            CreationTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "admin@admin.com",
-                            ExtraProperties = "{}",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Password = "123",
-                            PhoneInfo = "12345678901",
-                            UserName = "admin"
-                        });
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
