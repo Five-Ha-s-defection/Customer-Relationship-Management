@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.Payments;
 
 namespace CustomerRelationshipManagement;
 
@@ -12,7 +13,12 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
          * into multiple profile classes for a better organization. */
 
 
-        CreateMap<Receivables, ReceivablesDTO>();
-        CreateMap<CreateUpdateReceibablesDto, Receivables>();
+        CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
+        CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
+
+
+
+        CreateMap<Payment, PaymentDTO>().ReverseMap();
+        CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
     }
 }

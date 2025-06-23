@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Application.Dtos;
+using Volo.Abp.Caching;
 
 namespace CustomerRelationshipManagement.Finance
 {
-    public class ReceivablesDTO
+    [CacheName("Receivables")]
+    public class ReceivablesDTO:FullAuditedEntityDto<Guid>
     {
         /// <summary>
         /// 所属客户

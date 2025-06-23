@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.Payments;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -25,6 +26,7 @@ public class CustomerRelationshipManagementDbContext :
     }
 
     public DbSet<Receivables> Receivables { get; set; }
+    public DbSet<Payment> Payments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -45,6 +47,13 @@ public class CustomerRelationshipManagementDbContext :
         //    //...
         //});
 
+        builder.Entity<Payment>(b =>
+        {
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payments), CustomerRelationshipManagementConsts.DbSchema);
+            b.ConfigureByConvention(); //auto configure for the base class props
+            b.Property(x => x.PaymentCode).IsRequired().HasMaxLength(128);
+            b.Property(x => x.Amount).HasColumnType("decimal(18,2)");
+        });
 
         builder.Entity<Receivables>(b =>
         {

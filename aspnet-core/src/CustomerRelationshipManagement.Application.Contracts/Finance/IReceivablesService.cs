@@ -29,5 +29,27 @@ namespace CustomerRelationshipManagement.Finance
         /// <param name="receivablesSearchDto">应收款搜索条件</param>
         /// <returns>分页查询结果</returns>
         Task<ApiResult<PageInfoCount<ReceivablesDTO>>> GetPageAsync(ReceivablesSearchDto receivablesSearchDto);
+
+        /// <summary>
+        /// 根据ID获取应收款信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ApiResult<ReceivablesDTO>> GetByIdAsync(Guid id);
+
+        /// <summary>
+        /// 修改应收款信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="createUpdateReceibablesDto"></param>
+        /// <returns></returns>
+        Task<ApiResult<ReceivablesDTO>> UpdateAsync(Guid id, CreateUpdateReceibablesDto createUpdateReceibablesDto);
+
+        /// <summary>
+        /// 删除应收款信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ApiResult<ReceivablesDTO>> DeleteAsync(Guid id);
     }
 }

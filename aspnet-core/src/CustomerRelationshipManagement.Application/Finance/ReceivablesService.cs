@@ -1,13 +1,14 @@
 ﻿using CustomerRelationshipManagement.ApiResult;
 using CustomerRelationshipManagement.Paging;
-using CustomerRelationshipManagement.Redis;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.Finance
@@ -26,17 +27,20 @@ namespace CustomerRelationshipManagement.Finance
         /// <summary>
         /// Redis缓存服务接口
         /// </summary>
-        private readonly IRedisCacheService redisCacheService;
+        private readonly IDistributedCache<PageInfoCount<ReceivablesDTO>> _cache;
+
+        private readonly IDistributedCache<ReceivablesDTO> _cacheById;
 
         /// <summary>
         /// 构造函数，注入依赖服务
         /// </summary>
         /// <param name="repository">应收款数据仓储</param>
         /// <param name="redisCacheService">Redis缓存服务</param>
-        public ReceivablesService(IRepository<Receivables, Guid> repository,IRedisCacheService redisCacheService)
+        public ReceivablesService(IRepository<Receivables, Guid> repository, IDistributedCache<PageInfoCount<ReceivablesDTO>> cache, IDistributedCache<ReceivablesDTO> cacheById)
         {
             this.repository = repository;
-            this.redisCacheService = redisCacheService;
+            _cache = cache;
+            _cacheById = cacheById;
         }
 
         /// <summary>
@@ -58,11 +62,15 @@ namespace CustomerRelationshipManagement.Finance
                 var currentTime = DateTime.Now.ToString("yyyyMMdd"); // 格式：20241201
                 receivables.ReceivableCode = $"M{currentTime}-{randomNumber}"; // 格式：M20241201-1234
             }
+            else
+            {
+                receivables.ReceivableCode = $"M{receivables.ReceivableCode}";
+            }
             // 插入数据到数据库
             receivables =await repository.InsertAsync(receivables);
 
             // 返回成功结果，包含创建的应收款信息
-            return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
+            return  ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
         }
 
         /// <summary>
@@ -77,34 +85,19 @@ namespace CustomerRelationshipManagement.Finance
             string cacheKey ="Getreceivables";
 
             // 使用Redis缓存获取或添加数据
-            var redislist = await redisCacheService.GetOrAddAsync<PageInfoCount<ReceivablesDTO>>(cacheKey, async () =>
+            var redislist = await _cache.GetOrAddAsync(cacheKey, async () =>
             {
                 // 获取查询对象
                 var list = await repository.GetQueryableAsync();
-                
+
                 // 应收款编号过滤（模糊查询）
-                list = list.WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableCode), x => x.ReceivableCode.Contains(receivablesSearchDto.ReceivableCode));
-                
-                // 时间范围过滤 - 开始时间
-                list = list.WhereIf(receivablesSearchDto.StartTime.HasValue, x => x.ReceivableDate >= receivablesSearchDto.StartTime);
-                
-                // 时间范围过滤 - 结束时间
-                list = list.WhereIf(receivablesSearchDto.EndTime.HasValue, x => x.ReceivableDate <= receivablesSearchDto.EndTime);
-
-                // 负责人过滤
-                list = list.WhereIf(receivablesSearchDto.UserId.HasValue, x => x.UserId == receivablesSearchDto.UserId);
-
-                // 创建人过滤（已注释）
-                //list = list.WhereIf(receivablesSearchDto.CreateId.HasValue, x => x.CreateId == receivablesSearchDto.CreateId);
-
-                // 所属客户过滤
-                list = list.WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId);
-
-                // 关联合同过滤
-                list = list.WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId);
-
-                // 应收款金额过滤
-                list = list.WhereIf(receivablesSearchDto.ReceivablePay.HasValue, x => x.ReceivablePay == receivablesSearchDto.ReceivablePay);
+                list = list.WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableCode), x => x.ReceivableCode.Contains(receivablesSearchDto.ReceivableCode))
+                .WhereIf(receivablesSearchDto.StartTime.HasValue, x => x.ReceivableDate >= receivablesSearchDto.StartTime)
+                .WhereIf(receivablesSearchDto.EndTime.HasValue, x => x.ReceivableDate <= receivablesSearchDto.EndTime)
+                .WhereIf(receivablesSearchDto.UserId.HasValue, x => x.UserId == receivablesSearchDto.UserId)
+                .WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId)
+                .WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId)
+                .WhereIf(receivablesSearchDto.ReceivablePay.HasValue, x => x.ReceivablePay == receivablesSearchDto.ReceivablePay);
 
                 // 使用ABP框架的分页方法进行分页查询
                 var res = list.PageResult(receivablesSearchDto.PageIndex, receivablesSearchDto.PageSize);
@@ -119,13 +112,92 @@ namespace CustomerRelationshipManagement.Finance
                     PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / receivablesSearchDto.PageSize), // 总页数
                     Data = itemDtos // 当前页数据
                 };
-
-                // 返回分页结果（这个return语句很重要，不能缺失）
                 return pageInfo;
-            }, expiration: TimeSpan.FromMinutes(5)); // 设置缓存过期时间为5分钟
+            }, () => new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromMinutes(10)
+            }); // 设置缓存过期时间为5分钟
             
             // 返回成功结果
             return ApiResult<PageInfoCount<ReceivablesDTO>>.Success(ResultCode.Success, redislist);
+        }
+        /// <summary>
+        /// 根据id获取数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<ReceivablesDTO>> GetByIdAsync(Guid id)
+        {
+            // 构建缓存键名
+            string cacheKey = $"receivable:{id}";
+            
+            var receivablesDto = await _cacheById.GetOrAddAsync(
+                cacheKey,
+                async () => {
+                    var query = await repository.GetAsync(id);
+                    return ObjectMapper.Map<Receivables, ReceivablesDTO>(query);
+                },
+                () => new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromMinutes(10)
+                }
+            );
+
+            if (receivablesDto == null)
+            {
+                return ApiResult<ReceivablesDTO>.Fail("未找到该数据", ResultCode.NotFound);
+            }
+
+            return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, receivablesDto);
+        }
+        /// <summary>
+        /// 修改应收款的数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="createUpdateReceibablesDto"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<ReceivablesDTO>> UpdateAsync(Guid id, CreateUpdateReceibablesDto createUpdateReceibablesDto)
+        {
+            // 1. 获取数据库中最新的、带有正确ConcurrencyStamp的实体
+            var receivables = await repository.GetAsync(id);
+            if (receivables == null)
+            {
+                return ApiResult<ReceivablesDTO>.Fail("未找到该数据", ResultCode.NotFound);
+            }
+            
+            // 2. 将传入的DTO中的属性值，更新到从数据库查出的实体上
+            ObjectMapper.Map(createUpdateReceibablesDto, receivables);
+
+            // 3. 更新实体，此时Id和ConcurrencyStamp都是正确的
+            await repository.UpdateAsync(receivables);
+
+            // 4. 清除相关缓存
+            //await ClearReceivablesCacheAsync();
+            await _cacheById.RemoveAsync($"receivable:{id}");
+            
+            // 5. 返回更新后的数据
+            return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
+        }
+        /// <summary>
+        /// 删除应收款的信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<ReceivablesDTO>> DeleteAsync(Guid id)
+        {
+            try
+            {
+                await repository.DeleteAsync(id);
+                
+                await _cacheById.RemoveAsync($"receivable:{id}");
+
+                return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, null);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

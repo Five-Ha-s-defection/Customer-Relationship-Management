@@ -37,7 +37,7 @@ namespace CustomerRelationshipManagement;
     typeof(CustomerRelationshipManagementApplicationModule),
     typeof(CustomerRelationshipManagementEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
-   typeof(AbpCachingStackExchangeRedisModule),
+    typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
 )]
@@ -69,11 +69,11 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         var configuration = context.Services.GetConfiguration();
 
 
-        // 配置 Redis 连接
-        Configure<AbpDistributedCacheOptions>(options =>
-        {
-            options.KeyPrefix = "CRM:"; // Redis key 前缀，可自定义
-        });
+        //// 配置 Redis 连接
+        //Configure<AbpDistributedCacheOptions>(options =>
+        //{
+        //    options.KeyPrefix = "CRM:"; // Redis key 前缀，可自定义
+        //});
 
 
         var hostingEnvironment = context.Services.GetHostingEnvironment();
