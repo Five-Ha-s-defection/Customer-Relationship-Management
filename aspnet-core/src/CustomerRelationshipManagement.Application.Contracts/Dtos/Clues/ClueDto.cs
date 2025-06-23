@@ -6,9 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Caching;
 
 namespace CustomerRelationshipManagement.Dtos.Clues
 {
+    [CacheName("ClueDtoCache")]
     public class ClueDto:FullAuditedEntityDto<Guid>
     {
         /// <summary>

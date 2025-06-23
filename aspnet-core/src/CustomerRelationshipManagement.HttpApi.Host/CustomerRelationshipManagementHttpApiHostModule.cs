@@ -1,6 +1,5 @@
 ﻿
 using CustomerRelationshipManagement.EntityFrameworkCore;
-using CustomerRelationshipManagement.MultiTenancy;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +21,7 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
@@ -37,7 +37,8 @@ namespace CustomerRelationshipManagement;
     typeof(CustomerRelationshipManagementEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpCachingStackExchangeRedisModule)
 )]
 public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 {
