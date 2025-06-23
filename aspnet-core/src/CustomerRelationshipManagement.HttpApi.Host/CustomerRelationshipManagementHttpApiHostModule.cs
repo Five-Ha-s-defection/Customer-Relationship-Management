@@ -188,39 +188,20 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
            new Dictionary<string, string>
            {
                     {"CustomerRelationshipManagement", "CustomerRelationshipManagement API"}
-           },
-           options =>
-           {
-               options.SwaggerDoc("v1", new OpenApiInfo { Title = "CustomerRelationshipManagement API", Version = "v1" });
-               options.DocInclusionPredicate((docName, description) => true);
-               options.CustomSchemaIds(type => type.FullName);
-
-               //开启权限小锁
-               options.OperationFilter<AddResponseHeadersFilter>();
-               options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
-               options.OperationFilter<SecurityRequirementsOperationFilter>();
-               options.CustomSchemaIds(type => type.FullName);
+            },
+            options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo { Title = "CustomerRelationshipManagement API", Version = "v1" });
+                options.DocInclusionPredicate((docName, description) => true);
+                options.CustomSchemaIds(type => type.FullName);
 
 
 
-               //给参数设置默认值
-               //options.SchemaFilter<SchemaFilter>();
-
-               //在header中添加token，传递到后台
-               //options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-               //{
-               //    Description = "JWT授权(数据将在请求头中进行传递)直接在下面框中输入Bearer {token}(注意两者之间是一个空格) \"",
-               //    Name = "Authorization",//jwt默认的参数名称
-               //    In = ParameterLocation.Header,//jwt默认存放Authorization信息的位置(请求头中)
-               //    Type = SecuritySchemeType.ApiKey
-               //});
-
-               ////就是这里！！！！！！！！！
-               //var basePath = AppDomain.CurrentDomain.BaseDirectory;
-               //var xmlPath = Path.Combine(basePath, "CustomerRelationshipManagement.Application.xml");//这个就是刚刚配置的xml文件名
-               //options.IncludeXmlComments(xmlPath, true);//默认的第二个参数是false，这个是controller的注释，记得修改
-
-           });
+                ////就是这里！！！！！！！！！
+                //var basePath = AppDomain.CurrentDomain.BaseDirectory;
+                //var xmlPath = Path.Combine(basePath, "CustomerRelationshipManagement.Application.xml");//这个就是刚刚配置的xml文件名
+                //options.IncludeXmlComments(xmlPath, true);//默认的第二个参数是false，这个是controller的注释，记得修改
+            });
     }
 
     private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
@@ -284,17 +265,21 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
             c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
             c.OAuthScopes("CustomerRelationshipManagement");
 
+
             // 模型的默认扩展深度，设置为 -1 完全隐藏模型
             c.DefaultModelsExpandDepth(1);
+
             // API文档仅展开标记
             c.DocExpansion(DocExpansion.List);
             c.DefaultModelRendering(ModelRendering.Example);
             c.DefaultModelExpandDepth(-1);
+
             //API前缀设置为空
             c.RoutePrefix = string.Empty;
+
+
             // API页面Title
             c.DocumentTitle = "😍我们的客户管理系统接口管理⭐⭐⭐";
-
 
         });
 
