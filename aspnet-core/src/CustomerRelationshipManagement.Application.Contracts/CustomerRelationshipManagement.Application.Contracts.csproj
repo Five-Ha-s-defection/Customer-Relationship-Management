@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Volo.Abp.ObjectExtending" Version="9.2.0" />
     <PackageReference Include="Volo.Abp.SettingManagement.Application.Contracts" Version="9.2.0" />
   </ItemGroup>
