@@ -1,4 +1,4 @@
-﻿using CustomerRelationshipManagement.ApiResult;
+﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;

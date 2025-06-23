@@ -1,8 +1,4 @@
-﻿using CustomerRelationshipManagement.ApiResult;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using CustomerRelationshipManagement.ApiResults;
 using System.Threading.Tasks;
 
 namespace CustomerRelationshipManagement.Payments
