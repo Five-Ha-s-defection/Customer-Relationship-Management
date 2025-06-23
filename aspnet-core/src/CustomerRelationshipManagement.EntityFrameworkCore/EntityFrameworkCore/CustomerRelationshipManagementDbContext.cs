@@ -1,5 +1,6 @@
 ﻿using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Payments;
+﻿using CustomerRelationshipManagement.ProductManagement;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -16,8 +17,14 @@ public class CustomerRelationshipManagementDbContext :
     AbpDbContext<CustomerRelationshipManagementDbContext>
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
-
-
+    /// <summary>
+    /// 产品管理
+    /// </summary>
+    public DbSet<Product> Product { get; set; }
+    /// <summary>
+    /// 产品管理类型
+    /// </summary>
+    public DbSet<Category> Category { get; set; }
 
     public CustomerRelationshipManagementDbContext(DbContextOptions<CustomerRelationshipManagementDbContext> options)
         : base(options)
