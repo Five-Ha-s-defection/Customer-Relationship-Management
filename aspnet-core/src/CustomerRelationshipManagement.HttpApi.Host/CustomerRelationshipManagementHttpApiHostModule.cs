@@ -67,7 +67,7 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
     /// <param name="context"></param>
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        //配置antiforgery
+
         Configure<AbpAntiForgeryOptions>(options =>
         {
             options.TokenCookie.Expiration = TimeSpan.FromDays(365);
