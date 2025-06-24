@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.Dtos.Users;
-using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Payments;
-using CustomerRelationshipManagement.Dtos;
-using CustomerRelationshipManagement.Users;
-using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.ProductManagement;
+using CustomerRelationshipManagement.RBAC.Users;
 
 namespace CustomerRelationshipManagement;
 
