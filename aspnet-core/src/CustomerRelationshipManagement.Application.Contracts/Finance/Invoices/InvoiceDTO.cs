@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 
-namespace CustomerRelationshipManagement.Invoices
+namespace CustomerRelationshipManagement.FinanceInfo.Invoices
 {
     /// <summary>
     /// 发票数据传输对象

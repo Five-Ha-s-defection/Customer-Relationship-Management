@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.Payments
+namespace CustomerRelationshipManagement.FinanceInfo.Payments
 {
     public class CreateUpdatePaymentDTO
     {

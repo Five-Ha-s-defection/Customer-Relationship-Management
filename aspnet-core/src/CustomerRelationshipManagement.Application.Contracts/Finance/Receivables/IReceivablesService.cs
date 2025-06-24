@@ -4,7 +4,7 @@ using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-namespace CustomerRelationshipManagement.Finance
+namespace CustomerRelationshipManagement.FinanceInfo.Finance
 {
     /// <summary>
     /// 应收款服务接口

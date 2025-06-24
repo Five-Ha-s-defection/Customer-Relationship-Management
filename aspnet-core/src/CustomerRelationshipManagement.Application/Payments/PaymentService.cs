@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.FinanceInfo.Payments;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.Extensions.Caching.Distributed;
 using System;

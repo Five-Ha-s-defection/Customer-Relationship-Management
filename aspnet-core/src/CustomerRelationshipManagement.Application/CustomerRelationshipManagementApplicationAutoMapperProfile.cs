@@ -2,6 +2,8 @@
 using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.FinanceInfo.Finance;
+using CustomerRelationshipManagement.FinanceInfo.Payments;
 using CustomerRelationshipManagement.Payments;
 using CustomerRelationshipManagement.ProductManagement;
 using CustomerRelationshipManagement.RBAC.Users;
