@@ -1,6 +1,10 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Payments;
+using CustomerRelationshipManagement.Dtos;
+using CustomerRelationshipManagement.Users;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.ProductManagement;
 
 namespace CustomerRelationshipManagement;
 
@@ -20,5 +24,17 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
 
         CreateMap<Payment, PaymentDTO>().ReverseMap();
         CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
+        //用户信息映射
+        CreateMap<UserInfo, UserInfoDto>().ReverseMap();
+        
+        //产品管理显示Dto
+        CreateMap<Product, ProductDtos>().ReverseMap();
+        //产品管理添加修改Dto
+        CreateMap<Product,CreateUpdateProductDtos>().ReverseMap();
+        //产品分类显示Dto
+        CreateMap<Category, CategoryDtos>().ReverseMap();
+        //产品分类添加修改Dto
+        CreateMap<Category, CreateUpdateCategoryDtos>().ReverseMap();
+
     }
 }
