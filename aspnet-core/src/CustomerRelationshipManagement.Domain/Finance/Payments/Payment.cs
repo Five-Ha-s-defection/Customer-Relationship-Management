@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +25,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
         /// <summary>
         /// 关联应收（可选）
         /// </summary>
-        public Guid ReceivableId { get; set; }=Guid.Empty;
+        public Guid ReceivableId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// 负责人
@@ -58,13 +58,13 @@ namespace CustomerRelationshipManagement.Finance.Payments
         public Guid ApproverId { get; set; }
 
         /// <summary>
-        /// 收款状态
-        /// </summary>
-        public int PaymentStatus { get; set; }= 0;
-
-        /// <summary>
         /// 备注（可选）
         /// </summary>
-        public string Remark { get; set; }= string.Empty;
+        public string Remark { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 收款状态
+        /// </summary>
+        public int PaymentStatus { get; set; } = 0;
     }
 } 
