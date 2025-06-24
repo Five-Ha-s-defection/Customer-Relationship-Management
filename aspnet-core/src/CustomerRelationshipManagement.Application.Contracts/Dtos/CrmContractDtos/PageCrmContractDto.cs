@@ -51,6 +51,21 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         public string ContractName { get; set; } = string.Empty;
 
         /// <summary>
+        /// 签订日期
+        /// </summary>
+        public string SignDate {  get; set; } = string.Empty;
+
+        /// <summary>
+        /// 生效日期
+        /// </summary>
+        public string CommencementDate { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 截止日期
+        /// </summary>
+        public string ExpirationDate { get; set; } = string.Empty;
+
+        /// <summary>
         /// 经销商
         /// </summary>
         public string Dealer { get; set; } = string.Empty;
