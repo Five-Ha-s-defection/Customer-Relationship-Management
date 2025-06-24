@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
-using CustomerRelationshipManagement.ProductManagement;
+using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.CXS.ProductManagement;
+using CustomerRelationshipManagement.CXS.ProductManagementDto;
 
 namespace CustomerRelationshipManagement;
 
