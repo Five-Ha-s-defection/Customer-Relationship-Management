@@ -1,5 +1,25 @@
-﻿using CustomerRelationshipManagement.Finance.Invoices;
+﻿using CustomerRelationshipManagement.BusinessOpportunitys;
+using CustomerRelationshipManagement.Cards;
+using CustomerRelationshipManagement.Categorys;
+using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.ClueSources;
+using CustomerRelationshipManagement.ContactCommunications;
+using CustomerRelationshipManagement.ContactRelations;
+using CustomerRelationshipManagement.crmcontracts;
+using CustomerRelationshipManagement.CustomerContacts;
+using CustomerRelationshipManagement.CustomerLevels;
+using CustomerRelationshipManagement.CustomerRegions;
+using CustomerRelationshipManagement.Customers;
+using CustomerRelationshipManagement.CustomerTypes;
+using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
+<<<<<<< HEAD
+=======
+using CustomerRelationshipManagement.Industrys;
+using CustomerRelationshipManagement.PaymentMethods;
+using CustomerRelationshipManagement.Prioritys;
+using CustomerRelationshipManagement.Products;
+>>>>>>> DevBranth
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.RoleMenus;
@@ -8,6 +28,24 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
+<<<<<<< HEAD
+=======
+using CustomerRelationshipManagement.SalesProgresses;
+using CustomerRelationshipManagement.CXS.ProductManagement;
+using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.Invoices;
+using CustomerRelationshipManagement.Payments;
+﻿using CustomerRelationshipManagement.ProductManagement;
+using Microsoft.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.Menus;
+using CustomerRelationshipManagement.Permissions;
+using CustomerRelationshipManagement.RoleMenus;
+using CustomerRelationshipManagement.RolePermissions;
+using CustomerRelationshipManagement.Roles;
+using CustomerRelationshipManagement.UserPermissions;
+using CustomerRelationshipManagement.UserRoles;
+using CustomerRelationshipManagement.Users;
+>>>>>>> DevBranth
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -15,6 +53,7 @@ using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
+<<<<<<< HEAD
 using CustomerRelationshipManagement.crmcontracts;
 using Receivables = CustomerRelationshipManagement.Finance.Receivables.Receivables;
 using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.BusinessOpportunitys;
@@ -34,6 +73,8 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.SalesPro
 using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.ProductCategory.Categorys;
 using CustomerRelationshipManagement.ProductCategory.Products;
+=======
+>>>>>>> DevBranth
 
 namespace CustomerRelationshipManagement.EntityFrameworkCore;
 
@@ -129,7 +170,7 @@ public class CustomerRelationshipManagementDbContext :
     /// <summary>
     /// 应收款
     /// </summary>
-    public DbSet<Receivables> Receivables { get; set; }
+    public DbSet<Finance.Receivables.Receivables> Receivables { get; set; }
 
     /// <summary>
     /// 收款
@@ -216,7 +257,7 @@ public class CustomerRelationshipManagementDbContext :
 
 
         // 配置应收款单表
-        builder.Entity<Receivables>(b =>
+        builder.Entity<Finance.Receivables.Receivables>(b =>
         {
             // 设置表名和架构
             b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Receivables), CustomerRelationshipManagementConsts.DbSchema);

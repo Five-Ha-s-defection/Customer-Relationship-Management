@@ -22,6 +22,7 @@ namespace CustomerRelationshipManagement.Paging
         /// </summary>
         public int PageSize { get; set; }
     }
+
     /// <summary>
     ///  分页返回信息
     /// </summary>
