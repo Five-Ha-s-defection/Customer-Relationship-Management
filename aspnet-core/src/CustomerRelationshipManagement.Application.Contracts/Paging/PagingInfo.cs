@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Caching;
 
 namespace CustomerRelationshipManagement.Paging
 {
@@ -20,15 +21,12 @@ namespace CustomerRelationshipManagement.Paging
         /// 页大小
         /// </summary>
         public int PageSize { get; set; }
-        /// <summary>
-        /// 关键字
-        /// </summary>
-        public string? Keyword { get; set; }
     }
     /// <summary>
     ///  分页返回信息
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [CacheName("PageInfo")]
     public class PageInfoCount<T>
     {
         /// <summary>

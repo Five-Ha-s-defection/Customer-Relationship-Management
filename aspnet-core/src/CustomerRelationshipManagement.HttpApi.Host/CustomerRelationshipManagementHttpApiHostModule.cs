@@ -29,6 +29,7 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
 using Volo.Abp.Security.Claims;
@@ -44,6 +45,7 @@ namespace CustomerRelationshipManagement;
     typeof(CustomerRelationshipManagementApplicationModule),
     typeof(CustomerRelationshipManagementEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
+    typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule),
     typeof(AbpCachingStackExchangeRedisModule)
@@ -68,7 +70,7 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
     /// <param name="context"></param>
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        //配置antiforgery
+
         Configure<AbpAntiForgeryOptions>(options =>
         {
             options.TokenCookie.Expiration = TimeSpan.FromDays(365);
@@ -80,6 +82,11 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
+        //// 配置 Redis 连接
+        //Configure<AbpDistributedCacheOptions>(options =>
+        //{
+        //    options.KeyPrefix = "CRM:"; // Redis key 前缀，可自定义
+        //});
         ConfigureAuthentication(context);
         ConfigureBundles();
         ConfigureUrls(configuration);
@@ -223,12 +230,18 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
+                
             });
+          
         });
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
+
+        // 初始化 CSRedis
+        //RedisHelper.Initialization(new CSRedis.CSRedisClient("10.223.3.246:6379"));
+
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
 

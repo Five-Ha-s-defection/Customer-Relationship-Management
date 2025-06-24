@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.Application.Dtos;
+using Volo.Abp.Caching;
 
 namespace CustomerRelationshipManagement.Payments
 {
-    /// <summary>
-    /// 收款
-    /// </summary>
-    public class Payment : FullAuditedAggregateRoot<Guid>
+    [CacheName("Payment")]
+    public class PaymentDTO: FullAuditedEntityDto<Guid>
     {
         /// <summary>
         /// 所属客户
@@ -58,13 +57,13 @@ namespace CustomerRelationshipManagement.Payments
         public Guid ApproverId { get; set; }
 
         /// <summary>
-        /// 备注（可选）
-        /// </summary>
-        public string Remark { get; set; } = string.Empty;
-
-        /// <summary>
         /// 收款状态
         /// </summary>
         public int PaymentStatus { get; set; } = 0;
+
+        /// <summary>
+        /// 备注（可选）
+        /// </summary>
+        public string Remark { get; set; } = string.Empty;
     }
-} 
+}

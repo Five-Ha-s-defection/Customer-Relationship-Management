@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
 
 namespace CustomerRelationshipManagement.Payments
 {
-    /// <summary>
-    /// 收款
-    /// </summary>
-    public class Payment : FullAuditedAggregateRoot<Guid>
+    public class CreateUpdatePaymentDTO
     {
         /// <summary>
         /// 所属客户
         /// </summary>
+        [Required]
         public Guid CustomerId { get; set; }
 
         /// <summary>
@@ -58,13 +56,13 @@ namespace CustomerRelationshipManagement.Payments
         public Guid ApproverId { get; set; }
 
         /// <summary>
-        /// 备注（可选）
-        /// </summary>
-        public string Remark { get; set; } = string.Empty;
-
-        /// <summary>
         /// 收款状态
         /// </summary>
         public int PaymentStatus { get; set; } = 0;
+
+        /// <summary>
+        /// 备注（可选）
+        /// </summary>
+        public string Remark { get; set; } = string.Empty;
     }
-} 
+}
