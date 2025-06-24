@@ -31,5 +31,7 @@ namespace CustomerRelationshipManagement.Dtos.Clues
         /// 是否倒序
         /// </summary>
         public bool OrderDesc { get; set; } = true;
+
+        public string Keyword { get; set; }
     }
 }

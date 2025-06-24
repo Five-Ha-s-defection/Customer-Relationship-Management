@@ -163,12 +163,6 @@ public class CustomerRelationshipManagementDbContext :
     /// </summary>
     public DbSet<UserInfo> UserInfo { get; set; }
 
-    public DbSet<Receivables> Receivables { get; set; }
-    /// <summary>
-    /// 收款
-    /// </summary>
-    public DbSet<Payment> Payment { get; set; }
-
     /// <summary>
     /// 权限信息
     /// </summary>
@@ -245,6 +239,9 @@ public class CustomerRelationshipManagementDbContext :
             b.Property(x => x.PaymentCode).IsRequired().HasMaxLength(128);
             b.Property(x => x.Amount).HasColumnType("decimal(18,2)");
         });
+
+        
+
         // 配置发票表
         builder.Entity<Invoice>(b =>
         {
@@ -417,23 +414,7 @@ public class CustomerRelationshipManagementDbContext :
             b.ConfigureByConvention();
         });
 
-        //配置应收款表
-        builder.Entity<Receivables>(b =>
-        {
-            //设置表名和架构
-            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Receivables), CustomerRelationshipManagementConsts.DbSchema);
-            //按约定自动配置基类属性（如主键、审计字段等）
-            b.ConfigureByConvention();
-        });
 
-        //配置收款表
-        builder.Entity<Payment>(b =>
-        {
-            //设置表名和架构
-            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payment), CustomerRelationshipManagementConsts.DbSchema);
-            //按约定自动配置基类属性（如主键、审计字段等）
-            b.ConfigureByConvention();
-        });
 
         //配置发票表
         builder.Entity<Invoice>(b =>
