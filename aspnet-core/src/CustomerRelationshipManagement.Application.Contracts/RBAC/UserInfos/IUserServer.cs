@@ -19,11 +19,19 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// <param name="createOrUpdateUserInfoDto">用户DTO</param>
         /// <returns></returns>
         Task<ApiResult<UserInfo>> AddUserInfo(CreateOrUpdateUserInfoDto createOrUpdateUserInfoDto);
+
         /// <summary>
         /// 修改密码
         /// </summary>
         /// <param name="changePasswordDto"></param>
         /// <returns></returns>
         Task ChangePasswordAsync(ChangePasswordDto changePasswordDto);
+
+        /// <summary>
+        /// 获取当前登录用户信息
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<UserInfoDto>> GetCurrentUserInfoAsync();
+
     }
 }

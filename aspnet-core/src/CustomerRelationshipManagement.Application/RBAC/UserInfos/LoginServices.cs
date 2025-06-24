@@ -33,7 +33,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// </summary>
         /// <param name="loginDto">用户名和密码</param>
         /// <returns></returns>
-        public async Task<ApiResult<UserInfoDto>> Login([FromQuery] LoginDto loginDto)
+        public async Task<ApiResult<UserInfoDto>> Login(LoginDto loginDto)
         {
             try
             {

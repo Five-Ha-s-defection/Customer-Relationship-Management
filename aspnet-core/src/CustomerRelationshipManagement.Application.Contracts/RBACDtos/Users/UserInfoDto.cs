@@ -8,16 +8,14 @@ namespace CustomerRelationshipManagement.Dtos.Users
 {
     public class UserInfoDto
     {
-
+        /// <summary>  
+        /// 用户信息  
+        /// </summary>
+        public Guid UserId { get; set; } 
         /// <summary>  
         /// 用户名  
         /// </summary>  
         public string UserName { get; set; } = string.Empty;
-
-        /// <summary>  
-        /// 密码  
-        /// </summary>  
-        public string Password { get; set; } = string.Empty;
 
         /// <summary>  
         /// 邮箱  

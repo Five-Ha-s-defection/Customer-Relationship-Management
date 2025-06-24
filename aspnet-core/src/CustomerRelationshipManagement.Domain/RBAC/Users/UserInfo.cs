@@ -20,15 +20,20 @@ namespace CustomerRelationshipManagement.RBAC.Users
         /// </summary>  
         public string UserName { get; set; } = string.Empty;
 
+        /// <summary>
+        /// 真实姓名
+        /// </summary>
+        public string RealName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 头像
+        /// </summary>
+        public string Avatar { get; set; } = string.Empty;
+
         /// <summary>  
         /// 密码  
         /// </summary>  
         public string Password { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 确定密码
-        /// </summary>
-        public string ConfirmPassword { get; set; } = string.Empty;
 
         /// <summary>  
         /// 邮箱  

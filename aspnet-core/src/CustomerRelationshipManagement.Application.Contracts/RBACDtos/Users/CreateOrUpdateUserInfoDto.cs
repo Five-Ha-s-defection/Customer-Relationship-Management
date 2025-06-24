@@ -22,6 +22,12 @@ namespace CustomerRelationshipManagement.Dtos.Users
         /// 密码
         /// </summary>
         public string Password { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 真实姓名
+        /// </summary>
+        public string RealName { get; set; } = string.Empty;
+
         /// <summary>
         /// 确认密码
         /// </summary>
