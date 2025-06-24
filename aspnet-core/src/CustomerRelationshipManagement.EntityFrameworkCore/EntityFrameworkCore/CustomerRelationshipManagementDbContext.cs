@@ -23,11 +23,6 @@ public class CustomerRelationshipManagementDbContext :
 
     }
 
-    /// <summary>
-    /// 合同表
-    /// </summary>
-    public DbSet<CrmContract> CrmContract { get; set; }
-
 
 
     protected override void OnModelCreating(ModelBuilder builder)
