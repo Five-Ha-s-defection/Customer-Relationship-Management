@@ -1,8 +1,11 @@
 ﻿//using CustomerRelationshipManagement.DTOS.UploadFileDto;
 using CustomerRelationshipManagement.ErrorCode;
+using CustomerRelationshipManagement.ProductManagementDto;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -149,72 +152,66 @@ namespace CustomerRelationshipManagement.ProductManagement
                 throw;
             }
         }
-        //[HttpPost]
-        //public async Task<string> UploadImageAsync([FromForm] UploadFileDtos input)
-        //{
-        //    if (input.File == null || input.File.Length == 0)
-        //    {
-        //        throw new UserFriendlyException("请选择要上传的图片！");
-        //    }
 
-        //    // 生成唯一文件名
-        //    var fileName = Guid.NewGuid() + Path.GetExtension(input.File.FileName);
-        //    var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-        //    if (!Directory.Exists(folder))
-        //    {
-        //        Directory.CreateDirectory(folder);
-        //    }
-        //    var filePath = Path.Combine(folder, fileName);
+        /// <summary>
+        /// 导出所有产品信息为返回的后端json
+        /// </summary>
+        /// <returns>Excel文件流</returns>
+        [HttpGet]
+        [Route("api/product/export")]
+        public async Task<FileDto> ExportProductsAsyncJson()
+        {
+            // 从数据库查询所有产品信息
+            var products = await productRepository.GetListAsync();
 
-        //    using (var stream = new FileStream(filePath, FileMode.Create))
-        //    {
-        //        await input.File.CopyToAsync(stream);
-        //    }
+            // 创建一个新的Excel工作簿
+            IWorkbook workbook = new XSSFWorkbook();
+            // 在工作簿中创建一个名为“产品信息”的工作表
+            ISheet sheet = workbook.CreateSheet("产品信息");
 
-        //    // 返回图片访问路径
-        //    return $"/uploads/{fileName}";
-        //}
+            // 创建表头行，并设置每一列的标题
+            var headerRow = sheet.CreateRow(0);
+            headerRow.CreateCell(0).SetCellValue("产品分类");
+            headerRow.CreateCell(1).SetCellValue("父级分类ID");
+            headerRow.CreateCell(2).SetCellValue("产品图片");
+            headerRow.CreateCell(3).SetCellValue("门幅");
+            headerRow.CreateCell(4).SetCellValue("供应商");
+            headerRow.CreateCell(5).SetCellValue("产品编号");
+            headerRow.CreateCell(6).SetCellValue("产品描述");
+            headerRow.CreateCell(7).SetCellValue("建议售价");
+            headerRow.CreateCell(8).SetCellValue("备注");
+            headerRow.CreateCell(9).SetCellValue("上架状态");
+            headerRow.CreateCell(10).SetCellValue("成交价");
 
-        //[HttpPost]
-        //public async Task<Guid> UploadPicPreviewAsync(IFormFile uploadedFile)
-        //{
-        //    var formFileName = uploadedFile.FileName;
-        //    if (!new[] { ".png", ".jpg", ".bmp" }.Any((item) => formFileName.EndsWith(item)))
-        //    {
-        //        throw new AbpValidationException("您上传的文件格式必须为png、jpg、bmp中的一种");
-        //    }
-        //    byte[] bytes;
-        //    using (var bodyStream = uploadedFile.OpenReadStream())
-        //    {
-        //        using (var m = new MemoryStream())
-        //        {
-        //            await bodyStream.CopyToAsync(m);
-        //            bytes = m.ToArray();
-        //        }
-        //    }
-        //    string base64 = Convert.ToBase64String(bytes);
-        //    var bgId = Guid.NewGuid();
-        //    _cache.Set($"{CurrentUser.TenantId}:bg:{bgId}", base64, new DistributedCacheEntryOptions { SlidingExpiration = new TimeSpan(1, 0, 0) });
-        //    return bgId;
-        //}
+            // 遍历产品列表，将每个产品的信息写入Excel表格
+            for (int i = 0; i < products.Count; i++)
+            {
+                var row = sheet.CreateRow(i + 1); // 数据从第2行开始
+                var p = products[i];
+                row.CreateCell(0).SetCellValue(p.CategoryId.ToString());
+                row.CreateCell(1).SetCellValue(p.ParentId.ToString());
+                row.CreateCell(2).SetCellValue(p.ProductImageUrl);
+                row.CreateCell(3).SetCellValue(p.ProductBrand);
+                row.CreateCell(4).SetCellValue(p.ProductSupplier);
+                row.CreateCell(5).SetCellValue(p.ProductCode);
+                row.CreateCell(6).SetCellValue(p.ProductDescription);
+                row.CreateCell(7).SetCellValue(p.SuggestedPrice?.ToString() ?? "");
+                row.CreateCell(8).SetCellValue(p.ProductRemark);
+                row.CreateCell(9).SetCellValue(p.ProductStatus ? "上架" : "未上架");
+                row.CreateCell(10).SetCellValue(p.DealPrice?.ToString() ?? "");
+            }
 
-        ///// <summary>
-        ///// 保存图片，要使用到前置API的预览图片id
-        ///// </summary>
-        ///// <param name="createPictureInput"></param>
-        ///// <returns></returns>
-        //[Route("upload/")]
-        //[HttpPost]
-        //public async Task<bool> UploadPicAsync([FromBody] CreatePictureInput createPictureInput)
-        //{
-        //    var based64 = await _cache.GetAsync($"{CurrentUser.TenantId}:bg:{createPictureInput.PreviewPicId}");
-        //    if (string.IsNullOrEmpty(based64))
-        //        throw new AbpException("Cache Hotmap Picture do not find");
-        //    var model = ObjectMapper.Map<CreatePictureInput, Picture>(createPictureInput);
-        //    model.ProfileId = CurrentUser.TenantId;
-        //    model.BlobStorage = Convert.FromBase64String(based64);
-        //    return await _pictures.InsertAsync(model) != null;
-        //}
+            byte[] fileBytes;
+            using (var ms = new MemoryStream())
+            {
+                workbook.Write(ms);      // 写入流
+                fileBytes = ms.ToArray();// 直接读取字节数组
+            }
+            return new FileDto("产品信息.xlsx", fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+
+        }
+
+
 
     }
 }
