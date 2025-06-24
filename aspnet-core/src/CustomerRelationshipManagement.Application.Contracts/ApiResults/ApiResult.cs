@@ -2,11 +2,11 @@
 
 public enum ResultCode
 {
-    Success = 200,
-    Fail = 400,
-    NotFound = 404,
-    Unauthorized = 401,
-    InternalServerError = 500
+    Success = 200,// 成功
+    Fail = 400,// 失败
+    NotFound = 404,// 未找到
+    Unauthorized = 401,// 未授权
+    InternalServerError = 500// 服务器内部错误
 }   
 public class ApiResult
 {
