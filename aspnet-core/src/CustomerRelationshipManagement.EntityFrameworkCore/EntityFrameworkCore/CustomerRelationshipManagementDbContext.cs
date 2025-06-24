@@ -162,6 +162,10 @@ public class CustomerRelationshipManagementDbContext :
     /// 用户信息
     /// </summary>
     public DbSet<UserInfo> UserInfo { get; set; }
+    /// <summary>
+    /// 角色信息
+    /// </summary>
+    public DbSet<RoleInfo> RoleInfo { get; set; }
 
     /// <summary>
     /// 权限信息
