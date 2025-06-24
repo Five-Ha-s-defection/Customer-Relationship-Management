@@ -74,8 +74,6 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
             options.TokenCookie.Expiration = TimeSpan.FromDays(365);
             options.AutoValidate = false;
         });
-
-        });
         //配置http上下文
         context.Services.AddHttpContextAccessor();
 

@@ -1,5 +1,4 @@
-﻿using CustomerRelationshipManagement.ApiResult;
-using CustomerRelationshipManagement.Dtos.Clues;
+﻿using CustomerRelationshipManagement.Dtos.Clues;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,6 +11,7 @@ using System.Linq;
 using Volo.Abp.Caching;
 using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Distributed;
+using CustomerRelationshipManagement.ApiResults;
 
 namespace CustomerRelationshipManagement.Clues
 {
