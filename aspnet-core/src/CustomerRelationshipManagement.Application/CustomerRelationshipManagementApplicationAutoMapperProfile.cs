@@ -10,10 +10,10 @@ using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.FinanceInfo.Finance;
 using CustomerRelationshipManagement.FinanceInfo.Payments;
 using CustomerRelationshipManagement.ProductManagement;
+using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.CXS.ProductManagement;
+using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.RBAC.Users;
-using CustomerRelationshipManagement.Contracts;
-using CustomerRelationshipManagement.CrmContracts;
-using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 
 namespace CustomerRelationshipManagement;
 
