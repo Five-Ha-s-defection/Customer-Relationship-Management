@@ -1,16 +1,14 @@
+﻿
+using CustomerRelationshipManagement.EntityFrameworkCore;
 ﻿using CustomerRelationshipManagement.EntityFrameworkCore;
-using CustomerRelationshipManagement.MultiTenancy;
-using CustomerRelationshipManagement.Users;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Generic;
@@ -30,7 +28,6 @@ using Volo.Abp.Autofac;
 using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
-using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
@@ -45,10 +42,12 @@ namespace CustomerRelationshipManagement;
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpCachingStackExchangeRedisModule)
 )]
 public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 {
+
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
         PreConfigure<OpenIddictBuilder>(builder =>
@@ -72,7 +71,6 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         {
             options.TokenCookie.Expiration = TimeSpan.FromDays(365);
             options.AutoValidate = false;
-
         });
         //配置http上下文
         context.Services.AddHttpContextAccessor();
