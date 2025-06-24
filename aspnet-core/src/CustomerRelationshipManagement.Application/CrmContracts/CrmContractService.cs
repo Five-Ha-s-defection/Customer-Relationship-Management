@@ -1,6 +1,5 @@
-﻿using AutoMapper.Internal.Mappers;
-using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Contracts;
+﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.ICrmContracts;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,6 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.Uow;
 
 namespace CustomerRelationshipManagement.CrmContracts
 {

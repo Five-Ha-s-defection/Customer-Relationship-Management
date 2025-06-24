@@ -11,9 +11,6 @@ using CustomerRelationshipManagement.FinanceInfo.Finance;
 using CustomerRelationshipManagement.FinanceInfo.Payments;
 using CustomerRelationshipManagement.ProductManagement;
 using CustomerRelationshipManagement.RBAC.Users;
-using CustomerRelationshipManagement.Contracts;
-using CustomerRelationshipManagement.CrmContracts;
-using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 
 namespace CustomerRelationshipManagement;
 
@@ -33,15 +30,14 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
 
-        //应收款表
+
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
         CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
 
 
-        //收款表
+
         CreateMap<Payment, PaymentDTO>().ReverseMap();
         CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
-
         //用户信息映射
         CreateMap<UserInfo, UserInfoDto>().ReverseMap();
         CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();

@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.ObjectMapping;
 
 namespace CustomerRelationshipManagement.Finance.Payments
 {
@@ -46,7 +47,11 @@ namespace CustomerRelationshipManagement.Finance.Payments
             
             return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(payment));
         }
-        
+        /// <summary>
+        /// 显示分页查询收款列表
+        /// </summary>
+        /// <param name="searchDTO"></param>
+        /// <returns></returns>
         public async Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO searchDTO)
         {
             string cacheKey = $"GetPayment";
@@ -83,27 +88,55 @@ namespace CustomerRelationshipManagement.Finance.Payments
             });
             return ApiResult<PageInfoCount<PaymentDTO>>.Success(ResultCode.Success, redislist);
         }
-
-        public async Task<ApiResult<PaymentDTO>> GetPaymentById(Guid id)
-        {
-            var query = await repository.GetAsync(id);
-            if(query == null)
-            {
-                return ApiResult<PaymentDTO>.Fail( "未找到该数据",ResultCode.NotFound);
-            }
-            return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(query));
-
-        }
-
+        /// <summary>
+        /// 修改收款
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="createUpdatePaymentDTO"></param>
+        /// <returns></returns>
         public async Task<ApiResult<PaymentDTO>> UpdatePayment(Guid id,CreateUpdatePaymentDTO createUpdatePaymentDTO)
         {
+            var payment = await repository.GetAsync(id);
+            if(payment == null)
+            {
+                return ApiResult<PaymentDTO>.Fail("未找到该数据",ResultCode.NotFound);
+            }
+            ObjectMapper.Map(createUpdatePaymentDTO, payment);
+            await repository.UpdateAsync(payment);
+            return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(payment));
+        }
+
+        /// <summary>
+        /// 删除收款的信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<PaymentDTO>> DeleteAsync(Guid id)
+        {
+            try
+            {
+                await repository.DeleteAsync(id);
+
+                return ApiResult<PaymentDTO>.Success(ResultCode.Success, null);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+        /// <summary>
+        /// 通过Id查询
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<PaymentDTO>> GetByIdAsync(Guid id)
+        {
             var query = await repository.GetAsync(id);
             if(query == null)
             {
                 return ApiResult<PaymentDTO>.Fail( "未找到该数据",ResultCode.NotFound);
             }
-            query = ObjectMapper.Map(createUpdatePaymentDTO, query);
-            await repository.UpdateAsync(query);
             return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(query));
         }
     }

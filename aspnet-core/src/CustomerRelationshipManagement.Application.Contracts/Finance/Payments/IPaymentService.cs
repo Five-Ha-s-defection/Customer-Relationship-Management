@@ -15,8 +15,10 @@ namespace CustomerRelationshipManagement.FinanceInfo.Payments
 
         Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO paymentSearchDTO);
 
-        Task<ApiResult<PaymentDTO>> GetPaymentById(Guid id);
+        Task<ApiResult<PaymentDTO>> UpdatePayment(Guid id, CreateUpdatePaymentDTO createUpdatePaymentDTO);
 
-        Task<ApiResult<PaymentDTO>> UpdatePayment(Guid id,CreateUpdatePaymentDTO createUpdatePaymentDTO);
+        Task<ApiResult<PaymentDTO>> DeleteAsync(Guid id);
+
+        Task<ApiResult<PaymentDTO>> GetByIdAsync(Guid id);
     }
 }
