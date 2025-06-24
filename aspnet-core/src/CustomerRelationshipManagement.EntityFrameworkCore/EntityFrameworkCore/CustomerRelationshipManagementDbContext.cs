@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.Invoices;
 using CustomerRelationshipManagement.Payments;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -24,9 +25,24 @@ public class CustomerRelationshipManagementDbContext :
     {
 
     }
-
+    /// <summary>
+    /// 应收款
+    /// </summary>
     public DbSet<Receivables> Receivables { get; set; }
-    public DbSet<Payment> Payments { get; set; }
+    /// <summary>
+    /// 收款
+    /// </summary>
+    public DbSet<Payment> Payment { get; set; }
+
+    /// <summary>
+    /// 收款
+    /// </summary>
+    public DbSet<PaymentMethod> PaymentMethod { get; set; }
+
+    /// <summary>
+    /// 发票
+    /// </summary>
+    public DbSet<Invoice> Invoice { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -47,14 +63,8 @@ public class CustomerRelationshipManagementDbContext :
         //    //...
         //});
 
-        builder.Entity<Payment>(b =>
-        {
-            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payments), CustomerRelationshipManagementConsts.DbSchema);
-            b.ConfigureByConvention(); //auto configure for the base class props
-            b.Property(x => x.PaymentCode).IsRequired().HasMaxLength(128);
-            b.Property(x => x.Amount).HasColumnType("decimal(18,2)");
-        });
 
+        // 配置应收款单表
         builder.Entity<Receivables>(b =>
         {
             // 设置表名和架构
@@ -63,6 +73,28 @@ public class CustomerRelationshipManagementDbContext :
             b.ConfigureByConvention();
             // 配置 Name 属性为必填，最大长度 128
             b.Property(x => x.ReceivablePay).IsRequired().HasMaxLength(128);
+        });
+        // 配置收款方式
+        builder.Entity<PaymentMethod>(b =>
+        {
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(PaymentMethod), CustomerRelationshipManagementConsts.DbSchema);
+            b.ConfigureByConvention(); //auto configure for the base class props
+        });
+        // 配置收款
+        builder.Entity<Payment>(b =>
+        {
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payments), CustomerRelationshipManagementConsts.DbSchema);
+            b.ConfigureByConvention(); //auto configure for the base class props
+            b.Property(x => x.PaymentCode).IsRequired().HasMaxLength(128);
+            b.Property(x => x.Amount).HasColumnType("decimal(18,2)");
+        });
+        // 配置发票表
+        builder.Entity<Invoice>(b =>
+        {
+            // 设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Invoice), CustomerRelationshipManagementConsts.DbSchema);
+            // 按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
         });
     }
 }

@@ -45,7 +45,7 @@ namespace CustomerRelationshipManagement.Payments
         /// <summary>
         /// 收款方式
         /// </summary>
-        public Guid PaymentMethod { get; set; }
+        public int PaymentMethod { get; set; }
 
         /// <summary>
         /// 收款时间
@@ -56,6 +56,11 @@ namespace CustomerRelationshipManagement.Payments
         /// 审核人
         /// </summary>
         public Guid ApproverId { get; set; }
+
+        /// <summary>
+        /// 收款状态
+        /// </summary>
+        public int PaymentStatus { get; set; }= 0;
 
         /// <summary>
         /// 备注（可选）
