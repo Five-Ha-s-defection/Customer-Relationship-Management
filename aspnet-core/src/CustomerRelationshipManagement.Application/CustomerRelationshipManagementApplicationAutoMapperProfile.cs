@@ -11,9 +11,6 @@ using CustomerRelationshipManagement.FinanceInfo.Finance;
 using CustomerRelationshipManagement.FinanceInfo.Payments;
 using CustomerRelationshipManagement.ProductManagement;
 using CustomerRelationshipManagement.RBAC.Users;
-using CustomerRelationshipManagement.Contracts;
-using CustomerRelationshipManagement.CrmContracts;
-using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 
 namespace CustomerRelationshipManagement;
 
