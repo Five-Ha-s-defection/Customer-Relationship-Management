@@ -6,6 +6,19 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.Invoices;
+using CustomerRelationshipManagement.Payments;
+﻿using CustomerRelationshipManagement.ProductManagement;
+using Microsoft.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.Menus;
+using CustomerRelationshipManagement.Permissions;
+using CustomerRelationshipManagement.RoleMenus;
+using CustomerRelationshipManagement.RolePermissions;
+using CustomerRelationshipManagement.Roles;
+using CustomerRelationshipManagement.UserPermissions;
+using CustomerRelationshipManagement.UserRoles;
+using CustomerRelationshipManagement.Users;
 using Microsoft.EntityFrameworkCore;
 using System;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -24,50 +37,18 @@ public class CustomerRelationshipManagementDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
-
-
     public CustomerRelationshipManagementDbContext(DbContextOptions<CustomerRelationshipManagementDbContext> options)
         : base(options)
     {
 
     }
-    #region RBAC权限管理
-    /// <summary>
-    /// 用户信息
-    /// </summary>
-    public DbSet<UserInfo> UserInfo { get; set; }
 
+    public DbSet<Receivables> Receivables { get; set; }
     /// <summary>
-    /// 角色信息
+    /// 收款
     /// </summary>
-    public DbSet<RoleInfo> RoleInfo { get; set; }
+    public DbSet<Payment> Payment { get; set; }
 
-    /// <summary>
-    /// 权限信息
-    /// </summary>
-    public DbSet<PermissionInfo> PermissionInfo { get; set; }
-    /// <summary>
-    /// 角色权限信息
-    /// </summary>
-    public DbSet<RolePermissionInfo> RolePermissionInfo { get; set; }
-    /// <summary>
-    /// 角色菜单信息
-    /// </summary>
-    public DbSet<RoleMenuInfo> RoleMenuInfo { get; set; }
-    /// <summary>
-    /// 菜单信息
-    /// </summary>
-    public DbSet<MenuInfo> MenuInfo { get; set; }
-    /// <summary>
-    /// 用户权限信息
-    /// </summary>
-    public DbSet<UserPermissionInfo> UserPermissionInfo { get; set; }
-    /// <summary>
-    /// 用户角色信息
-    /// </summary>
-    public DbSet<UserRoleInfo> UserRoleInfo { get; set; }
-
-    #endregion
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -86,6 +67,40 @@ public class CustomerRelationshipManagementDbContext :
         //    b.ConfigureByConvention(); //auto configure for the base class props
         //    //...
         //});
+
+
+        // 配置应收款单表
+        builder.Entity<Receivables>(b =>
+        {
+            // 设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Receivables), CustomerRelationshipManagementConsts.DbSchema);
+            // 按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+            // 配置 Name 属性为必填，最大长度 128
+            b.Property(x => x.ReceivablePay).IsRequired().HasMaxLength(128);
+        });
+        // 配置收款方式
+        builder.Entity<PaymentMethod>(b =>
+        {
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(PaymentMethod), CustomerRelationshipManagementConsts.DbSchema);
+            b.ConfigureByConvention(); //auto configure for the base class props
+        });
+        // 配置收款
+        builder.Entity<Payment>(b =>
+        {
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payments), CustomerRelationshipManagementConsts.DbSchema);
+            b.ConfigureByConvention(); //auto configure for the base class props
+            b.Property(x => x.PaymentCode).IsRequired().HasMaxLength(128);
+            b.Property(x => x.Amount).HasColumnType("decimal(18,2)");
+        });
+        // 配置发票表
+        builder.Entity<Invoice>(b =>
+        {
+            // 设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Invoice), CustomerRelationshipManagementConsts.DbSchema);
+            // 按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
         // 配置用户信息表
         builder.Entity<UserInfo>(b =>
         {
