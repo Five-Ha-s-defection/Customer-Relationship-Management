@@ -23,7 +23,7 @@ public class ApiResult
         IsSuc = isSuc;
     }
 
-    public static ApiResult Success(ResultCode code)
+    public static ApiResult Success(ProductManagement.ProductDtos productDtos, ResultCode code)
     {
         return new ApiResult(true, "操作成功", code);
     }

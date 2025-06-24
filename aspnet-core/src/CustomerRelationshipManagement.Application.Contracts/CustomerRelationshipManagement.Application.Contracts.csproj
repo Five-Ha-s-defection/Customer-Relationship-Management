@@ -26,4 +26,8 @@
     <ProjectReference Include="..\CustomerRelationshipManagement.Domain\CustomerRelationshipManagement.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="CustomerProcess\ProcessManagement\" />
+  </ItemGroup>
+
 </Project>

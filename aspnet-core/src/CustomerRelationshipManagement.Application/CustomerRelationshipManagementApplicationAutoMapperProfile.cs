@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using CustomerRelationshipManagement.Clues;
-using CustomerRelationshipManagement.Customers;
-using CustomerRelationshipManagement.Dtos.Clues;
-using CustomerRelationshipManagement.Dtos.Customers;
+using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dtos;
+using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Customers.Dtos;
+using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Clues;
+using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Customers;
 using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.Finance.Payments;
