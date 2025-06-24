@@ -61,5 +61,10 @@ namespace CustomerRelationshipManagement.Payments
         /// 备注（可选）
         /// </summary>
         public string Remark { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 收款状态
+        /// </summary>
+        public int PaymentStatus { get; set; } = 0;
     }
 }
