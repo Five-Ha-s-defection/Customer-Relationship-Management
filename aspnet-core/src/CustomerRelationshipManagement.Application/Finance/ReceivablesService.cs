@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.FinanceInfo.Finance;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
