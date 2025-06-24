@@ -43,7 +43,7 @@ namespace CustomerRelationshipManagement.Payments
         /// <summary>
         /// 收款方式
         /// </summary>
-        public int? PaymentMethod { get; set; }
+        public Guid? PaymentMethod { get; set; }
 
         /// <summary>
         /// 收款时间

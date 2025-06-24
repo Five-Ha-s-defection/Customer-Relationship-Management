@@ -1,17 +1,14 @@
-﻿using CustomerRelationshipManagement.ApiResult;
-using CustomerRelationshipManagement.Finance;
+﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
 
 namespace CustomerRelationshipManagement.Payments
 {
@@ -20,7 +17,7 @@ namespace CustomerRelationshipManagement.Payments
         private readonly IRepository<Payment, Guid> repository;
         private readonly IDistributedCache<PageInfoCount<PaymentDTO>> cache;
 
-        public PaymentService(IRepository<Payment, Guid> repository,IDistributedCache<PageInfoCount<PaymentDTO>> cache)
+        public PaymentService(IRepository<Payment, Guid> repository, IDistributedCache<PageInfoCount<PaymentDTO>> cache)
         {
             this.repository = repository;
             this.cache = cache;
@@ -32,21 +29,22 @@ namespace CustomerRelationshipManagement.Payments
         /// <returns></returns>
         public async Task<ApiResult<PaymentDTO>> InsertPayment(CreateUpdatePaymentDTO createUpdatePaymentDTO)
         {
-            //var pay = ObjectMapper.Map<CreateUpdatePaymentDTO, Payment>(createUpdatePaymentDTO);
-            var pay = ObjectMapper.Map<CreateUpdatePaymentDTO, Payment>(createUpdatePaymentDTO);
+            var payment = ObjectMapper.Map<CreateUpdatePaymentDTO, Payment>(createUpdatePaymentDTO);
 
-            if (string.IsNullOrEmpty(pay.PaymentCode))
+            if (string.IsNullOrEmpty(payment.PaymentCode))
             {
                 Random random = new Random();
-                pay.PaymentCode = $"R{DateTime.Now.ToString("yyyyMMdd")}-{random.Next(1000, 10000)}";
+                payment.PaymentCode = $"R{DateTime.Now.ToString("yyyyMMdd")}-{random.Next(1000, 10000)}";
             }
             else
             {
-                pay.PaymentCode = $"R{pay.PaymentCode}";
+                payment.PaymentCode = $"R{payment.PaymentCode}";
             }
-                var payment = await repository.InsertAsync(pay);
+            await repository.InsertAsync(payment);
+            
             return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(payment));
         }
+        
         public async Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO searchDTO)
         {
             string cacheKey = $"GetPayment";
@@ -55,7 +53,7 @@ namespace CustomerRelationshipManagement.Payments
                 var query = await repository.GetQueryableAsync();
                 query = query.WhereIf(!string.IsNullOrEmpty(searchDTO.PaymentCode), x => x.PaymentCode.Contains(searchDTO.PaymentCode))
                     .WhereIf(searchDTO.PaymentStatus != 0, x => x.PaymentStatus == searchDTO.PaymentStatus)
-                    .WhereIf(searchDTO.PaymentMethod != null, x => x.PaymentMethod == searchDTO.PaymentMethod)
+                    .WhereIf(searchDTO.PaymentMethod.HasValue, x => x.PaymentMethod == searchDTO.PaymentMethod)
                     .WhereIf(searchDTO.PaymentDate != null, x => x.PaymentDate >= searchDTO.StartTime && x.PaymentDate <= searchDTO.EndTime)
                      .WhereIf(searchDTO.UserId.HasValue, x => x.UserId == searchDTO.UserId)
                     .WhereIf(searchDTO.CustomerId.HasValue, x => x.CustomerId == searchDTO.CustomerId)
@@ -83,6 +81,5 @@ namespace CustomerRelationshipManagement.Payments
             });
             return ApiResult<PageInfoCount<PaymentDTO>>.Success(ResultCode.Success, redislist);
         }
-
     }
 }
