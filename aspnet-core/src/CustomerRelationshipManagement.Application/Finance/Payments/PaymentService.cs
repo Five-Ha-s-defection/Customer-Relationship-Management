@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.FinanceInfo.Finance;
 using CustomerRelationshipManagement.FinanceInfo.Payments;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.Extensions.Caching.Distributed;
@@ -81,6 +82,29 @@ namespace CustomerRelationshipManagement.Finance.Payments
                 SlidingExpiration = TimeSpan.FromMinutes(5)
             });
             return ApiResult<PageInfoCount<PaymentDTO>>.Success(ResultCode.Success, redislist);
+        }
+
+        public async Task<ApiResult<PaymentDTO>> GetPaymentById(Guid id)
+        {
+            var query = await repository.GetAsync(id);
+            if(query == null)
+            {
+                return ApiResult<PaymentDTO>.Fail( "未找到该数据",ResultCode.NotFound);
+            }
+            return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(query));
+
+        }
+
+        public async Task<ApiResult<PaymentDTO>> UpdatePayment(Guid id,CreateUpdatePaymentDTO createUpdatePaymentDTO)
+        {
+            var query = await repository.GetAsync(id);
+            if(query == null)
+            {
+                return ApiResult<PaymentDTO>.Fail( "未找到该数据",ResultCode.NotFound);
+            }
+            query = ObjectMapper.Map(createUpdatePaymentDTO, query);
+            await repository.UpdateAsync(query);
+            return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(query));
         }
     }
 }
