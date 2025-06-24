@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 
-namespace CustomerRelationshipManagement.FinanceInfo.Finance
+namespace CustomerRelationshipManagement.Finance
 {
     [CacheName("Receivables")]
     public class ReceivablesDTO:FullAuditedEntityDto<Guid>

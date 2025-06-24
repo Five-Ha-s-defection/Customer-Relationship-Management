@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 
-namespace CustomerRelationshipManagement.FinanceInfo.Payments
+namespace CustomerRelationshipManagement.Payments
 {
     public class PaymentSearchDTO : PagingInfo
     {
