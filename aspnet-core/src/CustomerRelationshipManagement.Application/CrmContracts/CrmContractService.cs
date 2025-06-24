@@ -41,8 +41,33 @@ namespace CustomerRelationshipManagement.CrmContracts
                 //对合同表预查询
                 var query = await repository.GetQueryableAsync();
 
-                //查询条件
-                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName), a => a.ContractName.Contains(pageCrmContractDto.ContractName));
+
+                //查询条件(1.合同名称模糊查询)
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 0, a => a.ContractName.Contains(pageCrmContractDto.ContractName));
+                //创建时间范围查询
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.BeginTime)&&pageCrmContractDto.SearchTimeType==0,a=>a.CreationTime >= DateTime.Parse(pageCrmContractDto.BeginTime));
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.EndTime) && pageCrmContractDto.SearchTimeType == 0, a => a.CreationTime < DateTime.Parse(pageCrmContractDto.BeginTime).AddDays(1));
+                //签订时间范围查询
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.BeginTime) && pageCrmContractDto.SearchTimeType == 1, a => a.SignDate >= DateTime.Parse(pageCrmContractDto.BeginTime));
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.EndTime) && pageCrmContractDto.SearchTimeType == 1, a => a.SignDate < DateTime.Parse(pageCrmContractDto.BeginTime).AddDays(1));
+                //生效时间范围查询
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.BeginTime) && pageCrmContractDto.SearchTimeType == 2, a => a.CommencementDate >= DateTime.Parse(pageCrmContractDto.BeginTime));
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.EndTime) && pageCrmContractDto.SearchTimeType == 2, a => a.CommencementDate < DateTime.Parse(pageCrmContractDto.BeginTime).AddDays(1));
+                //截止时间范围查询
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.BeginTime) && pageCrmContractDto.SearchTimeType == 3, a => a.ExpirationDate >= DateTime.Parse(pageCrmContractDto.BeginTime));
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.EndTime) && pageCrmContractDto.SearchTimeType == 3, a => a.ExpirationDate < DateTime.Parse(pageCrmContractDto.BeginTime).AddDays(1));
+
+                //高级搜索(1.全部满足的情况,部门名称精准查询)
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 1, a => a.ContractName.Equals(pageCrmContractDto.ContractName));
+                //负责人查询
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 1, a => pageCrmContractDto.UserIds.Contains(a.UserId));
+                //创建人查询
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 1, a => pageCrmContractDto.CreateUserIds.Contains((Guid)a.CreatorId));
+                //所属客户查询
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 1, a => a.UserId.Equals(pageCrmContractDto.CustomerId));
+                //签订日期
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 1, a=>a.SignDate >= DateTime.Parse(pageCrmContractDto.BeginTime) && a.SignDate < DateTime.Parse(pageCrmContractDto.BeginTime).AddDays(1));
+
 
                 //分页
                 var querypaging = query.OrderByDescending(a => a.Id).Skip(pageCrmContractDto.PageIndex).Take(pageCrmContractDto.PageSize);
