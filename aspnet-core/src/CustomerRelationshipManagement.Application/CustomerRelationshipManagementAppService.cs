@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using CustomerRelationshipManagement.Localization;
+using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Modularity;
 
 namespace CustomerRelationshipManagement;
 
@@ -14,4 +16,5 @@ public abstract class CustomerRelationshipManagementAppService : ApplicationServ
     {
         LocalizationResource = typeof(CustomerRelationshipManagementResource);
     }
+
 }

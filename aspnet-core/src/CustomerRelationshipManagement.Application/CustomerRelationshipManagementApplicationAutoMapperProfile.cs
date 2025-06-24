@@ -1,7 +1,16 @@
 ﻿using AutoMapper;
-using CustomerRelationshipManagement.Contracts;
-using CustomerRelationshipManagement.CrmContracts;
-using CustomerRelationshipManagement.Dtos.CrmContractDtos;
+using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.Customers;
+using CustomerRelationshipManagement.Dtos.Clues;
+using CustomerRelationshipManagement.Dtos.Customers;
+using CustomerRelationshipManagement.Dtos.Users;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.Finance.Payments;
+using CustomerRelationshipManagement.Finance.Receivables;
+using CustomerRelationshipManagement.FinanceInfo.Finance;
+using CustomerRelationshipManagement.FinanceInfo.Payments;
+using CustomerRelationshipManagement.ProductManagement;
+using CustomerRelationshipManagement.RBAC.Users;
 
 namespace CustomerRelationshipManagement;
 
@@ -13,7 +22,34 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
 
-        CreateMap<Contracts.CrmContract, AddUpdateCrmContractDto>().ReverseMap();
-        CreateMap<Contracts.CrmContract, ShowCrmContractDto>().ReverseMap();
+        //线索表
+        CreateMap<Clue, ClueDto>().ReverseMap();
+        CreateMap<Clue,CreateUpdateClueDto>().ReverseMap();
+
+        //客户表
+        CreateMap<Customer, CustomerDto>().ReverseMap();
+        CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
+
+
+        CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
+        CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
+
+
+
+        CreateMap<Payment, PaymentDTO>().ReverseMap();
+        CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
+        //用户信息映射
+        CreateMap<UserInfo, UserInfoDto>().ReverseMap();
+        CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
+        
+        //产品管理显示Dto
+        CreateMap<Product, ProductDtos>().ReverseMap();
+        //产品管理添加修改Dto
+        CreateMap<Product,CreateUpdateProductDtos>().ReverseMap();
+        //产品分类显示Dto
+        CreateMap<Category, CategoryDtos>().ReverseMap();
+        //产品分类添加修改Dto
+        CreateMap<Category, CreateUpdateCategoryDtos>().ReverseMap();
+
     }
 }

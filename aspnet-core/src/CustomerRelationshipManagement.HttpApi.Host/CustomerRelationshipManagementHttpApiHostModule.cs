@@ -1,17 +1,20 @@
 ﻿
 using CustomerRelationshipManagement.EntityFrameworkCore;
-using CustomerRelationshipManagement.MultiTenancy;
+﻿using CustomerRelationshipManagement.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
@@ -22,8 +25,9 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.Caching;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
-using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
@@ -36,8 +40,10 @@ namespace CustomerRelationshipManagement;
     typeof(CustomerRelationshipManagementApplicationModule),
     typeof(CustomerRelationshipManagementEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
+    typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpCachingStackExchangeRedisModule)
 )]
 public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 {
@@ -54,18 +60,29 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
             //});
         });
     }
-
+    /// <summary>
+    /// 配置服务
+    /// </summary>
+    /// <param name="context"></param>
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+
         Configure<AbpAntiForgeryOptions>(options =>
         {
             options.TokenCookie.Expiration = TimeSpan.FromDays(365);
             options.AutoValidate = false;
         });
+        //配置http上下文
+        context.Services.AddHttpContextAccessor();
 
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
+        //// 配置 Redis 连接
+        //Configure<AbpDistributedCacheOptions>(options =>
+        //{
+        //    options.KeyPrefix = "CRM:"; // Redis key 前缀，可自定义
+        //});
         ConfigureAuthentication(context);
         ConfigureBundles();
         ConfigureUrls(configuration);
@@ -77,11 +94,38 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
     {
-       // context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
-        context.Services.Configure<AbpClaimsPrincipalFactoryOptions>(options =>
+        var configuration = context.Services.GetConfiguration();
+
+        context.Services.AddAuthentication(option =>
         {
-            options.IsDynamicClaimsEnabled = true;
-        });
+            option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+                .AddJwtBearer(
+                option =>
+                {
+                    option.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        //是否验证发行人
+                        ValidateIssuer = true,
+                        ValidIssuer = configuration["JwtConfig:Bearer:Issuer"],//发行人
+
+                        //是否验证受众人
+                        ValidateAudience = true,
+                        ValidAudience = configuration["JwtConfig:Bearer:Audience"],//受众人
+
+                        //是否验证密钥
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Bearer:SecurityKey"])),
+
+                        ValidateLifetime = true, //验证生命周期
+
+                        RequireExpirationTime = true, //过期时间
+
+                        ClockSkew = TimeSpan.FromSeconds(30)   //平滑过期偏移时间
+                    };
+                }
+            );
     }
 
     private void ConfigureBundles()
@@ -144,10 +188,11 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 
     private static void ConfigureSwaggerServices(ServiceConfigurationContext context, IConfiguration configuration)
     {
+
         context.Services.AddAbpSwaggerGenWithOAuth(
-            configuration["AuthServer:Authority"]!,
-            new Dictionary<string, string>
-            {
+           configuration["AuthServer:Authority"]!,
+           new Dictionary<string, string>
+           {
                     {"CustomerRelationshipManagement", "CustomerRelationshipManagement API"}
             },
             options =>
@@ -181,12 +226,18 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
+                
             });
+          
         });
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
+
+        // 初始化 CSRedis
+        //RedisHelper.Initialization(new CSRedis.CSRedisClient("10.223.3.246:6379"));
+
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
 
