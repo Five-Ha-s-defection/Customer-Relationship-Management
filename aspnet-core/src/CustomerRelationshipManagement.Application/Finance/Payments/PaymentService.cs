@@ -10,7 +10,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
 
-namespace CustomerRelationshipManagement.Payments
+namespace CustomerRelationshipManagement.Finance.Payments
 {
     public class PaymentService:ApplicationService, IPaymentService
     {

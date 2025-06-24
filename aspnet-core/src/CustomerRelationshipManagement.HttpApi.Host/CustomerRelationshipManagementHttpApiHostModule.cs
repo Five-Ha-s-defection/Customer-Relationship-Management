@@ -1,3 +1,5 @@
+﻿
+using CustomerRelationshipManagement.EntityFrameworkCore;
 ﻿using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -40,7 +42,8 @@ namespace CustomerRelationshipManagement;
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule)
+    typeof(AbpSwashbuckleModule),
+    typeof(AbpCachingStackExchangeRedisModule)
 )]
 public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 {
@@ -67,7 +70,6 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         {
             options.TokenCookie.Expiration = TimeSpan.FromDays(365);
             options.AutoValidate = false;
-
         });
         //配置http上下文
         context.Services.AddHttpContextAccessor();

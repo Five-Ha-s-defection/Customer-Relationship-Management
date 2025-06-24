@@ -5,9 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Finance
+namespace CustomerRelationshipManagement.Receivableses
 {
-    public class Receivables:FullAuditedAggregateRoot<Guid>
+    /// <summary>
+    /// 应收款
+    /// </summary>
+    public class Receivables : FullAuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 所属客户

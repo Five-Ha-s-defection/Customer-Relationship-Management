@@ -1,6 +1,6 @@
-﻿using CustomerRelationshipManagement.Finance;
-using CustomerRelationshipManagement.Invoices;
-using CustomerRelationshipManagement.Payments;
+﻿using CustomerRelationshipManagement.Finance.Invoices;
+using CustomerRelationshipManagement.Finance.Payments;
+using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.RoleMenus;
@@ -9,6 +9,20 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.BusinessOpportunitys;
+using CustomerRelationshipManagement.Cards;
+using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.ClueSources;
+using CustomerRelationshipManagement.ContactCommunications;
+using CustomerRelationshipManagement.ContactRelations;
+using CustomerRelationshipManagement.CustomerContacts;
+using CustomerRelationshipManagement.CustomerLevels;
+using CustomerRelationshipManagement.CustomerRegions;
+using CustomerRelationshipManagement.Customers;
+using CustomerRelationshipManagement.CustomerTypes;
+using CustomerRelationshipManagement.Industrys;
+using CustomerRelationshipManagement.Prioritys;
+using CustomerRelationshipManagement.SalesProgresses;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -16,6 +30,21 @@ using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
+using CustomerRelationshipManagement.crmcontracts;
+using CustomerRelationshipManagement.Receivableses;
+using CustomerRelationshipManagement.Payments;
+using CustomerRelationshipManagement.Categorys;
+using CustomerRelationshipManagement.Products;
+using CustomerRelationshipManagement.Invoices;
+using CustomerRelationshipManagement.PaymentMethods;
+using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.RBAC.Permissions;
+using CustomerRelationshipManagement.RBAC.RolePermissions;
+using CustomerRelationshipManagement.RBAC.RoleMenus;
+using CustomerRelationshipManagement.RBAC.Menus;
+using CustomerRelationshipManagement.RBAC.UserPermissions;
+using CustomerRelationshipManagement.RBAC.UserRoles;
+using CustomerRelationshipManagement.RBAC.Roles;
 
 namespace CustomerRelationshipManagement.EntityFrameworkCore;
 
@@ -26,18 +55,157 @@ public class CustomerRelationshipManagementDbContext :
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
 
-    public CustomerRelationshipManagementDbContext(DbContextOptions<CustomerRelationshipManagementDbContext> options)
-        : base(options)
-    {
+    # region 客户管理模块
+    /// <summary>
+    /// 线索表
+    /// </summary>
+    public DbSet<Clue> Clue { get; set; }
 
-    }
+    /// <summary>
+    /// 线索来源表
+    /// </summary>
+    public DbSet<ClueSource> ClueSource { get; set; }
 
+    /// <summary>
+    /// 行业表
+    /// </summary>
+    public DbSet<Industry> Industry { get; set; }
+
+    /// <summary>
+    /// 客户表
+    /// </summary>
+    public DbSet<Customer> Customer { get; set; }
+
+    /// <summary>
+    /// 车架号表
+    /// </summary>
+    public DbSet<CarFrameNumber> CarFrameNumber { get; set; }
+
+    /// <summary>
+    /// 客户级别表
+    /// </summary>
+    public DbSet<CustomerLevel> CustomerLevel { get; set; }
+
+    /// <summary>
+    /// 客户类型表
+    /// </summary>
+    public DbSet<CustomerType> CustomerType { get; set; }
+
+    /// <summary>
+    /// 客户地区表
+    /// </summary>
+    public DbSet<CustomerRegion> CustomerRegion { get; set; }
+
+    /// <summary>
+    /// 优先级表
+    /// </summary>
+    public DbSet<Priority> Priority { get; set; }
+
+    /// <summary>
+    /// 销售进度表
+    /// </summary>
+    public DbSet<SalesProgress> SalesProgress { get; set; }
+
+    /// <summary>
+    /// 联系人表
+    /// </summary>
+    public DbSet<CustomerContact> CustomerContact { get; set; }
+
+    /// <summary>
+    /// 联系人关系表
+    /// </summary>
+    public DbSet<ContactRelation> ContactRelation { get; set; }
+
+    /// <summary>
+    /// 商机表
+    /// </summary>
+    public DbSet<BusinessOpportunity> BusinessOpportunity { get; set; }
+    #endregion
+
+    #region 过程管理模块
+    /// <summary>
+    /// 联系记录表
+    /// </summary>
+    public DbSet<ContactCommunication> ContactCommunication { get; set; }
+    #endregion
+
+    #region 合同管理模块
+
+    //合同表设计
+    public DbSet<CrmContract> CrmContract { get; set; }
+
+    #endregion
+
+    #region 财务管理模块
+    /// <summary>
+    /// 应收款
+    /// </summary>
     public DbSet<Receivables> Receivables { get; set; }
+
     /// <summary>
     /// 收款
     /// </summary>
     public DbSet<Payment> Payment { get; set; }
 
+    /// <summary>
+    /// 发票实体类
+    /// </summary>
+    public DbSet<Invoice> Invoice { get; set; }
+
+    /// <summary>
+    /// 收款方式
+    /// </summary>
+    public DbSet<PaymentMethod> PaymentMethod { get; set; }
+    #endregion
+
+    #region 产品管理模块
+
+    //产品分类
+    public DbSet<Category> Category { get; set; }
+
+    //产品管理模块
+    public DbSet<Product> Product { get; set; }
+
+    #endregion
+
+    #region RBAC权限管理
+    /// <summary>
+    /// 用户信息
+    /// </summary>
+    public DbSet<UserInfo> UserInfo { get; set; }
+
+    /// <summary>
+    /// 权限信息
+    /// </summary>
+    public DbSet<PermissionInfo> PermissionInfo { get; set; }
+    /// <summary>
+    /// 角色权限信息
+    /// </summary>
+    public DbSet<RolePermissionInfo> RolePermissionInfo { get; set; }
+    /// <summary>
+    /// 角色菜单信息
+    /// </summary>
+    public DbSet<RoleMenuInfo> RoleMenuInfo { get; set; }
+    /// <summary>
+    /// 菜单信息
+    /// </summary>
+    public DbSet<MenuInfo> MenuInfo { get; set; }
+    /// <summary>
+    /// 用户权限信息
+    /// </summary>
+    public DbSet<UserPermissionInfo> UserPermissionInfo { get; set; }
+    /// <summary>
+    /// 用户角色信息
+    /// </summary>
+    public DbSet<UserRoleInfo> UserRoleInfo { get; set; }
+
+    #endregion
+    public CustomerRelationshipManagementDbContext(DbContextOptions<CustomerRelationshipManagementDbContext> options)
+        : base(options)
+    {
+
+    }
+   
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -77,11 +245,14 @@ public class CustomerRelationshipManagementDbContext :
         // 配置收款
         builder.Entity<Payment>(b =>
         {
-            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payments), CustomerRelationshipManagementConsts.DbSchema);
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payment), CustomerRelationshipManagementConsts.DbSchema);
             b.ConfigureByConvention(); //auto configure for the base class props
             b.Property(x => x.PaymentCode).IsRequired().HasMaxLength(128);
             b.Property(x => x.Amount).HasColumnType("decimal(18,2)");
         });
+
+        
+
         // 配置发票表
         builder.Entity<Invoice>(b =>
         {
@@ -199,6 +370,88 @@ public class CustomerRelationshipManagementDbContext :
             
         });
 
-        
+        //配置线索表
+        builder.Entity<Clue>(b =>
+        { 
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix +nameof(Clue),CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+        //配置客户表
+        builder.Entity<Customer>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Customer), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+
+        //配置商机表
+        builder.Entity<BusinessOpportunity>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(BusinessOpportunity), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+        //配置联系人表
+        builder.Entity<CustomerContact>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(CustomerContact), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+        //配置联系记录表
+        builder.Entity<ContactCommunication>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(ContactCommunication), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+        //配置合同表
+        builder.Entity<CrmContract>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(CrmContract), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+
+
+        //配置发票表
+        builder.Entity<Invoice>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Invoice), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+        //配置产品表
+        builder.Entity<Product>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Product), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+        //配置产品分类表
+        builder.Entity<Category>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Category), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
     }
 }

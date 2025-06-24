@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Invoices
+namespace CustomerRelationshipManagement.Finance.Invoices
 {
     /// <summary>
     /// 发票实体类
@@ -67,7 +67,7 @@ namespace CustomerRelationshipManagement.Invoices
         /// <summary>
         /// 开票状态
         /// </summary>
-        public int InvoiceStatus { get; set; }= 0;// 0:待审核 1:审核通过 2:审核未通过
+        public int InvoiceStatus { get; set; } = 0;// 0:待审核 1:审核通过 2:审核未通过
 
         /// <summary>
         /// 发票图片
