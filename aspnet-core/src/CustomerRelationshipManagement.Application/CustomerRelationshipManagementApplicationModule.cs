@@ -1,4 +1,7 @@
-﻿using Volo.Abp.AutoMapper;
+﻿using CustomerRelationshipManagement.Users;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 
@@ -16,6 +19,10 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
         Configure<AbpAutoMapperOptions>(options =>
         {
             options.AddMaps<CustomerRelationshipManagementApplicationModule>();
+
+
         });
+            // ✅ 注册自定义密码加密器
+            context.Services.AddScoped<IPasswordHasher<UserInfo>, PasswordHasher<UserInfo>>();
     }
 }
