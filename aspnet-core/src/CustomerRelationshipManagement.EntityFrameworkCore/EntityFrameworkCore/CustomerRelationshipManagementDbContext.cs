@@ -26,6 +26,20 @@ using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.SalesProgresses;
+using CustomerRelationshipManagement.CXS.ProductManagement;
+using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.Invoices;
+using CustomerRelationshipManagement.Payments;
+﻿using CustomerRelationshipManagement.ProductManagement;
+using Microsoft.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.Menus;
+using CustomerRelationshipManagement.Permissions;
+using CustomerRelationshipManagement.RoleMenus;
+using CustomerRelationshipManagement.RolePermissions;
+using CustomerRelationshipManagement.Roles;
+using CustomerRelationshipManagement.UserPermissions;
+using CustomerRelationshipManagement.UserRoles;
+using CustomerRelationshipManagement.Users;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -129,7 +143,7 @@ public class CustomerRelationshipManagementDbContext :
     /// <summary>
     /// 应收款
     /// </summary>
-    public DbSet<Receivables> Receivables { get; set; }
+    public DbSet<Finance.Receivables.Receivables> Receivables { get; set; }
 
     /// <summary>
     /// 收款
@@ -216,7 +230,7 @@ public class CustomerRelationshipManagementDbContext :
 
 
         // 配置应收款单表
-        builder.Entity<Receivables>(b =>
+        builder.Entity<Finance.Receivables.Receivables>(b =>
         {
             // 设置表名和架构
             b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Receivables), CustomerRelationshipManagementConsts.DbSchema);
