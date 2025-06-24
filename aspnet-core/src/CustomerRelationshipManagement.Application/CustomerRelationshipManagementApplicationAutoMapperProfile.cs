@@ -12,9 +12,6 @@ using CustomerRelationshipManagement.Payments;
 using CustomerRelationshipManagement.ProductManagement;
 using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;
-using CustomerRelationshipManagement.Contracts;
-using CustomerRelationshipManagement.CrmContracts;
-using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 
 namespace CustomerRelationshipManagement;
