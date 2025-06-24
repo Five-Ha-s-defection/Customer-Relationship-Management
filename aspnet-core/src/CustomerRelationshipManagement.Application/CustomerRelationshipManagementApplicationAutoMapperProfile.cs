@@ -3,6 +3,8 @@ using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.Customers;
 using CustomerRelationshipManagement.Dtos.Clues;
 using CustomerRelationshipManagement.Dtos.Customers;
+using CustomerRelationshipManagement.Dtos.Users;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.FinanceInfo.Finance;
 using CustomerRelationshipManagement.FinanceInfo.Payments;
