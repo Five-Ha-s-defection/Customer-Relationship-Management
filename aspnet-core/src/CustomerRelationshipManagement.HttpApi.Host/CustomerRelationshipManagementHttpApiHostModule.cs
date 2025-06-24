@@ -45,6 +45,7 @@ namespace CustomerRelationshipManagement;
 )]
 public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 {
+
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
         PreConfigure<OpenIddictBuilder>(builder =>
