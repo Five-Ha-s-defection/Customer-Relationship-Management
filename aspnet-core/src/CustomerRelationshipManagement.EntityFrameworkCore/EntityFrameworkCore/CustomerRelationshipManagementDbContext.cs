@@ -1,6 +1,6 @@
-﻿using CustomerRelationshipManagement.Finance;
-using CustomerRelationshipManagement.Invoices;
-using CustomerRelationshipManagement.Payments;
+﻿using CustomerRelationshipManagement.Finance.Invoices;
+using CustomerRelationshipManagement.Finance.Payments;
+using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.RoleMenus;
@@ -77,7 +77,7 @@ public class CustomerRelationshipManagementDbContext :
         // 配置收款
         builder.Entity<Payment>(b =>
         {
-            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payments), CustomerRelationshipManagementConsts.DbSchema);
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Payment), CustomerRelationshipManagementConsts.DbSchema);
             b.ConfigureByConvention(); //auto configure for the base class props
             b.Property(x => x.PaymentCode).IsRequired().HasMaxLength(128);
             b.Property(x => x.Amount).HasColumnType("decimal(18,2)");

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Invoices
+namespace CustomerRelationshipManagement.Finance.Invoices
 {
     /// <summary>
     /// 发票实体类

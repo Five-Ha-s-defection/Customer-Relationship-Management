@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 
-namespace CustomerRelationshipManagement.Payments
+namespace CustomerRelationshipManagement.Finance.Payments
 {
     public class PaymentMethod: Entity<Guid>
     {

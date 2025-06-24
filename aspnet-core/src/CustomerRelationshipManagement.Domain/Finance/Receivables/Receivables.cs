@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Finance
+namespace CustomerRelationshipManagement.Finance.Receivables
 {
     public class Receivables:FullAuditedAggregateRoot<Guid>
     {
