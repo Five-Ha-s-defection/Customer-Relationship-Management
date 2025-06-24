@@ -1,22 +1,18 @@
 ﻿//using CustomerRelationshipManagement.DTOS.UploadFileDto;
 using CustomerRelationshipManagement.CXS.ErrorCode;
 using CustomerRelationshipManagement.CXS.ProductManagementDto;
+using CustomerRelationshipManagement.Products;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
-using Volo.Abp.Validation;
 
 namespace CustomerRelationshipManagement.CXS.ProductManagement
 {

@@ -26,20 +26,6 @@ using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.SalesProgresses;
-using CustomerRelationshipManagement.CXS.ProductManagement;
-using CustomerRelationshipManagement.Finance;
-using CustomerRelationshipManagement.Invoices;
-using CustomerRelationshipManagement.Payments;
-﻿using CustomerRelationshipManagement.ProductManagement;
-using Microsoft.EntityFrameworkCore;
-﻿using CustomerRelationshipManagement.Menus;
-using CustomerRelationshipManagement.Permissions;
-using CustomerRelationshipManagement.RoleMenus;
-using CustomerRelationshipManagement.RolePermissions;
-using CustomerRelationshipManagement.Roles;
-using CustomerRelationshipManagement.UserPermissions;
-using CustomerRelationshipManagement.UserRoles;
-using CustomerRelationshipManagement.Users;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -47,7 +33,6 @@ using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
-using Receivables = CustomerRelationshipManagement.Finance.Receivables.Receivables;
 
 namespace CustomerRelationshipManagement.EntityFrameworkCore;
 

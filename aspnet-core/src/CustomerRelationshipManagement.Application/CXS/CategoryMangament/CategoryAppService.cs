@@ -1,4 +1,5 @@
 ﻿using AutoMapper.Internal.Mappers;
+using CustomerRelationshipManagement.Categorys;
 using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.CXS.ErrorCode;
 using CustomerRelationshipManagement.CXS.ProductManagement;

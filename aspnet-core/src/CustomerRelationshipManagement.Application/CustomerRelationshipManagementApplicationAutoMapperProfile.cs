@@ -1,18 +1,17 @@
 ﻿using AutoMapper;
+using CustomerRelationshipManagement.Categorys;
 using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.Customers;
+using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.Dtos.Clues;
 using CustomerRelationshipManagement.Dtos.Customers;
 using CustomerRelationshipManagement.Dtos.Users;
-using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.FinanceInfo.Finance;
 using CustomerRelationshipManagement.FinanceInfo.Payments;
-using CustomerRelationshipManagement.ProductManagement;
-using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
-using CustomerRelationshipManagement.CXS.ProductManagement;
-using CustomerRelationshipManagement.CXS.ProductManagementDto;
+using CustomerRelationshipManagement.Products;
 using CustomerRelationshipManagement.RBAC.Users;
 
 namespace CustomerRelationshipManagement;
