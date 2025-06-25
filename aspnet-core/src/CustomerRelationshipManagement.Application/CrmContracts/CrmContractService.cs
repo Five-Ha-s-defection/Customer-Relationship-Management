@@ -19,12 +19,13 @@ namespace CustomerRelationshipManagement.CrmContracts
     public class CrmContractService : ApplicationService, ICrmContractService
     {
         private readonly IRepository<CrmContract, Guid> repository;
-        private readonly IRepository<Receivables, Guid> Receivablesrepository;
+        private readonly IRepository<Receivables, Guid> receivablesrepository;
         private readonly ILogger<CrmContractService> logger;
 
-        public CrmContractService(IRepository<CrmContract, Guid> repository, ILogger<CrmContractService> logger)
+        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, ILogger<CrmContractService> logger)
         {
             this.repository = repository;
+            this.receivablesrepository = receivablesrepository;
             this.logger = logger;
         }
 
@@ -120,11 +121,16 @@ namespace CustomerRelationshipManagement.CrmContracts
             {
                 try
                 {
+                    //合同表操作
                     //转换要添加的合同表数据
                     var crmcontract = ObjectMapper.Map<AddUpdateCrmContractDto, CrmContract>(addUpdateCrmContractDto);
 
                     //执行插入的数据的操作
                     var result = await repository.InsertAsync(crmcontract);
+
+                    //应收款表操作
+                    //转换要添加的应收款数据
+                    //var receivables = await receivablesrepository.
 
                     //提交事务
                     scope.Complete();
