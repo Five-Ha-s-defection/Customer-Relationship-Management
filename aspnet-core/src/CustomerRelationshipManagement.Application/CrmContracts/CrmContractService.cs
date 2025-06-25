@@ -1,7 +1,7 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
-using CustomerRelationshipManagement.ICrmContracts;
+using CustomerRelationshipManagement.Interfaces.ICrmContracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,7 +39,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 //对合同表预查询
                 var query = await repository.GetQueryableAsync();
 
-
+                #region 查询条件
                 //查询条件(1.合同名称模糊查询)
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 0, a => a.ContractName.Contains(pageCrmContractDto.ContractName));
                 //创建时间范围查询
@@ -88,7 +88,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ExpirationDate) && pageCrmContractDto.CheckType == 2, a => a.ExpirationDate >= DateTime.Parse(pageCrmContractDto.ExpirationDate) && a.ExpirationDate < DateTime.Parse(pageCrmContractDto.ExpirationDate).AddDays(1));
                 //经销商
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 2, a => a.ContractName.Contains(pageCrmContractDto.ContractName));
-
+                #endregion
 
                 //分页
                 var querypaging = query.OrderByDescending(a => a.Id).Skip(pageCrmContractDto.PageIndex).Take(pageCrmContractDto.PageSize);
@@ -142,6 +142,23 @@ namespace CustomerRelationshipManagement.CrmContracts
             }
         }
 
+        /// <summary>
+        /// 删除合同方法
+        /// </summary>
+        /// <param name="DeleteId"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> DeleteCrmContract(Guid DeleteId)
+        {
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("删除合同出错 "+ex.Message);
+                throw;
+            }
+        }
 
 
 

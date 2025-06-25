@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-namespace CustomerRelationshipManagement.ICrmContracts
+namespace CustomerRelationshipManagement.Interfaces.ICrmContracts
 {
     public interface ICrmContractService:IApplicationService
     {
