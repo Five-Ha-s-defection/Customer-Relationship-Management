@@ -6,9 +6,11 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Customer
 using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.Finance.Receivables;
+using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.FinanceInfo.Finance;
 using CustomerRelationshipManagement.FinanceInfo.Payments;
+using CustomerRelationshipManagement.ProductCategory.Categorys;
+using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.ProductManagement;
 using CustomerRelationshipManagement.RBAC.Users;
 

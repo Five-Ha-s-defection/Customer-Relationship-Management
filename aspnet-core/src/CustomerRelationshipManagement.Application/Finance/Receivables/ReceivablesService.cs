@@ -12,7 +12,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
 
-namespace CustomerRelationshipManagement.Finance.Receivables
+namespace CustomerRelationshipManagement.Finance.Receivableses
 {
     /// <summary>
     /// 应收款服务类

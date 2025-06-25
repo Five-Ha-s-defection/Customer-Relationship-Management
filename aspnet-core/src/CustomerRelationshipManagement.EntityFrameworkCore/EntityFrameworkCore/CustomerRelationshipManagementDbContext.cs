@@ -16,7 +16,6 @@ using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using CustomerRelationshipManagement.crmcontracts;
-using Receivables = CustomerRelationshipManagement.Finance.Receivables.Receivables;
 using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Cars;
 using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Clues;
@@ -34,6 +33,7 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.SalesPro
 using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.ProductCategory.Categorys;
 using CustomerRelationshipManagement.ProductCategory.Products;
+using CustomerRelationshipManagement.Finance.Receivableses;
 
 namespace CustomerRelationshipManagement.EntityFrameworkCore;
 
