@@ -19,16 +19,16 @@ namespace CustomerRelationshipManagement.RBAC.RolePermissions
         /// </summary>
         public Guid RoleId { get; set; }
         /// <summary>
-        /// 角色导航属性
-        /// </summary>
-        public RoleInfo Role { get; set; } = new RoleInfo();
-        /// <summary>
         /// 权限Id
         /// </summary>
         public Guid PermissionId { get; set; }
         /// <summary>
+        /// 角色导航属性
+        /// </summary>
+        public virtual RoleInfo Role { get; set; }  // ✅ 只做导航，不手动赋值
+        /// <summary>
         /// 权限导航属性
         /// </summary>
-        public PermissionInfo Permission { get; set; } = new PermissionInfo();
+        public virtual PermissionInfo Permission { get; set; }
     }
 }

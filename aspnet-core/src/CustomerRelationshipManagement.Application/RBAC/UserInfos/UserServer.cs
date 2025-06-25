@@ -190,5 +190,70 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 return await Task.FromResult(ApiResult<UserInfoDto>.Fail(ex.Message, ResultCode.Fail));
             }
         }
+        /// <summary>
+        /// 获取用户列表
+        /// </summary>
+        /// <returns>用户信息列表</returns>
+        public async Task<ApiResult<List<UserInfoDto>>> GetUserInfoList()
+        {
+            try
+            {
+                var users = await userRep.GetListAsync();
+                var dtos = ObjectMapper.Map<List<UserInfo>, List<UserInfoDto>>(users.ToList());
+                return ApiResult<List<UserInfoDto>>.Success(ResultCode.Success, dtos);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<List<UserInfoDto>>.Fail(ex.Message, ResultCode.Fail);
+            }
+        }
+
+        /// <summary>
+        /// 删除用户
+        /// </summary>
+        /// <param name="id">要删除的用户ID</param>
+        /// <returns>删除结果</returns>
+        public async Task<ApiResult> DeleteUserInfo(Guid id)
+        {
+            try
+            {
+                var user = await userRep.GetAsync(id);
+                if (user == null)
+                {
+                    return ApiResult.Fail("未找到要删除的用户", ResultCode.NotFound);
+                }
+                await userRep.DeleteAsync(user);
+                return ApiResult.Success(ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult.Fail(ex.Message, ResultCode.Fail);
+            }
+        }
+
+        /// <summary>
+        /// 修改用户信息
+        /// </summary>
+        /// <param name="id">要修改的用户ID</param>
+        /// <param name="dto">要修改的用户信息</param>
+        /// <returns>修改后的用户信息</returns>
+        public async Task<ApiResult<UserInfoDto>> UpdateUserInfo(Guid id, CreateOrUpdateUserInfoDto dto)
+        {
+            try
+            {
+                var user = await userRep.GetAsync(id);
+                if (user == null)
+                {
+                    return ApiResult<UserInfoDto>.Fail("未找到要修改的用户", ResultCode.NotFound);
+                }
+                ObjectMapper.Map(dto, user);
+                var updated = await userRep.UpdateAsync(user);
+                return ApiResult<UserInfoDto>.Success(ResultCode.Success, ObjectMapper.Map<UserInfo, UserInfoDto>(updated));
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<UserInfoDto>.Fail(ex.Message, ResultCode.Fail);
+            }
+        }
     }
 }
