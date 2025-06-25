@@ -33,7 +33,6 @@ using Volo.Abp.Data;
 using Volo.Abp.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
-using Receivables = CustomerRelationshipManagement.Finance.Receivables.Receivables;
 
 namespace CustomerRelationshipManagement.EntityFrameworkCore;
 
@@ -129,7 +128,7 @@ public class CustomerRelationshipManagementDbContext :
     /// <summary>
     /// 应收款
     /// </summary>
-    public DbSet<Receivables> Receivables { get; set; }
+    public DbSet<Finance.Receivables.Receivables> Receivables { get; set; }
 
     /// <summary>
     /// 收款
@@ -220,7 +219,7 @@ public class CustomerRelationshipManagementDbContext :
 
 
         // 配置应收款单表
-        builder.Entity<Receivables>(b =>
+        builder.Entity<Finance.Receivables.Receivables>(b =>
         {
             // 设置表名和架构
             b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Receivables), CustomerRelationshipManagementConsts.DbSchema);

@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
+using CustomerRelationshipManagement.Categorys;
+using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.Dtos.Users;
-using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.Payments;
-using CustomerRelationshipManagement.ProductManagement;
+using CustomerRelationshipManagement.Products;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;
