@@ -17,8 +17,6 @@ using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
-using CustomerRelationshipManagement.Products;
-using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.ProductCategory.Categorys;
 using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.RBAC.Menus;
