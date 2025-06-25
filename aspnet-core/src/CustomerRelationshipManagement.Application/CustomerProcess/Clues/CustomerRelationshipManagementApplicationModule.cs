@@ -5,12 +5,7 @@ using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application/CustomerProcess/CustomerManagement/Clues/CustomerRelationshipManagementApplicationModule.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues;
-========
 namespace CustomerRelationshipManagement.CustomerProcess.Clues;
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application/CustomerProcess/Clues/CustomerRelationshipManagementApplicationModule.cs
-
 [DependsOn(
     typeof(CustomerRelationshipManagementDomainModule),
     typeof(CustomerRelationshipManagementApplicationContractsModule),

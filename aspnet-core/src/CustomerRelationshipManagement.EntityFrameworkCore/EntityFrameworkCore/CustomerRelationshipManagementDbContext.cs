@@ -1,5 +1,4 @@
-﻿using CustomerRelationshipManagement.Categorys;
-using CustomerRelationshipManagement.crmcontracts;
+﻿using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
@@ -17,7 +16,9 @@ using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
 using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.Products;
+using CustomerRelationshipManagement.Finance.Receivables;
+using CustomerRelationshipManagement.ProductCategory.Categorys;
+using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.RoleMenus;

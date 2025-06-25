@@ -1,20 +1,13 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CustomerProcess/CustomerManagement/Clues/IClueService.cs
-using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dtos;
-========
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/Interfaces/ICustomerProcess/IClues/IClueService.cs
 using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CustomerProcess/CustomerManagement/Clues/IClueService.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues
-========
+
 namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/Interfaces/ICustomerProcess/IClues/IClueService.cs
 {
     public interface IClueService:IApplicationService
     {

@@ -6,11 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CustomerProcess/CustomerManagement/Clues/Dtos/CreateUpdateClueDto.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dtos
-========
+
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/DTOS/CustomerProcessDtos/Clues/CreateUpdateClueDto.cs
 {
     public class CreateUpdateClueDto
     {

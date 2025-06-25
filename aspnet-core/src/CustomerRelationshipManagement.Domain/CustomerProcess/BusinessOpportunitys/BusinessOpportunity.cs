@@ -5,11 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/CustomerManegement/BusinessOpportunitys/BusinessOpportunity.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManegement.BusinessOpportunitys
-========
+
 namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/BusinessOpportunitys/BusinessOpportunity.cs
 {
     /// <summary>
     /// 商机表

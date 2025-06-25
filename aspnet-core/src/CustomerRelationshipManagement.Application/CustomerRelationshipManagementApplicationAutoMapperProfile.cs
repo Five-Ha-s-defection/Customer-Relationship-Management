@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CustomerRelationshipManagement.Categorys;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
@@ -11,7 +10,8 @@ using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.Payments;
-using CustomerRelationshipManagement.Products;
+using CustomerRelationshipManagement.ProductCategory.Categorys;
+using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;

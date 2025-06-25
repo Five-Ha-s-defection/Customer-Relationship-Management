@@ -7,11 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/CustomerManegement/Clues/Clue.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Clues
-========
+
 namespace CustomerRelationshipManagement.CustomerProcess.Clues
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/Clues/Clue.cs
 {
     /// <summary>
     /// 线索表

@@ -6,11 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CustomerProcess/CustomerManagement/Clues/Dtos/SearchClueDto.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dtos
-========
+
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/DTOS/CustomerProcessDtos/Clues/SearchClueDto.cs
 {
     public class SearchClueDto:PagingInfo
     {
@@ -36,13 +33,11 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// </summary>
         public bool OrderDesc { get; set; } = true;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CustomerProcess/CustomerManagement/Clues/Dtos/SearchClueDto.cs
+
         /// <summary>
         /// 关键字(模糊查询)
         /// </summary>
-        public string Keyword { get; set; }
-========
         public string? Keyword { get; set; }
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/DTOS/CustomerProcessDtos/Clues/SearchClueDto.cs
+
     }
 }

@@ -4,11 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CustomerProcess/CustomerManagement/Customers/Dtos/CustomerDto.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Customers.Dtos
-========
+
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/DTOS/CustomerProcessDtos/Customers/CustomerDto.cs
 {
     public class CustomerDto
     {

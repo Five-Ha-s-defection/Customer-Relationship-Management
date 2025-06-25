@@ -5,11 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/CustomerManegement/CustomerLevels/CustomerLevel.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManegement.CustomerLevels
-========
 namespace CustomerRelationshipManagement.CustomerProcess.CustomerLevels
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/CustomerLevels/CustomerLevel.cs
 {
     /// <summary>
     /// 客户级别表

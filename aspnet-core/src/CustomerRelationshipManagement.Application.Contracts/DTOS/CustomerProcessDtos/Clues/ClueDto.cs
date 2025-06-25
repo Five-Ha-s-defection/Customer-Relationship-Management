@@ -8,11 +8,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CustomerProcess/CustomerManagement/Clues/Dtos/ClueDto.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dtos
-========
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/DTOS/CustomerProcessDtos/Clues/ClueDto.cs
 {
     [CacheName("ClueDtoCache")]
     public class ClueDto:FullAuditedEntityDto<Guid>

@@ -5,11 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/CustomerManegement/CustomerContacts/CustomerContact.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManegement.CustomerContacts
-========
+
 namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/CustomerContacts/CustomerContact.cs
 {
     /// <summary>
     /// 联系人表

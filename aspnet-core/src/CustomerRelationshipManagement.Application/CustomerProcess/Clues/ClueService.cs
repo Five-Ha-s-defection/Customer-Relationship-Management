@@ -12,17 +12,12 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Distributed;
 using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Clues;
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Application/CustomerProcess/CustomerManagement/Clues/ClueService.cs
-using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dtos;
-using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Clues;
-
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues
-========
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+
+
 
 namespace CustomerRelationshipManagement.CustomerProcess.Clues
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application/CustomerProcess/Clues/ClueService.cs
 {
     [ApiExplorerSettings(GroupName = "v1")]
     public class ClueService : ApplicationService, IClueService

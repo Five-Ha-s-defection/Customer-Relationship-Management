@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/CustomerManegement/ClueSources/ClueSource.cs
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerManegement.ClueSources
-========
+
 namespace CustomerRelationshipManagement.CustomerProcess.ClueSources
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Domain/CustomerProcess/ClueSources/ClueSource.cs
 {
     /// <summary>
     /// 线索来源表
