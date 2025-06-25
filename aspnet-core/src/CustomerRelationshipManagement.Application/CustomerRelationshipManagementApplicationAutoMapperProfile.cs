@@ -1,17 +1,17 @@
 ﻿using AutoMapper;
-using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dtos;
-using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Customers.Dtos;
-using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Clues;
-using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Customers;
+using CustomerRelationshipManagement.Categorys;
+using CustomerRelationshipManagement.CustomerProcess.Clues;
+using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.Dtos.Users;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.Finance.Receivableses;
+using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.Payments;
-using CustomerRelationshipManagement.ProductCategory.Categorys;
-using CustomerRelationshipManagement.ProductCategory.Products;
+using CustomerRelationshipManagement.Products;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;
@@ -35,8 +35,9 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //客户表
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
+        CreateMap<CustomerDto, CustomerWithClueDto>().ReverseMap();
 
-
+        
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
         CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
 
