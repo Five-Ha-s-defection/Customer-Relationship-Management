@@ -7,7 +7,7 @@ using Volo.Abp.Domain.Entities.Auditing;
 
 namespace CustomerRelationshipManagement.Finance.Receivables
 {
-    public class Receivables:FullAuditedAggregateRoot<Guid>
+    public class Receivables : FullAuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 所属客户

@@ -9,6 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CustomerProcess\ProcessManagement\**" />
+    <EmbeddedResource Remove="CustomerProcess\ProcessManagement\**" />
+    <None Remove="CustomerProcess\ProcessManagement\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CustomerRelationshipManagement.Domain.Shared\CustomerRelationshipManagement.Domain.Shared.csproj" />
     <ProjectReference Include="..\CustomerRelationshipManagement.Domain\CustomerRelationshipManagement.Domain.csproj" />
     <ProjectReference Include="..\CustomerRelationshipManagement.Application.Contracts\CustomerRelationshipManagement.Application.Contracts.csproj" />
