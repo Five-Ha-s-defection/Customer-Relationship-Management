@@ -1,4 +1,7 @@
-﻿namespace CustomerRelationshipManagement.ApiResults;
+﻿using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using System;
+
+namespace CustomerRelationshipManagement.ApiResults;
 
 public enum ResultCode
 {
@@ -53,5 +56,10 @@ public class ApiResult<T> : ApiResult
     public static ApiResult<T> Fail(string msg, ResultCode code)
     {
         return new ApiResult<T>(false, msg, code, default);
+    }
+
+    public static ApiResult<CategoryDtos> Success(CategoryDtos categoryDtos, ResultCode success)
+    {
+        throw new NotImplementedException();
     }
 }

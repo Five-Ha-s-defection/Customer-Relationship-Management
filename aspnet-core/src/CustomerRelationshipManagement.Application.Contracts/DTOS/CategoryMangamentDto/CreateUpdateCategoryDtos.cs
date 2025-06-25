@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto
+namespace CustomerRelationshipManagement.DTOS.CategoryMangamentDto
 {
     public class CreateUpdateCategoryDtos
     {

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.CXS.ProductManagement
+namespace CustomerRelationshipManagement.Helper
 {
     /// <summary>
     /// Excel导出工具类，支持通过Func选择器自定义每列内容

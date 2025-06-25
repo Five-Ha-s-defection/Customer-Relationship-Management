@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.Categorys;
-using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
-using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.Dtos.Users;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivables;

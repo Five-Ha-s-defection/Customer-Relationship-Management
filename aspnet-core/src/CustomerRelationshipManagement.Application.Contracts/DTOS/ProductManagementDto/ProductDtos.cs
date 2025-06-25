@@ -1,16 +1,17 @@
-﻿using System;
+﻿using CustomerRelationshipManagement.Paging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 
-namespace CustomerRelationshipManagement.CXS.ProductManagementDto
+namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
 {
     /// <summary>
     /// 产品管理DTOS
     /// </summary>
-    public class ProductDtos:FullAuditedEntityDto<Guid>
+    public class ProductDtos:PagingInfo
     {
         /// <summary>
         /// 产品分类
