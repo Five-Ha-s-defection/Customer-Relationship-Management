@@ -1,6 +1,7 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
+using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.Interfaces.ICrmContracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ namespace CustomerRelationshipManagement.CrmContracts
     public class CrmContractService : ApplicationService, ICrmContractService
     {
         private readonly IRepository<CrmContract, Guid> repository;
+        private readonly IRepository<Receivables, Guid> Receivablesrepository;
         private readonly ILogger<CrmContractService> logger;
 
         public CrmContractService(IRepository<CrmContract, Guid> repository, ILogger<CrmContractService> logger)
@@ -145,17 +147,20 @@ namespace CustomerRelationshipManagement.CrmContracts
         /// <summary>
         /// 删除合同方法
         /// </summary>
-        /// <param name="DeleteId"></param>
+        /// <param name="DeleteIds"></param>
         /// <returns></returns>
-        public async Task<ApiResult> DeleteCrmContract(Guid DeleteId)
+        public async Task<ApiResult> DeleteCrmContract(IList<Guid> DeleteIds)
         {
             try
             {
+                await repository.DeleteManyAsync(DeleteIds);
 
+                return ApiResult.Success(ResultCode.Success);
             }
             catch (Exception ex)
             {
                 logger.LogError("删除合同出错 "+ex.Message);
+                return ApiResult.Fail("删除失败",ResultCode.Fail);
                 throw;
             }
         }
