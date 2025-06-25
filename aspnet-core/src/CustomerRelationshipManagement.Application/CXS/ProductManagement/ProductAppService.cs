@@ -1,6 +1,7 @@
 ﻿//using CustomerRelationshipManagement.DTOS.UploadFileDto;
 using CustomerRelationshipManagement.CXS.ErrorCode;
 using CustomerRelationshipManagement.CXS.ProductManagementDto;
+using CustomerRelationshipManagement.Products;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
