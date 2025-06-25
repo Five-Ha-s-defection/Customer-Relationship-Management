@@ -11,10 +11,10 @@ namespace CustomerRelationshipManagement.Finance.Invoices
 {
     public interface IInvoiceService
     {
-        Task<ApiResult<InvoiceDTO>> InvoiceAsync(CreateUpdateInvoiceDto input);
+        Task<ApiResult<InvoiceDTO>> InvoiceAsync(CreateUpdateInvoiceDto createUpdateInvoiceDto);
         Task<ApiResult<InvoiceDTO>> GetInvoiceByIdAsync(Guid id);
-        Task<ApiResult<PageInfoCount<InvoiceDTO>>> GetInvoiceListAsync(InvoiceDTO input);
-        Task<ApiResult<InvoiceDTO>> UpdateInvoiceAsync(Guid id,CreateUpdateInvoiceDto input);
+        Task<ApiResult<PageInfoCount<InvoiceDTO>>> GetInvoiceListAsync(InvoiceSearchDto invoiceSearchDto);
+        Task<ApiResult<InvoiceDTO>> UpdateInvoiceAsync(Guid id,CreateUpdateInvoiceDto createUpdateInvoiceDto);
         Task<ApiResult<InvoiceDTO>> DeleteInvoiceAsync(Guid id);
     }
 }

@@ -118,25 +118,5 @@ namespace CustomerRelationshipManagement.FinanceInfo.Invoices
         /// 开票电话
         /// </summary>
         public string BillingPhone { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 是否已发送
-        /// </summary>
-        public bool IsSent { get; set; }
-
-        /// <summary>
-        /// 发送日期
-        /// </summary>
-        public DateTime? SentDate { get; set; }
-
-        /// <summary>
-        /// 审核日期
-        /// </summary>
-        public DateTime? ApprovalDate { get; set; }
-
-        /// <summary>
-        /// 审核意见
-        /// </summary>
-        public string ApprovalRemark { get; set; } = string.Empty;
     }
 } 

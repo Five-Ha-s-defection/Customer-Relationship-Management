@@ -7,9 +7,11 @@ using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.Dtos.Clues;
 using CustomerRelationshipManagement.Dtos.Customers;
 using CustomerRelationshipManagement.Dtos.Users;
+using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.FinanceInfo.Finance;
+using CustomerRelationshipManagement.FinanceInfo.Invoices;
 using CustomerRelationshipManagement.FinanceInfo.Payments;
 using CustomerRelationshipManagement.Products;
 using CustomerRelationshipManagement.RBAC.Users;
@@ -32,14 +34,18 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
 
-
+        //应收款表
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
         CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
 
-
-
+        //收款表
         CreateMap<Payment, PaymentDTO>().ReverseMap();
         CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
+
+        //发票表
+        CreateMap<Invoice, InvoiceDTO>().ReverseMap();
+        CreateMap<CreateUpdateInvoiceDto, Invoice>().ReverseMap();
+
         //用户信息映射
         CreateMap<UserInfo, UserInfoDto>().ReverseMap();
         CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
