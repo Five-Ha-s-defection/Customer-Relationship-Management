@@ -45,6 +45,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<CreateOrUpdateRoleDto,RoleInfo>().ReverseMap();
         //权限信息映射
         CreateMap<CreatePermissionDto, PermissionInfo>().ReverseMap();
+        CreateMap<PermissionInfo, PermissionDto>().ReverseMap();
 
 
         #endregion

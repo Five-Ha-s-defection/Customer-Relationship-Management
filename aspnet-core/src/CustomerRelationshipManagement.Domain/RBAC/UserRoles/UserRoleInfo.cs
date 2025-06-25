@@ -21,7 +21,7 @@ namespace CustomerRelationshipManagement.RBAC.UserRoles
         /// <summary>
         /// 用户导航属性
         /// </summary>
-        public UserInfo User { get; set; }=new UserInfo();
+        public virtual UserInfo User { get; set; }
         /// <summary>
         /// 角色Id
         /// </summary>
@@ -29,7 +29,7 @@ namespace CustomerRelationshipManagement.RBAC.UserRoles
         /// <summary>
         /// 角色导航属性
         /// </summary>
-        public RoleInfo Role { get; set; } = new RoleInfo();
+        public virtual RoleInfo Role { get; set; }
 
     }
 }
