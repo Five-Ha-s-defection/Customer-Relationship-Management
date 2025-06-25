@@ -1,4 +1,5 @@
-﻿namespace CustomerRelationshipManagement.ApiResults;
+﻿
+namespace CustomerRelationshipManagement.ApiResults;
 
 public enum ResultCode
 {
@@ -23,7 +24,7 @@ public class ApiResult
         IsSuc = isSuc;
     }
 
-    public static ApiResult Success(ProductManagement.ProductDtos productDtos, ResultCode code)
+    public static ApiResult Success(ResultCode code)
     {
         return new ApiResult(true, "操作成功", code);
     }

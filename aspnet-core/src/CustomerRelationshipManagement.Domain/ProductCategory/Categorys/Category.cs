@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Application.Dtos;
+using Volo.Abp.Domain.Entities.Auditing;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/ProductCategory/Categorys/Category.cs
 namespace CustomerRelationshipManagement.ProductCategory.Categorys
-========
-namespace CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CXS/DTOS/CategoryMangamentDto/CategoryDtos.cs
 {
-    public class CategoryDtos:FullAuditedEntityDto<Guid>
+    public class Category:FullAuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 分类名称
@@ -32,10 +28,5 @@ namespace CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto
         /// 分类描述
         /// </summary>
         public string Description { get; set; } = string.Empty;
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/ProductCategory/Categorys/Category.cs
-
-
-========
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CXS/DTOS/CategoryMangamentDto/CategoryDtos.cs
     }
 }

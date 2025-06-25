@@ -1,15 +1,10 @@
-﻿using AutoMapper.Internal.Mappers;
-using CustomerRelationshipManagement.Categorys;
-using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
+﻿using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.CXS.ErrorCode;
-using CustomerRelationshipManagement.CXS.ProductManagement;
+using CustomerRelationshipManagement.ProductCategory.Categorys;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;

@@ -3,15 +3,15 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dt
 using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Customers.Dtos;
 using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Customers;
-using CustomerRelationshipManagement.Categorys;
 using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.Finance.Receivables;
+using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Payments;
-using CustomerRelationshipManagement.Products;
+using CustomerRelationshipManagement.ProductCategory.Categorys;
+using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;
@@ -28,13 +28,13 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
 
-        ////线索表
-        //CreateMap<Clue, ClueDto>().ReverseMap();
-        //CreateMap<Clue,CreateUpdateClueDto>().ReverseMap();
+        //线索表
+        CreateMap<Clue, ClueDto>().ReverseMap();
+        CreateMap<Clue,CreateUpdateClueDto>().ReverseMap();
 
-        ////客户表
-        //CreateMap<Customer, CustomerDto>().ReverseMap();
-        //CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
+        //客户表
+        CreateMap<Customer, CustomerDto>().ReverseMap();
+        CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
 
 
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
