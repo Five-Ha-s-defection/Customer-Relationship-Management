@@ -19,6 +19,6 @@ namespace CustomerRelationshipManagement.RBAC.Permissions
         /// </summary>
         /// <param name="createPermissionDto"></param>
         /// <returns></returns>
-        Task<ApiResult<PermissionInfo>> AddPermission(CreatePermissionDto createPermissionDto);
+        Task<ApiResult<PermissionDto>> AddPermission(CreatePermissionDto createPermissionDto);
     }
 }
