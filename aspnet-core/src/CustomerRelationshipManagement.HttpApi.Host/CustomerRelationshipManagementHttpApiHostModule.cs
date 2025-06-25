@@ -1,4 +1,5 @@
-﻿using CustomerRelationshipManagement.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.CustomerProcess.Clues;
+using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
