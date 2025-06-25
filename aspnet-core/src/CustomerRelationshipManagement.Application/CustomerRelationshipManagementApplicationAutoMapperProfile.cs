@@ -35,7 +35,6 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //客户表
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
-        CreateMap<CustomerDto, CustomerWithClueDto>().ReverseMap();
 
         
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
