@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Entities.Auditing;
 
+
 namespace CustomerRelationshipManagement.CustomerProcess.ClueSources
 {
     /// <summary>

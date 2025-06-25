@@ -1,6 +1,7 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
+using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.Interfaces.ICrmContracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -18,11 +19,13 @@ namespace CustomerRelationshipManagement.CrmContracts
     public class CrmContractService : ApplicationService, ICrmContractService
     {
         private readonly IRepository<CrmContract, Guid> repository;
+        private readonly IRepository<Receivables, Guid> receivablesrepository;
         private readonly ILogger<CrmContractService> logger;
 
-        public CrmContractService(IRepository<CrmContract, Guid> repository, ILogger<CrmContractService> logger)
+        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, ILogger<CrmContractService> logger)
         {
             this.repository = repository;
+            this.receivablesrepository = receivablesrepository;
             this.logger = logger;
         }
 
@@ -39,7 +42,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 //对合同表预查询
                 var query = await repository.GetQueryableAsync();
 
-
+                #region 查询条件
                 //查询条件(1.合同名称模糊查询)
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 0, a => a.ContractName.Contains(pageCrmContractDto.ContractName));
                 //创建时间范围查询
@@ -88,7 +91,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ExpirationDate) && pageCrmContractDto.CheckType == 2, a => a.ExpirationDate >= DateTime.Parse(pageCrmContractDto.ExpirationDate) && a.ExpirationDate < DateTime.Parse(pageCrmContractDto.ExpirationDate).AddDays(1));
                 //经销商
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 2, a => a.ContractName.Contains(pageCrmContractDto.ContractName));
-
+                #endregion
 
                 //分页
                 var querypaging = query.OrderByDescending(a => a.Id).Skip(pageCrmContractDto.PageIndex).Take(pageCrmContractDto.PageSize);
@@ -118,11 +121,16 @@ namespace CustomerRelationshipManagement.CrmContracts
             {
                 try
                 {
+                    //合同表操作
                     //转换要添加的合同表数据
                     var crmcontract = ObjectMapper.Map<AddUpdateCrmContractDto, CrmContract>(addUpdateCrmContractDto);
 
                     //执行插入的数据的操作
                     var result = await repository.InsertAsync(crmcontract);
+
+                    //应收款表操作
+                    //转换要添加的应收款数据
+                    //var receivables = await receivablesrepository.
 
                     //提交事务
                     scope.Complete();
@@ -142,6 +150,26 @@ namespace CustomerRelationshipManagement.CrmContracts
             }
         }
 
+        /// <summary>
+        /// 删除合同方法
+        /// </summary>
+        /// <param name="DeleteIds"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> DeleteCrmContract(IList<Guid> DeleteIds)
+        {
+            try
+            {
+                await repository.DeleteManyAsync(DeleteIds);
+
+                return ApiResult.Success(ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("删除合同出错 "+ex.Message);
+                return ApiResult.Fail("删除失败",ResultCode.Fail);
+                throw;
+            }
+        }
 
 
 

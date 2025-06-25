@@ -65,36 +65,51 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         {
             try
             {
-                ////构建缓存键名
-                //string cacheKey = "CustomerRedis";
-                ////使用Redis缓存获取或添加数据
-                //var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
-                //{
+                //构建缓存键名
+                string cacheKey = "CustomerRedis";
+                //使用Redis缓存获取或添加数据
+                var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
+                {
                     var customerlist = await repository.GetQueryableAsync();
                     var cluelist = await clueRepository.GetQueryableAsync();
                     var list=from cus in customerlist
                              join clu in cluelist 
                              on cus.ClueId equals clu.Id
-                             select new CustomerWithClueDto
+                             select new CustomerDto
                              {
-                                 Customer=cus,
+                                 Id=cus.Id,
+                                 CustomerName=cus.CustomerName,
+                                 CustomerPhone=cus.CustomerPhone,
+                                 CustomerEmail=cus.CustomerEmail,
+                                 CustomerLevelId=cus.CustomerLevelId,
+                                 CustomerTypeId=cus.CustomerTypeId,
+                                 CustomerRegionId=cus.CustomerRegionId,
+                                 CustomerSourceId=cus.CustomerSourceId,
+                                 CustomerAddress=cus.CustomerAddress,
+                                 CustomerRemark=cus.CustomerRemark,
+                                 ClueId=cus.ClueId,
+                                 CustomerExpireTime=cus.CustomerExpireTime,
                                  ClueWechat=clu.ClueWechat,
+                                 LastFollowTime= clu.LastFollowTime,
+                                 NextContactTime= clu.NextContactTime,
+                                 CreationTime =cus.CreationTime,
+
                              };
                     //查询条件
                     //根据客户姓名、（联系人）、电话、邮箱、（微信号）模糊查询
                     if (!string.IsNullOrEmpty(dto.Keyword))
                     {
-                        list = list.Where(x => x.Customer.CustomerName.Contains(dto.Keyword)
-                                               || x.Customer.CustomerPhone.Contains(dto.Keyword)
+                        list = list.Where(x => x.CustomerName.Contains(dto.Keyword)
+                                               || x.CustomerPhone.Contains(dto.Keyword)
                                                || x.ClueWechat.Contains(dto.Keyword)
-                                               || x.Customer.CustomerEmail.Contains(dto.Keyword));
+                                               || x.CustomerEmail.Contains(dto.Keyword));
                     }
                     // 时间筛选
                     if (dto.StartTime.HasValue && dto.EndTime.HasValue && dto.TimeType.HasValue)
                     {
                         list= dto.TimeType switch
                         {
-                            TimeField.CreateTime => list.Where(x => x.Customer.CreationTime >= dto.StartTime && x.Customer.CreationTime <= dto.EndTime),
+                            TimeField.CreateTime => list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime),
                             TimeField.NextContact => list.Where(x => x.NextContactTime >= dto.StartTime && x.NextContactTime <= dto.EndTime),
                             TimeField.LastFollow => list.Where(x => x.LastFollowTime >= dto.StartTime && x.LastFollowTime <= dto.EndTime),
                             _ => list
@@ -106,8 +121,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                     {
                         list = (dto.OrderBy.Value, dto.OrderDesc) switch
                         {
-                            (TimeField.CreateTime, true) => list.OrderByDescending(x => x.Customer.CreationTime),
-                            (TimeField.CreateTime, false) => list.OrderBy(x => x.Customer.CreationTime),
+                            (TimeField.CreateTime, true) => list.OrderByDescending(x => x.CreationTime),
+                            (TimeField.CreateTime, false) => list.OrderBy(x => x.CreationTime),
 
                             (TimeField.NextContact, true) => list.OrderByDescending(x => x.NextContactTime),
                             (TimeField.NextContact, false) => list.OrderBy(x => x.NextContactTime),
@@ -121,22 +136,19 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
 
                     //用ABP框架的分页
                     var res = list.PageResult(dto.PageIndex, dto.PageSize);
-                    //实体列表转换成DTO列表
-                    var customerDtos = ObjectMapper.Map<List<CustomerWithClueDto>, List<CustomerDto>>(res.Queryable.ToList());
                     //构建分页结果对象
                     var pageInfo = new PageInfoCount<CustomerDto>
                     {
                         TotalCount = res.RowCount,
                         PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / dto.PageSize),
-                        Data = customerDtos
+                        Data = res.Queryable.ToList()
                     };
-                //    return pageInfo;
-                //}, () => new DistributedCacheEntryOptions
-                //{
-                //    SlidingExpiration = TimeSpan.FromMinutes(5)     //设置缓存过期时间为5分钟
-                //});
-
-                return ApiResult<PageInfoCount<CustomerDto>>.Success(ResultCode.Success,pageInfo);
+                    return pageInfo;
+                }, () => new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromMinutes(5)     //设置缓存过期时间为5分钟
+                });
+                return ApiResult<PageInfoCount<CustomerDto>>.Success(ResultCode.Success,redislist);
             }
             catch (Exception)
             {
