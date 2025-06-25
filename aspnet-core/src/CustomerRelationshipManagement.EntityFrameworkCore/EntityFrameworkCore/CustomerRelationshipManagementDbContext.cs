@@ -1,21 +1,22 @@
-﻿using CustomerRelationshipManagement.BusinessOpportunitys;
-using CustomerRelationshipManagement.Cards;
-using CustomerRelationshipManagement.Categorys;
-using CustomerRelationshipManagement.Clues;
-using CustomerRelationshipManagement.ClueSources;
-using CustomerRelationshipManagement.ContactCommunications;
-using CustomerRelationshipManagement.ContactRelations;
+﻿using CustomerRelationshipManagement.Categorys;
 using CustomerRelationshipManagement.crmcontracts;
-using CustomerRelationshipManagement.CustomerContacts;
-using CustomerRelationshipManagement.CustomerLevels;
-using CustomerRelationshipManagement.CustomerRegions;
-using CustomerRelationshipManagement.Customers;
-using CustomerRelationshipManagement.CustomerTypes;
+using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
+using CustomerRelationshipManagement.CustomerProcess.Cars;
+using CustomerRelationshipManagement.CustomerProcess.Clues;
+using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.ContactCommunications;
+using CustomerRelationshipManagement.CustomerProcess.ContactRelations;
+using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
+using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
+using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
+using CustomerRelationshipManagement.CustomerProcess.Customers;
+using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
+using CustomerRelationshipManagement.CustomerProcess.Industrys;
+using CustomerRelationshipManagement.CustomerProcess.Prioritys;
+using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
 using CustomerRelationshipManagement.Finance.Invoices;
+using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.Industrys;
-using CustomerRelationshipManagement.PaymentMethods;
-using CustomerRelationshipManagement.Prioritys;
 using CustomerRelationshipManagement.Products;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
@@ -26,6 +27,20 @@ using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.SalesProgresses;
+using CustomerRelationshipManagement.CXS.ProductManagement;
+using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.Invoices;
+using CustomerRelationshipManagement.Payments;
+﻿using CustomerRelationshipManagement.ProductManagement;
+using Microsoft.EntityFrameworkCore;
+﻿using CustomerRelationshipManagement.Menus;
+using CustomerRelationshipManagement.Permissions;
+using CustomerRelationshipManagement.RoleMenus;
+using CustomerRelationshipManagement.RolePermissions;
+using CustomerRelationshipManagement.Roles;
+using CustomerRelationshipManagement.UserPermissions;
+using CustomerRelationshipManagement.UserRoles;
+using CustomerRelationshipManagement.Users;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -161,6 +176,10 @@ public class CustomerRelationshipManagementDbContext :
     /// 用户信息
     /// </summary>
     public DbSet<UserInfo> UserInfo { get; set; }
+    /// <summary>
+    /// 角色信息
+    /// </summary>
+    public DbSet<RoleInfo> RoleInfo { get; set; }
 
     /// <summary>
     /// 权限信息
