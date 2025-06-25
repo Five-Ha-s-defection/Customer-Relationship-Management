@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace CustomerRelationshipManagement.RBACDtos.Permissions
 {
-    public class CreatePermissionDto
+    public class PermissionDto
     {
         /// <summary>
         /// 权限名称
         /// </summary>
-        public string PermissionName { get; set; }= string.Empty;
+        public string PermissionName { get; set; } = string.Empty;
         /// <summary>
-        /// 权限编码
+        /// 权限代码
         /// </summary>
         public string PermissionCode { get; set; } = string.Empty;
         /// <summary>

@@ -6,6 +6,7 @@ using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
+
 namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
 {
     public interface IClueService:IApplicationService

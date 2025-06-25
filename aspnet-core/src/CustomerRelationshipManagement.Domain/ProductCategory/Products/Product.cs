@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Products
+namespace CustomerRelationshipManagement.ProductCategory.Products
 {
     /// <summary>
-    /// 产品管理模块
+    /// 产品管理
     /// </summary>
     public class Product : FullAuditedAggregateRoot<Guid>
     {

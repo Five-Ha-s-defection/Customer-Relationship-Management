@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
 {
     public class CreateUpdateClueDto

@@ -5,12 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Categorys
+namespace CustomerRelationshipManagement.ProductCategory.Categorys
 {
-    /// <summary>
-    /// 产品分类
-    /// </summary>
-    public class Category : FullAuditedAggregateRoot<Guid>
+    public class Category:FullAuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 分类名称
@@ -31,7 +28,5 @@ namespace CustomerRelationshipManagement.Categorys
         /// 分类描述
         /// </summary>
         public string Description { get; set; } = string.Empty;
-
-
     }
 }
