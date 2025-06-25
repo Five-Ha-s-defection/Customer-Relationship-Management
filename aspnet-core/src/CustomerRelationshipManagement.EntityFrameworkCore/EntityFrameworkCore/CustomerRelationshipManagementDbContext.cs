@@ -26,20 +26,6 @@ using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.SalesProgresses;
-using CustomerRelationshipManagement.CXS.ProductManagement;
-using CustomerRelationshipManagement.Finance;
-using CustomerRelationshipManagement.Invoices;
-using CustomerRelationshipManagement.Payments;
-﻿using CustomerRelationshipManagement.ProductManagement;
-using Microsoft.EntityFrameworkCore;
-﻿using CustomerRelationshipManagement.Menus;
-using CustomerRelationshipManagement.Permissions;
-using CustomerRelationshipManagement.RoleMenus;
-using CustomerRelationshipManagement.RolePermissions;
-using CustomerRelationshipManagement.Roles;
-using CustomerRelationshipManagement.UserPermissions;
-using CustomerRelationshipManagement.UserRoles;
-using CustomerRelationshipManagement.Users;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -175,6 +161,10 @@ public class CustomerRelationshipManagementDbContext :
     /// 用户信息
     /// </summary>
     public DbSet<UserInfo> UserInfo { get; set; }
+    /// <summary>
+    /// 角色信息
+    /// </summary>
+    public DbSet<RoleInfo> RoleInfo { get; set; }
 
     /// <summary>
     /// 权限信息

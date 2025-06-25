@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.FinanceInfo.Finance
+namespace CustomerRelationshipManagement.Finance
 {
     public class ReceivablesSearchDto: PagingInfo
     {

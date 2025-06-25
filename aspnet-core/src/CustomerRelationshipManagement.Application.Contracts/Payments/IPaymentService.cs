@@ -7,7 +7,7 @@ using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Paging;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.FinanceInfo.Payments
+namespace CustomerRelationshipManagement.Payments
 {
     public interface IPaymentService
     {

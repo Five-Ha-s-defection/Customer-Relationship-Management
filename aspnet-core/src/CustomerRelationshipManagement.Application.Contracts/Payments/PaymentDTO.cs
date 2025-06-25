@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Caching;
 
-namespace CustomerRelationshipManagement.FinanceInfo.Payments
+namespace CustomerRelationshipManagement.Payments
 {
     [CacheName("Payment")]
     public class PaymentDTO: FullAuditedEntityDto<Guid>

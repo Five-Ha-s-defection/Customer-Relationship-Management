@@ -1,5 +1,3 @@
-﻿
-using CustomerRelationshipManagement.EntityFrameworkCore;
 ﻿using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -25,7 +23,6 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
-using Volo.Abp.Caching;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
@@ -198,6 +195,8 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
             options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "CustomerRelationshipManagement API", Version = "v1" });
+                //swagger分组
+                
                 options.DocInclusionPredicate((docName, description) => true);
                 options.CustomSchemaIds(type => type.FullName);
 
@@ -206,7 +205,7 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
                 ////就是这里！！！！！！！！！
                 //var basePath = AppDomain.CurrentDomain.BaseDirectory;
                 //var xmlPath = Path.Combine(basePath, "CustomerRelationshipManagement.Application.xml");//这个就是刚刚配置的xml文件名
-                //options.IncludeXmlComments(xmlPath, true);//默认的第二个参数是false，这个是controller的注释，记得修改
+                //options.IncludeXmlComments(xmlPath, false);//默认的第二个参数是false，这个是controller的注释，记得修改
             });
     }
 
