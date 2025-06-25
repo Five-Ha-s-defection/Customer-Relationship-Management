@@ -3,14 +3,20 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Clues.Dt
 using CustomerRelationshipManagement.CustomerProcess.CustomerManagement.Customers.Dtos;
 using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.CustomerManegement.Customers;
+using CustomerRelationshipManagement.Categorys;
+using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.Dtos.Users;
-using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivables;
-using CustomerRelationshipManagement.FinanceInfo.Finance;
-using CustomerRelationshipManagement.FinanceInfo.Payments;
-using CustomerRelationshipManagement.ProductManagement;
+using CustomerRelationshipManagement.Payments;
+using CustomerRelationshipManagement.Products;
+using CustomerRelationshipManagement.RBAC.Permissions;
+using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.RBACDtos.Permissions;
+using CustomerRelationshipManagement.RBACDtos.Roles;
 
 namespace CustomerRelationshipManagement;
 
@@ -22,25 +28,34 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
 
-        //线索表
-        CreateMap<Clue, ClueDto>().ReverseMap();
-        CreateMap<Clue,CreateUpdateClueDto>().ReverseMap();
+        ////线索表
+        //CreateMap<Clue, ClueDto>().ReverseMap();
+        //CreateMap<Clue,CreateUpdateClueDto>().ReverseMap();
 
-        //客户表
-        CreateMap<Customer, CustomerDto>().ReverseMap();
-        CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
+        ////客户表
+        //CreateMap<Customer, CustomerDto>().ReverseMap();
+        //CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
 
 
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
         CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
 
-
-
-        CreateMap<Payment, PaymentDTO>().ReverseMap();
-        CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
+        #region RBAC
         //用户信息映射
         CreateMap<UserInfo, UserInfoDto>().ReverseMap();
         CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
+        //角色信息映射
+        CreateMap<RoleInfo,RoleDto>().ReverseMap();
+        CreateMap<CreateOrUpdateRoleDto,RoleInfo>().ReverseMap();
+        //权限信息映射
+        CreateMap<CreatePermissionDto, PermissionInfo>().ReverseMap();
+
+
+        #endregion
+
+        CreateMap<Payment, PaymentDTO>().ReverseMap();
+        CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
+        
         
         //产品管理显示Dto
         CreateMap<Product, ProductDtos>().ReverseMap();

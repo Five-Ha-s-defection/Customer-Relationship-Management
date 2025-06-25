@@ -1,5 +1,22 @@
-﻿using CustomerRelationshipManagement.Finance.Invoices;
+﻿using CustomerRelationshipManagement.BusinessOpportunitys;
+using CustomerRelationshipManagement.Cards;
+using CustomerRelationshipManagement.Categorys;
+using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.ClueSources;
+using CustomerRelationshipManagement.ContactCommunications;
+using CustomerRelationshipManagement.ContactRelations;
+using CustomerRelationshipManagement.crmcontracts;
+using CustomerRelationshipManagement.CustomerContacts;
+using CustomerRelationshipManagement.CustomerLevels;
+using CustomerRelationshipManagement.CustomerRegions;
+using CustomerRelationshipManagement.Customers;
+using CustomerRelationshipManagement.CustomerTypes;
+using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
+using CustomerRelationshipManagement.Industrys;
+using CustomerRelationshipManagement.PaymentMethods;
+using CustomerRelationshipManagement.Prioritys;
+using CustomerRelationshipManagement.Products;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.RoleMenus;
@@ -8,6 +25,7 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.SalesProgresses;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -129,7 +147,7 @@ public class CustomerRelationshipManagementDbContext :
     /// <summary>
     /// 应收款
     /// </summary>
-    public DbSet<Receivables> Receivables { get; set; }
+    public DbSet<Finance.Receivables.Receivables> Receivables { get; set; }
 
     /// <summary>
     /// 收款
@@ -162,6 +180,10 @@ public class CustomerRelationshipManagementDbContext :
     /// 用户信息
     /// </summary>
     public DbSet<UserInfo> UserInfo { get; set; }
+    /// <summary>
+    /// 角色信息
+    /// </summary>
+    public DbSet<RoleInfo> RoleInfo { get; set; }
 
     /// <summary>
     /// 权限信息
@@ -216,7 +238,7 @@ public class CustomerRelationshipManagementDbContext :
 
 
         // 配置应收款单表
-        builder.Entity<Receivables>(b =>
+        builder.Entity<Finance.Receivables.Receivables>(b =>
         {
             // 设置表名和架构
             b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Receivables), CustomerRelationshipManagementConsts.DbSchema);

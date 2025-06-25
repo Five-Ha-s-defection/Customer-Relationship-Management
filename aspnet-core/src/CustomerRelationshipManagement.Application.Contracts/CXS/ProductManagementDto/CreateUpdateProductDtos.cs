@@ -3,22 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Application.Dtos;
 
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/ProductCategory/Products/Product.cs
-namespace CustomerRelationshipManagement.ProductCategory.Products
-========
 namespace CustomerRelationshipManagement.CXS.ProductManagementDto
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CXS/ProductManagementDto/ProductDtos.cs
 {
-    /// <summary>
-    /// 产品管理DTOS
-    /// </summary>
-<<<<<<<< HEAD:aspnet-core/src/CustomerRelationshipManagement.Domain/ProductCategory/Products/Product.cs
-    public class Product : FullAuditedAggregateRoot<Guid>
-========
-    public class ProductDtos:FullAuditedEntityDto<Guid>
->>>>>>>> DevBranth:aspnet-core/src/CustomerRelationshipManagement.Application.Contracts/CXS/ProductManagementDto/ProductDtos.cs
+    public class CreateUpdateProductDtos
     {
         /// <summary>
         /// 产品分类
