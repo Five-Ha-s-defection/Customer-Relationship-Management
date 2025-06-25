@@ -1,4 +1,5 @@
-﻿namespace CustomerRelationshipManagement.ApiResults;
+﻿
+namespace CustomerRelationshipManagement.ApiResults;
 
 public enum ResultCode
 {

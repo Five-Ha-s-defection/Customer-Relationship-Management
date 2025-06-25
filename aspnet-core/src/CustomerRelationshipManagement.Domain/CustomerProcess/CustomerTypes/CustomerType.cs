@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Domain.Entities;
 
+
 namespace CustomerRelationshipManagement.CustomerProcess.CustomerTypes
 {
     /// <summary>

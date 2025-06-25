@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
 {
     public class SearchClueDto:PagingInfo
@@ -32,6 +33,11 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// </summary>
         public bool OrderDesc { get; set; } = true;
 
+
+        /// <summary>
+        /// 关键字(模糊查询)
+        /// </summary>
         public string? Keyword { get; set; }
+
     }
 }

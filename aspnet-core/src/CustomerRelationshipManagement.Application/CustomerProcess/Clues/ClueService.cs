@@ -12,8 +12,10 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Caching.Distributed;
 using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Clues;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+
+
 
 namespace CustomerRelationshipManagement.CustomerProcess.Clues
 {

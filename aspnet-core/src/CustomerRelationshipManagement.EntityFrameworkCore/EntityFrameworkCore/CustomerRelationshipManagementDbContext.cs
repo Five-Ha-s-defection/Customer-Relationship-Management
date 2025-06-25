@@ -1,5 +1,4 @@
-﻿using CustomerRelationshipManagement.Categorys;
-using CustomerRelationshipManagement.crmcontracts;
+﻿using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
@@ -17,7 +16,9 @@ using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
 using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.Products;
+using CustomerRelationshipManagement.Finance.Receivables;
+using CustomerRelationshipManagement.ProductCategory.Categorys;
+using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.RoleMenus;
@@ -128,7 +129,7 @@ public class CustomerRelationshipManagementDbContext :
     /// <summary>
     /// 应收款
     /// </summary>
-    public DbSet<Finance.Receivables.Receivables> Receivables { get; set; }
+    public DbSet<Receivables> Receivables { get; set; }
 
     /// <summary>
     /// 收款
@@ -219,7 +220,7 @@ public class CustomerRelationshipManagementDbContext :
 
 
         // 配置应收款单表
-        builder.Entity<Finance.Receivables.Receivables>(b =>
+        builder.Entity<Receivables>(b =>
         {
             // 设置表名和架构
             b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(Receivables), CustomerRelationshipManagementConsts.DbSchema);

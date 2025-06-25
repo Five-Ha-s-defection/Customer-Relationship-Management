@@ -6,7 +6,6 @@ using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Clues;
-
 [DependsOn(
     typeof(CustomerRelationshipManagementDomainModule),
     typeof(CustomerRelationshipManagementApplicationContractsModule),
