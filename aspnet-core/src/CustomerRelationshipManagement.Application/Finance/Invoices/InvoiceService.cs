@@ -1,14 +1,13 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.FinanceInfo.Invoices;
+using CustomerRelationshipManagement.DTOS.Finance.Incoices;
+using CustomerRelationshipManagement.Interfaces.IFinance.Invoices;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Runtime.Serialization;
-using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
@@ -45,8 +44,8 @@ namespace CustomerRelationshipManagement.Finance.Invoices
             }
             await repository.InsertAsync(invoice);
             return ApiResult<InvoiceDTO>.Success(ResultCode.Success, ObjectMapper.Map<Invoice, InvoiceDTO>(invoice));
-
         }
+        
 
         public async Task<ApiResult<PageInfoCount<InvoiceDTO>>> GetInvoiceListAsync(InvoiceSearchDto invoiceSearchDto)
         {
@@ -56,7 +55,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                 var invoice = await repository.GetQueryableAsync();
                 invoice = invoice.WhereIf(!string.IsNullOrEmpty(invoiceSearchDto.InvoiceNumberCode), x => x.InvoiceNumberCode.Contains(invoiceSearchDto.InvoiceNumberCode))
                     .WhereIf(invoiceSearchDto.InvoiceStatus != null, x => x.InvoiceStatus == invoiceSearchDto.InvoiceStatus)
-                    .WhereIf(invoiceSearchDto.InvoiceType != 0, x => x.InvoiceType == invoiceSearchDto.InvoiceType)
+                    .WhereIf(invoiceSearchDto.InvoiceType != null, x => x.InvoiceType == invoiceSearchDto.InvoiceType)
                     .WhereIf(invoiceSearchDto.InvoiceDate != null, x => x.InvoiceDate >= invoiceSearchDto.StartTime && x.InvoiceDate <= invoiceSearchDto.EndTime)
                     .WhereIf(invoiceSearchDto.CustomerId.HasValue, x => x.CustomerId == invoiceSearchDto.CustomerId)
                     .WhereIf(invoiceSearchDto.ContractId.HasValue, x => x.ContractId == invoiceSearchDto.ContractId)

@@ -1,4 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.Interfaces.IFinance.Receivableses;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -11,7 +13,7 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
 
-namespace CustomerRelationshipManagement.Finance.Receivables
+namespace CustomerRelationshipManagement.Finance.Receivableses
 {
     /// <summary>
     /// 应收款服务类

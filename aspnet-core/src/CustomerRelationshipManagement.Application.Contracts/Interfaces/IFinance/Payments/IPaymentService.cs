@@ -6,8 +6,9 @@ using System.Text;
 using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Paging;
 using System.Threading.Tasks;
+using CustomerRelationshipManagement.DTOS.Finance.Payments;
 
-namespace CustomerRelationshipManagement.Payments
+namespace CustomerRelationshipManagement.Interfaces.IFinance.Payments
 {
     public interface IPaymentService
     {

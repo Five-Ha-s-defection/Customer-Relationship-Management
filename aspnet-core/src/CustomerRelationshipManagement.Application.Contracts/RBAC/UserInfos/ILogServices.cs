@@ -1,5 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Dtos.Users;
+using CustomerRelationshipManagement.RBACDtos.Users;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 

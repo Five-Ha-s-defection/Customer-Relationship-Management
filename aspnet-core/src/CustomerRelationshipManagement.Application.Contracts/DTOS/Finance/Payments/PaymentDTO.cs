@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Caching;
 
-namespace CustomerRelationshipManagement.Payments
+namespace CustomerRelationshipManagement.DTOS.Finance.Payments
 {
-    public class CreateUpdatePaymentDTO
+    [CacheName("Payment")]
+    public class PaymentDTO: FullAuditedEntityDto<Guid>
     {
         /// <summary>
         /// 所属客户
         /// </summary>
-        [Required]
         public Guid CustomerId { get; set; }
 
         /// <summary>
@@ -65,5 +65,13 @@ namespace CustomerRelationshipManagement.Payments
         /// 备注（可选）
         /// </summary>
         public string Remark { get; set; } = string.Empty;
+
+
+
+
+        /// <summary>
+        /// 应收款金额
+        /// </summary>
+        public decimal? ReceivablePay { get; set; }
     }
 }

@@ -1,47 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.Finance.Receivableses
+namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
 {
-    public class Receivables:FullAuditedAggregateRoot<Guid>
+    public class CreateUpdateReceibablesDto
     {
         /// <summary>
         /// 所属客户
         /// </summary>
+        [Required]
         public Guid CustomerId { get; set; }
 
         /// <summary>
         /// 关联合同
         /// </summary>
+        [Required]
         public Guid ContractId { get; set; }
 
         /// <summary>
         /// 负责人
         /// </summary>
+        [Required]
         public Guid UserId { get; set; }
 
         /// <summary>
-        /// 应收款编号
+        /// 应收款编号（可选，系统会自动生成）
         /// </summary>
-        public string ReceivableCode { get; set; } = string.Empty;
+        public string? ReceivableCode { get; set; }
 
         /// <summary>
         /// 应收款金额
-        /// </summary>
+        /// </summary
+        [Required]
         public decimal ReceivablePay { get; set; }
 
         /// <summary>
         /// 应收款时间
         /// </summary>
+        [Required]
         public DateTime ReceivableDate { get; set; }
 
         /// <summary>
         /// 备注
         /// </summary>
+        
         public string Remark { get; set; }
     }
 }

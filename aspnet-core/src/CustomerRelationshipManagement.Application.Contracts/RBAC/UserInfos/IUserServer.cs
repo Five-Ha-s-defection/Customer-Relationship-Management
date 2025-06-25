@@ -1,5 +1,4 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
 using System;
