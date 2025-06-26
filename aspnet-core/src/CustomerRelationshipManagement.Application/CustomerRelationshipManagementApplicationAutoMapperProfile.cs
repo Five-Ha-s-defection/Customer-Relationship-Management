@@ -20,6 +20,7 @@ using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
 using CustomerRelationshipManagement.RBAC.Menus;
+using CustomerRelationshipManagement.RBACDtos.Menus;
 
 namespace CustomerRelationshipManagement;
 
@@ -57,6 +58,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<UserInfo, LoginResultDto>().ReverseMap();
         //菜单信息映射
         CreateMap<MenuInfo, MenuDto>().ReverseMap();
+        CreateMap<CreateOrUpdateMenuDto, MenuInfo>().ReverseMap();
 
 
 

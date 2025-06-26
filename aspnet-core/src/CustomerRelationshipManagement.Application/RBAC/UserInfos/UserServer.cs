@@ -24,7 +24,7 @@ using Volo.Abp.Users;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
-    [ApiExplorerSettings(GroupName ="v1")]
+    [ApiExplorerSettings(GroupName = "v1")]
     [Authorize]
     public class UserServer : ApplicationService, IUserServer
     {

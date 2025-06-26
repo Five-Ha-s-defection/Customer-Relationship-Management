@@ -10,6 +10,7 @@ using Volo.Abp.Application.Services;
 
 namespace CustomerRelationshipManagement.Captchas
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class CaptchaServer : ApplicationService,ICaptchaServer
     {
         private readonly ICaptcha captcha;
