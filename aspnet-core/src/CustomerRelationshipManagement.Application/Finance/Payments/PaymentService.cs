@@ -129,7 +129,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
                 var query = from p in payments
                             join r in receivables on p.ReceivableId equals r.Id into pr
                             from r in pr.DefaultIfEmpty() // left join，如果要inner join去掉DefaultIfEmpty
-                            join c in userinfo on r.CustomerId equals c.Id into rc
+                            join c in userinfo on r.UserId equals c.Id into rc
                             from c in rc.DefaultIfEmpty()
                             select new PaymentDTO
                             {
