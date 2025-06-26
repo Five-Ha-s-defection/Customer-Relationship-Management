@@ -3,7 +3,6 @@ using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.Interfaces.IFinance.Invoices;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.Extensions.Caching.Distributed;
-using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;

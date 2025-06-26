@@ -11,29 +11,34 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         /// <summary>  
         /// 用户信息  
         /// </summary>
-        public Guid UserId { get; set; } 
+        public Guid Id { get; set; } 
         /// <summary>  
         /// 用户名  
         /// </summary>  
         public string UserName { get; set; } = string.Empty;
 
-        /// <summary>  
-        /// 邮箱  
-        /// </summary>  
-        public string Email { get; set; } = string.Empty;
-
-        /// <summary>  
-        /// 手机号码  
-        /// </summary>  
-        public string PhoneInfo { get; set; } = string.Empty;
-
-        /// <summary>  
-        /// 是否激活  
-        /// </summary>  
-        public bool IsActive { get; set; } = true;
         /// <summary>
-        /// 登录令牌
+        /// 真实姓名
         /// </summary>
-        public string? Token { get; set; }
+        public string RealName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 头像
+        /// </summary>
+        public string? Avatar { get; set; }
+        /// <summary>
+        /// 用户的所有角色名称的集合
+        /// </summary>
+        public List<string> Roles { get; set; }
+        /// <summary>
+        /// 用户的所有权限编码的集合
+        /// </summary>
+        public List<string> Permissions { get; set; }
+        /// <summary>
+        /// 菜单
+        /// </summary>
+        public List<MenuDto> Menus { get; set; }
+
+
     }
 }
