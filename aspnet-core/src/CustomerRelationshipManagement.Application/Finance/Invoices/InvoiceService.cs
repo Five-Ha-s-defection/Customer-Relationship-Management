@@ -59,7 +59,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                     .WhereIf(invoiceSearchDto.InvoiceDate != null, x => x.InvoiceDate >= invoiceSearchDto.StartTime && x.InvoiceDate <= invoiceSearchDto.EndTime)
                     .WhereIf(invoiceSearchDto.CustomerId.HasValue, x => x.CustomerId == invoiceSearchDto.CustomerId)
                     .WhereIf(invoiceSearchDto.ContractId.HasValue, x => x.ContractId == invoiceSearchDto.ContractId)
-                    .WhereIf(invoiceSearchDto.ApproverId.HasValue, x => x.ApproverId == invoiceSearchDto.ApproverId);
+                    .WhereIf(invoiceSearchDto.ApproverIds.Count > 0, x => x.ApproverIds.Any(y => invoiceSearchDto.ApproverIds.Contains(y)));
 
                 var res = invoice.PageResult(invoiceSearchDto.PageIndex, invoiceSearchDto.PageSize);
 
