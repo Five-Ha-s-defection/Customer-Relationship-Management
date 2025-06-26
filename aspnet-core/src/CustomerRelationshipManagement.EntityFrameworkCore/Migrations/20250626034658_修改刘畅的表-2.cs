@@ -11,7 +11,7 @@ namespace CustomerRelationshipManagement.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable("app_payments");
+            //migrationBuilder.DropTable("app_payments");
 
             migrationBuilder.CreateTable(
                 name: "App_Payment",

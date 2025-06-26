@@ -42,7 +42,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
         /// <summary>
         /// 开票金额
         /// </summary>
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
 
         /// <summary>
         /// 税额
