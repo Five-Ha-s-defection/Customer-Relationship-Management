@@ -140,20 +140,25 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 }
                 // 通过用户id来查出我的用户信息
                 var userInfo = await userRep.GetAsync(userId);
+
                 //转换成query格式
                 var userRoleQuery = await userRoleRepo.GetQueryableAsync();
+
                 //通过用户id来筛选出我的角色信息
                 var roleIds = await userRoleQuery
                     .Where(x => x.UserId == userId)
                     .Select(x => x.RoleId)
                     .ToListAsync();
+
                 //通过角色id来获取角色名称
                 var roleInfo = await roleRepo.GetQueryableAsync();
                 var roleNames =await roleInfo.Where(x => roleIds.Contains(x.Id))
                    .Select(x => x.RoleName)
                    .ToListAsync();
+                
                 //用户权限的信息
                 var userPermissionInfo = await userPermissionRepo.GetQueryableAsync();
+
                 //通过用户信息来获取用户权限的id
                 var userpermissionIds =await userPermissionInfo.Where(x => x.UserId == userId)
                 .Select(x => x.PermissionId)
@@ -163,10 +168,12 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
 
                 // 获取角色权限的信息
                 var rolePermissionInfo = await rolePermissionRepo.GetQueryableAsync();
+
                 //通过角色信息来获取角色权限的id
                 var  rolePermissionIds =await rolePermissionInfo.Where(x => roleIds.Contains(x.RoleId))
                 .Select(x => x.PermissionId)
                 .ToListAsync();
+
                 // 获取所有权限的id通过用户权限，然后通过union来进行合并用户和角色的权限然后过滤其中一样的权限
                 var allPermissionIds =  userpermissionIds.Union(rolePermissionIds).Distinct().ToList();
 

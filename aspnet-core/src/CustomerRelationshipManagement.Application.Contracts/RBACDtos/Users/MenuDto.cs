@@ -1,22 +1,13 @@
-﻿using CustomerRelationshipManagement.RBAC.RoleMenus;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities.Auditing;
 
-namespace CustomerRelationshipManagement.RBAC.Menus
+namespace CustomerRelationshipManagement.RBACDtos.Users
 {
-    /// <summary>
-    /// 菜单信息
-    /// </summary>
-    public class MenuInfo : FullAuditedAggregateRoot<Guid>
+    public class MenuDto
     {
-        /// <summary>
-        /// 父级菜单Id
-        /// </summary>
-        public Guid? ParentId { get; set; }
         /// <summary>
         /// 菜单名称
         /// </summary>
@@ -32,7 +23,7 @@ namespace CustomerRelationshipManagement.RBAC.Menus
         /// <summary>
         /// 权限图标
         /// </summary>
-        public string Icon { get; set; }= string.Empty;
+        public string Icon { get; set; } = string.Empty;
         /// <summary>
         /// 权限码
         /// </summary>
@@ -45,10 +36,7 @@ namespace CustomerRelationshipManagement.RBAC.Menus
         ///  排序
         /// </summary>
         public int Sort { get; set; }
-        /// <summary>
-        /// 角色菜单
-        /// </summary>
-        public ICollection<RoleMenuInfo> RoleMenus { get; set; } 
+
 
     }
 }
