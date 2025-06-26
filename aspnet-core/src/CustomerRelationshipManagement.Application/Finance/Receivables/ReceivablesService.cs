@@ -22,6 +22,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.Finance.Receivableses
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     /// <summary>
     /// 应收款服务类
     /// 提供应收款的增删改查功能，并集成Redis缓存以提高查询性能

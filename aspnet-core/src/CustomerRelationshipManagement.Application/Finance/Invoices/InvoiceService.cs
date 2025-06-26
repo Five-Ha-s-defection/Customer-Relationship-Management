@@ -2,6 +2,7 @@
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.Interfaces.IFinance.Invoices;
 using CustomerRelationshipManagement.Paging;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.Finance.Invoices
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class InvoiceService : ApplicationService, IInvoiceService
     {
         private readonly IRepository<Invoice, Guid> repository;

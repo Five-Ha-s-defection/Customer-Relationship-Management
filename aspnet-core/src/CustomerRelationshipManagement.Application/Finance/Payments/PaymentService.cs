@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Interfaces.IFinance.Payments;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System;
@@ -17,6 +18,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.Finance.Payments
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class PaymentService:ApplicationService, IPaymentService
     {
         private readonly IRepository<Payment, Guid> repository;
