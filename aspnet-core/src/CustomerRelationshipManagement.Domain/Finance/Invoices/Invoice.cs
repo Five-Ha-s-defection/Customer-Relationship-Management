@@ -42,7 +42,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
         /// <summary>
         /// 开票金额
         /// </summary>
-        public decimal Amount { get; set; }
+        public int Amount { get; set; }
 
         /// <summary>
         /// 税额
@@ -66,7 +66,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
         /// <summary>
         /// 当前审批到第几人（从0开始）
         /// </summary>
-        public int CurrentStep { get; set; } = 0; 
+        public int CurrentStep { get; set; } = 0;
         /// <summary>
         /// 审批意见
         /// </summary>

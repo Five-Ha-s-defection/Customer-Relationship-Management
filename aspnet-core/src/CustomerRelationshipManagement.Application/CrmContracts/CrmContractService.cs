@@ -16,6 +16,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CrmContracts
 {
+    /// <summary>
+    /// 合同服务(模版)
+    /// </summary>
     public class CrmContractService : ApplicationService, ICrmContractService
     {
         private readonly IRepository<CrmContract, Guid> repository;

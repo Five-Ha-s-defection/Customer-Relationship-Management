@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.CXS.DTOS.Base64UploadDtos
+namespace CustomerRelationshipManagement.DTOS.Base64UploadDtos
 {
     /// <summary>
     /// Base64图片上传DTO

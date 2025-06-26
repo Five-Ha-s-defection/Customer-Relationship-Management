@@ -1,17 +1,22 @@
-﻿using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
-using CustomerRelationshipManagement.CXS.ErrorCode;
+﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.Interfaces.ICategoryAppService;
 using CustomerRelationshipManagement.ProductCategory.Categorys;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
+
 
 namespace CustomerRelationshipManagement.CXS.CategoryMangament
 {
+    /// <summary>
+    /// 产品类型
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class CategoryAppService : ApplicationService, ICategoryAppService
     {
@@ -42,15 +47,15 @@ namespace CustomerRelationshipManagement.CXS.CategoryMangament
         /// 
         [HttpDelete]
 
-        public async Task<ApiResult<CategoryDtos>> DeletedCategory(Guid id)
+        public async Task<ApiResult> DeletedCategory(Guid id)
         {
             var category = await categoryRepository.GetAsync(x => x.Id == id);
             if (category == null)
             {
-                return ApiResult<CategoryDtos>.Fail("产品类型不存在", ResultCode.Fail);
+                return ApiResult.Fail("产品类型不存在", ResultCode.Fail);
             }
             await categoryRepository.DeleteAsync(category);
-            return ApiResult<CategoryDtos>.Success(ObjectMapper.Map<Category, CategoryDtos>(category), ResultCode.Success);
+            return ApiResult.Success(ResultCode.Success);
         }
         /// <summary>
         /// 获取产品类型列表
@@ -59,27 +64,22 @@ namespace CustomerRelationshipManagement.CXS.CategoryMangament
         /// <returns></returns>
         /// 
         [HttpGet]
-        public async Task<ApiResult<ApiPaging<CategoryDtos>>> GetCategory([FromQuery] ApiPaging apiPaging)
+        public async Task<ApiResult<IList<CategoryDtos>>> GetCategory([FromQuery] CategoryDtos CategoryDtos)
         {
             try
             {
                 //对产品类型进行预查询
                 var categorylist = await categoryRepository.GetQueryableAsync();
                 //查询条件
+
                 //分页
-                var totalCount = categorylist.Count();
-                var totalPage = (int)Math.Ceiling((double)categorylist.Count() / apiPaging.PageSize);
-                var pageCatesgory = categorylist.OrderByDescending(x => x.Id).Skip((apiPaging.PageIndex - 1) * apiPaging.PageSize).Take(apiPaging.PageSize).ToList();
-                return ApiResult<ApiPaging<CategoryDtos>>.Success(new ApiPaging<CategoryDtos>
-                {
-                    Data = ObjectMapper.Map<List<Category>, List<CategoryDtos>>(pageCatesgory),
-                    TotalCount = totalCount,
-                    TotalPage = totalPage,
-                }, ResultCode.Success);
+                var categorypaging = categorylist.OrderByDescending(x => x.Id).Skip(CategoryDtos.PageIndex).Take(CategoryDtos.PageSize);
+
+
                 //将数据通过映射转换
-
+                var categorydtos=ObjectMapper.Map<IList<Category>, IList<CategoryDtos>>(categorypaging.ToList());
                 //返回apiresult
-
+                return ApiResult<IList<CategoryDtos>>.Success(ResultCode.Success, categorydtos);
             }
             catch (Exception)
             {
@@ -132,7 +132,7 @@ namespace CustomerRelationshipManagement.CXS.CategoryMangament
                 }
                 var categoryDto=ObjectMapper.Map(updateCategory, category);
                 await categoryRepository.UpdateAsync(category);
-                return ApiResult<CreateUpdateCategoryDtos>.Success(ObjectMapper.Map<Category, CreateUpdateCategoryDtos>(categoryDto), ResultCode.Success);
+                return ApiResult<CreateUpdateCategoryDtos>.Success(ResultCode.Success,ObjectMapper.Map<Category, CreateUpdateCategoryDtos>(categoryDto));
 
             }
             catch (Exception)

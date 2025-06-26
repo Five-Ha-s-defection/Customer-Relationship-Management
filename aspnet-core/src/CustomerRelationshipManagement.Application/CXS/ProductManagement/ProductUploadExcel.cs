@@ -1,4 +1,5 @@
 ﻿//using CustomerRelationshipManagement.ProductManagementDto;
+using CustomerRelationshipManagement.Helper;
 using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.Products;
 using Microsoft.AspNetCore.Mvc;
@@ -15,11 +16,11 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CXS.ProductManagement
 {
-    public class ProductController: ControllerBase
+    public class ProductUploadExcel: ControllerBase
     {
         private readonly IRepository<Product> productRepository;
 
-        public ProductController(IRepository<Product> productRepository)
+        public ProductUploadExcel(IRepository<Product> productRepository)
         {
             this.productRepository = productRepository;
         }

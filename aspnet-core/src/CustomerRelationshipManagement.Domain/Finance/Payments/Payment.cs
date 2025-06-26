@@ -58,7 +58,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
         /// <summary>
         /// 当前审批到第几人（从0开始）
         /// </summary>
-        public int CurrentStep { get; set; } = 0; 
+        public int CurrentStep { get; set; } = 0;
         /// <summary>
         /// 审批意见
         /// </summary>
