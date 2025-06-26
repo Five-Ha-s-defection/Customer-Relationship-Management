@@ -24,6 +24,7 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.AutoMapper;
 using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
@@ -34,6 +35,7 @@ namespace CustomerRelationshipManagement;
 
 [DependsOn(
     typeof(AbpAutofacModule),
+    //typeof(AbpAutoMapperModule),
     typeof(AbpAspNetCoreMultiTenancyModule),
     typeof(CustomerRelationshipManagementApplicationModule),
     typeof(CustomerRelationshipManagementEntityFrameworkCoreModule),
@@ -64,6 +66,16 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
     /// <param name="context"></param>
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
+        // 这里才是配置AutoMapper的地方
+        //Configure<AbpAutoMapperOptions>(options =>
+        //{
+        //    // 这行代码会告诉ABP去发现并添加 CustomerRelationshipManagementApplicationModule
+        //    // 所在程序集中的所有 AutoMapper Profile。
+        //    options.AddMaps<CustomerRelationshipManagementApplicationModule>();
+
+        //    // 如果你只有一个特定的Profile，并且想明确地添加它，也可以这样：
+        //    // options.AddProfile<CustomerRelationshipManagementApplicationAutoMapperProfile>();
+        //});
 
         Configure<AbpAntiForgeryOptions>(options =>
         {
