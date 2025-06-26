@@ -1,6 +1,7 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
+using CustomerRelationshipManagement.Finance;
 using CustomerRelationshipManagement.Finance.Receivables;
 using CustomerRelationshipManagement.Interfaces.ICrmContracts;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +14,11 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.ObjectMapping;
 
 namespace CustomerRelationshipManagement.CrmContracts
 {
-    public class CrmContractService : ApplicationService, ICrmContractService
+    public class CrmContractService : ApplicationService, ICrmContractService 
     {
         private readonly IRepository<CrmContract, Guid> repository;
         private readonly IRepository<Receivables, Guid> receivablesrepository;
@@ -110,11 +112,11 @@ namespace CustomerRelationshipManagement.CrmContracts
         }
 
         /// <summary>
-        /// 添加的方法
+        /// 添加合同的方法(事务实现)
         /// </summary>
-        /// <param name="addUpdateCrmContractDto"></param>
+        /// <param name="addCrmContractDto"></param>
         /// <returns></returns>
-        public async Task<ApiResult> AddCrmContract(AddUpdateCrmContractDto addUpdateCrmContractDto)
+        public async Task<ApiResult> AddCrmContract(AddCrmContractDto addCrmContractDto)
         {
             var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
             using (scope)
@@ -123,14 +125,23 @@ namespace CustomerRelationshipManagement.CrmContracts
                 {
                     //合同表操作
                     //转换要添加的合同表数据
-                    var crmcontract = ObjectMapper.Map<AddUpdateCrmContractDto, CrmContract>(addUpdateCrmContractDto);
+                    var crmcontract = ObjectMapper.Map<AddCrmContractDto, CrmContract>(addCrmContractDto);
 
-                    //执行插入的数据的操作
-                    var result = await repository.InsertAsync(crmcontract);
+                    //执行插入合同表的数据的操作
+                    var crmcontractresult = await repository.InsertAsync(crmcontract);
+
+                    //合同产品关系表操作
+                    
 
                     //应收款表操作
                     //转换要添加的应收款数据
-                    //var receivables = await receivablesrepository.
+                    var receivables = ObjectMapper.Map<CreateUpdateReceibablesDto, Receivables>(addCrmContractDto.CreateUpdateReceibablesDto);
+                    receivables.CustomerId = crmcontractresult.CustomerId;
+                    receivables.ContractId = crmcontractresult.Id;
+                    receivables.UserId = crmcontractresult.UserId;
+
+                    //执行插入应收款表的操作
+                    var receivablesresult = await receivablesrepository.InsertAsync(receivables);
 
                     //提交事务
                     scope.Complete();
@@ -151,7 +162,41 @@ namespace CustomerRelationshipManagement.CrmContracts
         }
 
         /// <summary>
+        /// 修改合同的方法
+        /// </summary>
+        /// <param name="UpdateCrmContractDto"></param>
+        /// <returns></returns>
+        //public async Task<ApiResult> UpdateCrmContract(UpdateCrmContractDto UpdateCrmContractDto)
+        //{
+        //    //获取对应id的合同表数据
+        //    var crmcontract = await repository.FindAsync(UpdateCrmContractDto.Id);
+
+            
+        //}
+
+        /// <summary>
         /// 删除合同方法
+        /// </summary>
+        /// <param name="DeleteId"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> DeleteCrmContract(Guid DeleteId)
+        {
+            try
+            {
+                await repository.DeleteAsync(DeleteId);
+
+                return ApiResult.Success(ResultCode.Success);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("删除合同出错 " + ex.Message);
+                return ApiResult.Fail("删除失败", ResultCode.Fail);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 批量删除合同方法
         /// </summary>
         /// <param name="DeleteIds"></param>
         /// <returns></returns>
@@ -165,13 +210,11 @@ namespace CustomerRelationshipManagement.CrmContracts
             }
             catch (Exception ex)
             {
-                logger.LogError("删除合同出错 "+ex.Message);
+                logger.LogError("批量删除合同出错 " + ex.Message);
                 return ApiResult.Fail("删除失败",ResultCode.Fail);
                 throw;
             }
         }
-
-
 
     }
 }

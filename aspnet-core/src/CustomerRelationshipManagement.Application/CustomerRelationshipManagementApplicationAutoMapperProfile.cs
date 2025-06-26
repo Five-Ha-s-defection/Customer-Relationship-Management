@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.CXS.ProductManagementDto;
+using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
@@ -66,6 +68,10 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Category, CategoryDtos>().ReverseMap();
         //产品分类添加修改Dto
         CreateMap<Category, CreateUpdateCategoryDtos>().ReverseMap();
+
+        //合同表
+        CreateMap<AddCrmContractDto, CrmContract>().ReverseMap();
+
 
     }
 }
