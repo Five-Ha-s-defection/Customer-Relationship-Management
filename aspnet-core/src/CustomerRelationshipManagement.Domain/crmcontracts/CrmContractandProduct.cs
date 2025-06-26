@@ -26,7 +26,7 @@ namespace CustomerRelationshipManagement.crmcontracts
         /// <summary>
         /// 购买数量
         /// </summary>
-        public int BuyProductNum {  get; set; } = 0;
+        public int BuyProductNum { get; set; } = 0;
 
         /// <summary>
         /// 售价

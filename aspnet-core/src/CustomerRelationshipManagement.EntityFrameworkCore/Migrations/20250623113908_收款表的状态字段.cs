@@ -11,7 +11,7 @@ namespace CustomerRelationshipManagement.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+            /*migrationBuilder.CreateTable(
                 name: "App_Payments",
                 columns: table => new
                 {
@@ -45,9 +45,9 @@ namespace CustomerRelationshipManagement.Migrations
                 {
                     table.PrimaryKey("PK_App_Payments", x => x.Id);
                 })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                .Annotation("MySql:CharSet", "utf8mb4");*/
 
-            migrationBuilder.CreateTable(
+            /*migrationBuilder.CreateTable(
                 name: "App_Receivables",
                 columns: table => new
                 {
@@ -84,7 +84,7 @@ namespace CustomerRelationshipManagement.Migrations
                 keyColumn: "Id",
                 keyValue: new Guid("00000000-0000-0000-0000-000000000000"),
                 column: "ConcurrencyStamp",
-                value: "243f88f77a7a42aca657ad749385b05b");
+                value: "243f88f77a7a42aca657ad749385b05b");*/
         }
 
         /// <inheritdoc />

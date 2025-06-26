@@ -2,16 +2,20 @@
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.CXS.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
-using CustomerRelationshipManagement.Finance;
+using CustomerRelationshipManagement.DTOS.Finance.Incoices;
+using CustomerRelationshipManagement.DTOS.Finance.Payments;
+using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.Finance.Receivables;
-using CustomerRelationshipManagement.Payments;
+using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.ProductCategory.Categorys;
 using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.RBAC.Permissions;
@@ -19,6 +23,7 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
+using CustomerRelationshipManagement.RBACDtos.Users;
 
 namespace CustomerRelationshipManagement;
 
@@ -38,7 +43,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
 
-        
+        //应收款表
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
         CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
 
@@ -58,7 +63,14 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
 
         CreateMap<Payment, PaymentDTO>().ReverseMap();
         CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
-        
+
+        //发票表
+        CreateMap<Invoice, InvoiceDTO>().ReverseMap();
+        CreateMap<CreateUpdateInvoiceDto, Invoice>().ReverseMap();
+
+        //用户信息映射
+        CreateMap<UserInfo, UserInfoDto>().ReverseMap();
+        CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
         
         //产品管理显示Dto
         CreateMap<Product, ProductDtos>().ReverseMap();

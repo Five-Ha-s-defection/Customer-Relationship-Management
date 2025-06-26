@@ -18,7 +18,10 @@ using Volo.Abp.ObjectMapping;
 
 namespace CustomerRelationshipManagement.CrmContracts
 {
-    public class CrmContractService : ApplicationService, ICrmContractService 
+    /// <summary>
+    /// 合同服务(模版)
+    /// </summary>
+    public class CrmContractService : ApplicationService, ICrmContractService
     {
         private readonly IRepository<CrmContract, Guid> repository;
         private readonly IRepository<Receivables, Guid> receivablesrepository;

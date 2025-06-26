@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.Dtos.Users
+namespace CustomerRelationshipManagement.RBACDtos.Users
 {
     public class LoginDto
     {

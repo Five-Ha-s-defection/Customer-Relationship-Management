@@ -77,5 +77,21 @@ namespace CustomerRelationshipManagement.crmcontracts
         /// </summary>
         public decimal ContractProceeds { get; set; } = 0;
 
+        /// <summary>
+        /// 当前审批到第几人（从0开始）
+        /// </summary>
+        public int CurrentStep { get; set; } = 0;
+        /// <summary>
+        /// 审批意见
+        /// </summary>
+        public List<string> ApproveComments { get; set; } = new();
+        /// <summary>
+        /// 审批时间
+        /// </summary>
+        public List<DateTime> ApproveTimes { get; set; } = new();
+        /// <summary>
+        /// 收款状态
+        /// </summary>
+        public int PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
     }
 }
