@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CustomerRelationshipManagement.Migrations
 {
     [DbContext(typeof(CustomerRelationshipManagementDbContext))]
-    partial class CustomerRelationshipManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250626070925_修改李怡宣的表-1")]
+    partial class 修改李怡宣的表1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1492,14 +1495,6 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
-                    b.PrimitiveCollection<string>("ApproveComments")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.PrimitiveCollection<string>("ApproveTimes")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Attachment")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -1544,9 +1539,6 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("CreatorId");
 
-                    b.Property<int>("CurrentStep")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("char(36)");
 
@@ -1583,9 +1575,6 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<Guid?>("LastModifierId")
                         .HasColumnType("char(36)")
                         .HasColumnName("LastModifierId");
-
-                    b.Property<int>("PaymentStatus")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("SignDate")
                         .HasColumnType("datetime(6)");

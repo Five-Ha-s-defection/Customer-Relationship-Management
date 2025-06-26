@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
-using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;

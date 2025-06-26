@@ -123,6 +123,9 @@ public class CustomerRelationshipManagementDbContext :
     //合同表设计
     public DbSet<CrmContract> CrmContract { get; set; }
 
+    //合同产品关系表
+    public DbSet<CrmContractandProduct> CrmContractandProduct { get; set; }
+
     #endregion
 
     #region 财务管理模块
@@ -414,6 +417,15 @@ public class CustomerRelationshipManagementDbContext :
         {
             //设置表名和架构
             b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(CrmContract), CustomerRelationshipManagementConsts.DbSchema);
+            //按约定自动配置基类属性（如主键、审计字段等）
+            b.ConfigureByConvention();
+        });
+
+        //配置合同产品关系表
+        builder.Entity<CrmContractandProduct>(b =>
+        {
+            //设置表名和架构
+            b.ToTable(CustomerRelationshipManagementConsts.DbTablePrefix + nameof(CrmContractandProduct), CustomerRelationshipManagementConsts.DbSchema);
             //按约定自动配置基类属性（如主键、审计字段等）
             b.ConfigureByConvention();
         });
