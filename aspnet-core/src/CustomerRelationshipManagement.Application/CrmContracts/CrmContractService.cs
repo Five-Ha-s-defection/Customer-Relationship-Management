@@ -23,6 +23,7 @@ namespace CustomerRelationshipManagement.CrmContracts
     /// <summary>
     /// 合同服务(模版)
     /// </summary>
+    [ApiExplorerSettings(GroupName = "v1")]
     public class CrmContractService : ApplicationService, ICrmContractService
     {
         private readonly IRepository<CrmContract, Guid> repository;
