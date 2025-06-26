@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
-using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
@@ -20,6 +19,7 @@ using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using CustomerRelationshipManagement.RBAC.Menus;
 
 namespace CustomerRelationshipManagement;
 
@@ -53,6 +53,11 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //权限信息映射
         CreateMap<CreatePermissionDto, PermissionInfo>().ReverseMap();
         CreateMap<PermissionInfo, PermissionDto>().ReverseMap();
+        //登录返回结果映射
+        CreateMap<UserInfo, LoginResultDto>().ReverseMap();
+        //菜单信息映射
+        CreateMap<MenuInfo, MenuDto>().ReverseMap();
+
 
 
         #endregion

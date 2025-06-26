@@ -11,7 +11,7 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         /// <summary>
         /// 菜单名称
         /// </summary>
-        public string MenuName { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
         /// <summary>
         /// 路径 如 /order/list
         /// </summary>
@@ -25,17 +25,21 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         /// </summary>
         public string Icon { get; set; } = string.Empty;
         /// <summary>
-        /// 权限码
+        /// 权限码（用于路由及权限判断）
         /// </summary>
         public string PermissionCode { get; set; } = string.Empty;
         /// <summary>
         /// 是否可见
         /// </summary>
-        public bool IsVisible { get; set; } = true;
+        public bool Hidden { get; set; } = true;
         /// <summary>
-        ///  排序
+        ///  排序（前端的侧边栏进行排序）
         /// </summary>
         public int Sort { get; set; }
+        /// <summary>
+        /// 子菜单(构架树形结构)
+        /// </summary>
+        public List<MenuDto> Children { get; set; }
 
 
     }

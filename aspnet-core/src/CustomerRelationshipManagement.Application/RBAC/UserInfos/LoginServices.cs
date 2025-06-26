@@ -18,22 +18,24 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// </summary>
         private readonly IRepository<UserInfo, Guid> userInfoRepository;
         private readonly IPasswordHasher<UserInfo> passwordHasher;
+        private readonly UserProfileManager userProfileManager;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="userInfoRepository"></param>
-        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher)
+        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager)
         {
             this.userInfoRepository = userInfoRepository;
             this.passwordHasher = passwordHasher;
+            this.userProfileManager = userProfileManager;
         }
         /// <summary>
         /// 登录
         /// </summary>
         /// <param name="loginDto">用户名和密码</param>
         /// <returns></returns>
-        public async Task<ApiResult<UserInfoDto>> Login(LoginDto loginDto)
+        public async Task<ApiResult<LoginResultDto>> Login(LoginDto loginDto)
         {
             try
             {
@@ -44,18 +46,31 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 }
                 //密码加密
                 var password = passwordHasher.VerifyHashedPassword(userInfo, userInfo.Password, loginDto.Password);
-                if (!userInfo.IsActive)
-                {
-                    throw new UserFriendlyException("用户已被禁用");
-                }
+                //验证密码
                 if (password != PasswordVerificationResult.Success)
                 {
                     throw new UserFriendlyException("密码错误");
                 }
+                // 用户被禁用，抛出禁用错误
+                if (!userInfo.IsActive)
+                {
+                    throw new UserFriendlyException("用户已被禁用");
+                }
+                // 登录成功，返回用户信息和令牌
+                
+
+                var profile = userProfileManager.BuildUserProfileAsync(userInfo.Id).Result;
+
+              
+               
                 //登录成功，返回用户信息和令牌
-                var userInfoDto = ObjectMapper.Map<UserInfo, UserInfoDto>(userInfo);
+                var userInfoDto = ObjectMapper.Map<UserInfo, LoginResultDto>(userInfo);
                 //返回数据
-                return ApiResult<UserInfoDto>.Success(ResultCode.Success, userInfoDto);
+                return ApiResult<LoginResultDto>.Success(ResultCode.Success, new LoginResultDto
+                {
+                      User=profile
+                });
+                
             }
             catch (Exception ex)
             {

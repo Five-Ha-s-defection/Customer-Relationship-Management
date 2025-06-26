@@ -7,6 +7,6 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
     public interface ILogServices:IApplicationService
     {
-        Task<ApiResult<UserInfoDto>> Login(LoginDto loginDto);
+        Task<ApiResult<LoginResultDto>> Login(LoginDto loginDto);
     }
 }

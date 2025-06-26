@@ -34,6 +34,10 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         /// 用户的所有权限编码的集合
         /// </summary>
         public List<string> Permissions { get; set; }
+        /// <summary>
+        /// 菜单
+        /// </summary>
+        public List<MenuDto> Menus { get; set; }
 
 
     }
