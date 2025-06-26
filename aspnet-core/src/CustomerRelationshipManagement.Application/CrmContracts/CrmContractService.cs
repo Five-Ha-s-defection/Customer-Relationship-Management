@@ -1,11 +1,13 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
-using CustomerRelationshipManagement.Finance;
-using CustomerRelationshipManagement.Finance.Receivables;
+using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Interfaces.ICrmContracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Tls.Crypto.Impl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +27,14 @@ namespace CustomerRelationshipManagement.CrmContracts
     {
         private readonly IRepository<CrmContract, Guid> repository;
         private readonly IRepository<Receivables, Guid> receivablesrepository;
+        private readonly IRepository<CrmContractandProduct, Guid> crmContractandProductrepository;
         private readonly ILogger<CrmContractService> logger;
 
-        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, ILogger<CrmContractService> logger)
+        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, ILogger<CrmContractService> logger)
         {
             this.repository = repository;
             this.receivablesrepository = receivablesrepository;
+            this.crmContractandProductrepository = crmContractandProductrepository;
             this.logger = logger;
         }
 
@@ -133,8 +137,23 @@ namespace CustomerRelationshipManagement.CrmContracts
                     //执行插入合同表的数据的操作
                     var crmcontractresult = await repository.InsertAsync(crmcontract);
 
+
                     //合同产品关系表操作
-                    
+                    //创建要添加的关系表数据集合
+                    List<CrmContractandProduct> crmcontractproductlist = new List<CrmContractandProduct>();
+
+                    //遍历添加产品id到集合中
+                    foreach (var item in addCrmContractDto.ProductId) {
+                        crmcontractproductlist.Add(new CrmContractandProduct
+                        {
+                            CrmContractId = crmcontract.Id,
+                            ProductId = item,
+                        });
+                    }
+
+                    //批量添加到关系表中
+                    await crmContractandProductrepository.InsertManyAsync(crmcontractproductlist);
+
 
                     //应收款表操作
                     //转换要添加的应收款数据
@@ -163,6 +182,28 @@ namespace CustomerRelationshipManagement.CrmContracts
                 }
             }
         }
+                
+        /// <summary>
+        /// 获取合同表的详情
+        /// </summary>
+        /// <param name="GetId"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<GetCrmContractDto>> GetCrmContract(Guid GetId)
+        {
+            //根据合同id获取合同表数据
+            var crmcontract = await repository.FindAsync(GetId);
+            var crmcontractdto = ObjectMapper.Map<CrmContract, ShowCrmContractDto>(crmcontract);
+
+            //根据合同表id获取所有产品关系表
+            var crmcontractproduct = await crmContractandProductrepository.GetListAsync(a=>a.CrmContractId == GetId);
+
+            //实例化dto
+            var getCrmContractDto = new GetCrmContractDto();
+            getCrmContractDto.showCrmContractDto = crmcontractdto;
+            getCrmContractDto.crmContractandProducts = crmcontractproduct;
+
+            return ApiResult<GetCrmContractDto>.Success(ResultCode.Success, getCrmContractDto);
+        }
 
         /// <summary>
         /// 修改合同的方法
@@ -174,7 +215,7 @@ namespace CustomerRelationshipManagement.CrmContracts
         //    //获取对应id的合同表数据
         //    var crmcontract = await repository.FindAsync(UpdateCrmContractDto.Id);
 
-            
+
         //}
 
         /// <summary>

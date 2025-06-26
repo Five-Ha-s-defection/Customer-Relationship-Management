@@ -1,4 +1,5 @@
-﻿using CustomerRelationshipManagement.Finance;
+﻿using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.Finance;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ using Volo.Abp.Application.Dtos;
 namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
 {
     /// <summary>
-    /// 添加修改合同Dto
+    /// 添加合同Dto
     /// </summary>
     public class AddCrmContractDto: FullAuditedEntityDto<Guid>
     {
@@ -96,7 +97,9 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         public IList<Guid> ProductId { get; set; }
 
 
-
+        /// <summary>
+        /// 添加应收款表信息
+        /// </summary>
         public CreateUpdateReceibablesDto CreateUpdateReceibablesDto { get; set; } = new CreateUpdateReceibablesDto();
 
     }

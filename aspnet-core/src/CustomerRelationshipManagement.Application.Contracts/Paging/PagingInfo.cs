@@ -1,6 +1,7 @@
 ﻿using CustomerRelationshipManagement.Clues;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,10 +17,12 @@ namespace CustomerRelationshipManagement.Paging
         /// <summary>
         /// 页索引
         /// </summary>
+        [DefaultValue("1")]
         public int PageIndex { get; set; }
         /// <summary>
         /// 页大小
         /// </summary>
+        [DefaultValue("10")]
         public int PageSize { get; set; }
     }
 

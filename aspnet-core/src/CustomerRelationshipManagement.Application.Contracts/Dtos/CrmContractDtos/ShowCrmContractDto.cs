@@ -8,7 +8,7 @@ using Volo.Abp.Application.Dtos;
 namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
 {
     /// <summary>
-    /// 实现合同dto
+    /// 显示合同dto
     /// </summary>
     public class ShowCrmContractDto:FullAuditedEntityDto<Guid>
     {
@@ -60,7 +60,7 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// <summary>
         /// 审核人ID
         /// </summary>
-        public Guid AuditorId { get; set; }
+        public IList<Guid> AuditorId { get; set; } = new List<Guid>();
 
         /// <summary>
         /// 合同扫描件(图片)
@@ -75,14 +75,8 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// <summary>
         /// 合同收款
         /// </summary>
-        public decimal ContractProceeds { get; set; }
+        public decimal ContractProceeds { get; set; } = 0;
 
-
-
-        /// <summary>
-        /// 产品ID
-        /// </summary>
-        public Guid ProductId { get; set; }
 
     }
 }
