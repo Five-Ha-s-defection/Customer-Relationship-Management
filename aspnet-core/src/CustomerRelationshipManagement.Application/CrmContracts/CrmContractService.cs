@@ -1,7 +1,7 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
-using CustomerRelationshipManagement.Finance.Receivables;
+using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Interfaces.ICrmContracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -16,6 +16,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CrmContracts
 {
+    /// <summary>
+    /// 合同服务(模版)
+    /// </summary>
     public class CrmContractService : ApplicationService, ICrmContractService
     {
         private readonly IRepository<CrmContract, Guid> repository;

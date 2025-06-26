@@ -33,7 +33,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         {
             this.repository = repository;
             this.logger = logger;
-            this.cache = cache;
+      this.cache = cache;
         }
 
         /// <summary>
