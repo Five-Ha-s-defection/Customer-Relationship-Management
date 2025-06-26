@@ -5,6 +5,7 @@ using CustomerRelationshipManagement.Interfaces.IFinance.Payments;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -137,6 +138,10 @@ namespace CustomerRelationshipManagement.Finance.Payments
                                 Amount = p.Amount,
                                 PaymentMethod = p.PaymentMethod,
                                 PaymentDate = p.PaymentDate,
+                                ApproverIds = p.ApproverIds,
+                                CurrentStep = p.CurrentStep,
+                                ApproveComments = p.ApproveComments,
+                                ApproveTimes = p.ApproveTimes,
                                 PaymentStatus = p.PaymentStatus,
                                 Remark = p.Remark,
                                 UserId = p.UserId,
@@ -144,6 +149,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
                                 ContractId = p.ContractId,
                                 ReceivableId = p.ReceivableId,
                                 ReceivablePay = r.ReceivablePay,
+
                             };
                 // 这里可以加上你的where条件，对p.xxx和r.xxx都可以筛选
                 query = query
@@ -153,9 +159,10 @@ namespace CustomerRelationshipManagement.Finance.Payments
                     .WhereIf(searchDTO.PaymentDate != null, x => x.PaymentDate >= searchDTO.StartTime && x.PaymentDate <= searchDTO.EndTime)
                     .WhereIf(searchDTO.UserId.HasValue, x => x.UserId == searchDTO.UserId)
                     .WhereIf(searchDTO.CustomerId.HasValue, x => x.CustomerId == searchDTO.CustomerId)
-                    .WhereIf(searchDTO.ContractId.HasValue, x => x.ContractId == searchDTO.ContractId);
-                    //.WhereIf(searchDTO.ApproverIds.HasValue, x => x.ApproverIds == searchDTO.ApproverIds);
-        
+                    .WhereIf(searchDTO.ContractId.HasValue, x => x.ContractId == searchDTO.ContractId)
+                    .WhereIf(searchDTO.ApproverIds != null && searchDTO.ApproverIds.Any(),
+         x => x.ApproverIds.Any(id => searchDTO.ApproverIds.Contains(id)));
+
                 // 使用ABP框架的分页方法进行分页查询
                 var res = query.PageResult(searchDTO.PageIndex, searchDTO.PageSize);
 

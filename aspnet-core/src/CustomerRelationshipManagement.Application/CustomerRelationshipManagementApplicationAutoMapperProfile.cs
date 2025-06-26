@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
-using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
-using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
