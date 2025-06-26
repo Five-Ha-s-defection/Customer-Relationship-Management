@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
@@ -19,6 +21,7 @@ using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using System.Collections.Generic;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBACDtos.Menus;
 
@@ -83,6 +86,11 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Category, CategoryDtos>().ReverseMap();
         //产品分类添加修改Dto
         CreateMap<Category, CreateUpdateCategoryDtos>().ReverseMap();
+
+        //合同表
+        CreateMap<AddCrmContractDto, CrmContract>().ReverseMap();
+        CreateMap<CrmContract, ShowCrmContractDto>().ReverseMap();
+
 
     }
 }
