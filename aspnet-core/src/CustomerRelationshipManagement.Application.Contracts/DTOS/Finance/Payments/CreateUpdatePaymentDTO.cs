@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
-using Volo.Abp.Caching;
 
-namespace CustomerRelationshipManagement.Payments
+namespace CustomerRelationshipManagement.DTOS.Finance.Payments
 {
-    [CacheName("Payment")]
-    public class PaymentDTO: FullAuditedEntityDto<Guid>
+    public class CreateUpdatePaymentDTO
     {
         /// <summary>
         /// 所属客户
         /// </summary>
+        [Required]
         public Guid CustomerId { get; set; }
 
         /// <summary>

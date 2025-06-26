@@ -1,6 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Dtos.Users;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;

@@ -1,10 +1,11 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.Paging;
 using System;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-namespace CustomerRelationshipManagement.Finance
+namespace CustomerRelationshipManagement.Interfaces.IFinance.Receivableses
 {
     /// <summary>
     /// 应收款服务接口
