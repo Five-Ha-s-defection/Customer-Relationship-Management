@@ -10,6 +10,7 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;

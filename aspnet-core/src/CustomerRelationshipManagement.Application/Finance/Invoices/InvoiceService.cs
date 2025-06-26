@@ -2,6 +2,7 @@
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.Interfaces.IFinance.Invoices;
 using CustomerRelationshipManagement.Paging;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.Finance.Invoices
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class InvoiceService : ApplicationService, IInvoiceService
     {
         private readonly IRepository<Invoice, Guid> repository;
@@ -57,8 +59,8 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                     .WhereIf(invoiceSearchDto.InvoiceType != null, x => x.InvoiceType == invoiceSearchDto.InvoiceType)
                     .WhereIf(invoiceSearchDto.InvoiceDate != null, x => x.InvoiceDate >= invoiceSearchDto.StartTime && x.InvoiceDate <= invoiceSearchDto.EndTime)
                     .WhereIf(invoiceSearchDto.CustomerId.HasValue, x => x.CustomerId == invoiceSearchDto.CustomerId)
-                    .WhereIf(invoiceSearchDto.ContractId.HasValue, x => x.ContractId == invoiceSearchDto.ContractId);
-                    //.WhereIf(invoiceSearchDto.ApproverId.HasValue, x => x.ApproverId == invoiceSearchDto.ApproverId);
+                    .WhereIf(invoiceSearchDto.ContractId.HasValue, x => x.ContractId == invoiceSearchDto.ContractId)
+                    .WhereIf(invoiceSearchDto.ApproverIds.Count > 0, x => x.ApproverIds.Any(y => invoiceSearchDto.ApproverIds.Contains(y)));
 
                 var res = invoice.PageResult(invoiceSearchDto.PageIndex, invoiceSearchDto.PageSize);
 

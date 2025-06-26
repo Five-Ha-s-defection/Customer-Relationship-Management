@@ -65,9 +65,21 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         public int InvoiceType { get; set; }
 
         /// <summary>
-        /// 审核人ID
+        /// 每一级的审批人 ID
         /// </summary>
-        public Guid ApproverId { get; set; }
+        public List<Guid> ApproverIds { get; set; } = new();
+        /// <summary>
+        /// 当前审批到第几人（从0开始）
+        /// </summary>
+        public int CurrentStep { get; set; } = 0;
+        /// <summary>
+        /// 审批意见
+        /// </summary>
+        public List<string> ApproveComments { get; set; } = new();
+        /// <summary>
+        /// 审批时间
+        /// </summary>
+        public List<DateTime> ApproveTimes { get; set; } = new();
 
         /// <summary>
         /// 开票状态
