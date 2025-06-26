@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CustomerRelationshipManagement.Migrations
 {
     [DbContext(typeof(CustomerRelationshipManagementDbContext))]
-    partial class CustomerRelationshipManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250626034600_修改刘畅的表-1")]
+    partial class 修改刘畅的表1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,7 +116,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CarFrameNumber", (string)null);
+                    b.ToTable("CarFrameNumber");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.ClueSources.ClueSource", b =>
@@ -137,7 +140,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ClueSource", (string)null);
+                    b.ToTable("ClueSource");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Clues.Clue", b =>
@@ -334,7 +337,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ContactRelation", (string)null);
+                    b.ToTable("ContactRelation");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerContacts.CustomerContact", b =>
@@ -440,7 +443,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerLevel", (string)null);
+                    b.ToTable("CustomerLevel");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerRegions.CustomerRegion", b =>
@@ -457,7 +460,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerRegion", (string)null);
+                    b.ToTable("CustomerRegion");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerTypes.CustomerType", b =>
@@ -471,7 +474,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerType", (string)null);
+                    b.ToTable("CustomerType");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Customers.Customer", b =>
@@ -583,7 +586,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Industry", (string)null);
+                    b.ToTable("Industry");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Prioritys.Priority", b =>
@@ -597,7 +600,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Priority", (string)null);
+                    b.ToTable("Priority");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.SalesProgresses.SalesProgress", b =>
@@ -611,7 +614,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SalesProgress", (string)null);
+                    b.ToTable("SalesProgress");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.Finance.Invoices.Invoice", b =>
@@ -745,120 +748,6 @@ namespace CustomerRelationshipManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("App_Invoice", (string)null);
-                });
-
-            modelBuilder.Entity("CustomerRelationshipManagement.Finance.PaymentMethods.PaymentMethod", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("PaymentMethodName")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("App_PaymentMethod", (string)null);
-                });
-
-            modelBuilder.Entity("CustomerRelationshipManagement.Finance.Payments.Payment", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.PrimitiveCollection<string>("ApproveComments")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.PrimitiveCollection<string>("ApproveTimes")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.PrimitiveCollection<string>("ApproverIds")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("ConcurrencyStamp");
-
-                    b.Property<Guid>("ContractId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<int>("CurrentStep")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid?>("DeleterId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("DeleterId");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("DeletionTime");
-
-                    b.Property<string>("ExtraProperties")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("ExtraProperties");
-
-                    b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint(1)")
-                        .HasDefaultValue(false)
-                        .HasColumnName("IsDeleted");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("LastModificationTime");
-
-                    b.Property<Guid?>("LastModifierId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("LastModifierId");
-
-                    b.Property<string>("PaymentCode")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("PaymentMethod")
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("PaymentStatus")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ReceivableId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Remark")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("App_Payment", (string)null);
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.Finance.Receivableses.Receivables", b =>
@@ -1485,6 +1374,23 @@ namespace CustomerRelationshipManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("App_UserInfo", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("00000000-0000-0000-0000-000000000000"),
+                            Avatar = "",
+                            ConcurrencyStamp = "fbd39ef61246436f8db9ddb40053d27b",
+                            CreationTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Email = "admin@admin.com",
+                            ExtraProperties = "{}",
+                            IsActive = true,
+                            IsDeleted = false,
+                            Password = "123",
+                            PhoneInfo = "12345678901",
+                            RealName = "",
+                            UserName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.crmcontracts.CrmContract", b =>

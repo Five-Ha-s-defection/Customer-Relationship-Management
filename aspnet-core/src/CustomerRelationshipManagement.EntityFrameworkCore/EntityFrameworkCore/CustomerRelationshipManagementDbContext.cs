@@ -267,7 +267,7 @@ public class CustomerRelationshipManagementDbContext :
             b.Property(x => x.IsActive).IsRequired();
 
             //数据播种随机生成主键的guid
-            b.HasData(new UserInfo
+            /*b.HasData(new UserInfo
             {
                 UserName = "admin",
                 Password = "123",
@@ -275,7 +275,7 @@ public class CustomerRelationshipManagementDbContext :
                 PhoneInfo = "12345678901",
                 IsActive = true,
 
-            });
+            });*/
         });
        
        
