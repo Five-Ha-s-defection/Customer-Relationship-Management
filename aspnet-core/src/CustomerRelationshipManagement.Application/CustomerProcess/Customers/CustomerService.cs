@@ -1,6 +1,7 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
+using CustomerRelationshipManagement.CustomerProcess.Customers.Helpers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
@@ -65,8 +66,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         {
             try
             {
-                //构建缓存键名
-                string cacheKey = "CustomerRedis";
+                //缓存key(动态分页查询不同的key)
+                string cacheKey = CustomerCacheKeyHelper.BuildHashKey(dto);
                 //使用Redis缓存获取或添加数据
                 var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
                 {
@@ -137,18 +138,17 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                     //用ABP框架的分页
                     var res = list.PageResult(dto.PageIndex, dto.PageSize);
                     //构建分页结果对象
-                    var pageInfo = new PageInfoCount<CustomerDto>
+                    return new PageInfoCount<CustomerDto>
                     {
                         TotalCount = res.RowCount,
                         PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / dto.PageSize),
                         Data = res.Queryable.ToList()
                     };
-                    return pageInfo;
-                }, () => new DistributedCacheEntryOptions
+                },()=>new DistributedCacheEntryOptions
                 {
                     SlidingExpiration = TimeSpan.FromMinutes(5)     //设置缓存过期时间为5分钟
                 });
-                return ApiResult<PageInfoCount<CustomerDto>>.Success(ResultCode.Success,redislist);
+                return ApiResult<PageInfoCount<CustomerDto>>.Success(ResultCode.Success, redislist);
             }
             catch (Exception)
             {
