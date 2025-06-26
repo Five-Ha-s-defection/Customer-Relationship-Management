@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CustomerRelationshipManagement.Migrations
 {
     [DbContext(typeof(CustomerRelationshipManagementDbContext))]
-    partial class CustomerRelationshipManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250626035241_修改刘畅的表-4")]
+    partial class 修改刘畅的表4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -113,7 +116,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CarFrameNumber", (string)null);
+                    b.ToTable("CarFrameNumber");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.ClueSources.ClueSource", b =>
@@ -137,7 +140,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ClueSource", (string)null);
+                    b.ToTable("ClueSource");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Clues.Clue", b =>
@@ -334,7 +337,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ContactRelation", (string)null);
+                    b.ToTable("ContactRelation");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerContacts.CustomerContact", b =>
@@ -440,7 +443,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerLevel", (string)null);
+                    b.ToTable("CustomerLevel");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerRegions.CustomerRegion", b =>
@@ -457,7 +460,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerRegion", (string)null);
+                    b.ToTable("CustomerRegion");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerTypes.CustomerType", b =>
@@ -471,7 +474,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CustomerType", (string)null);
+                    b.ToTable("CustomerType");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Customers.Customer", b =>
@@ -583,7 +586,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Industry", (string)null);
+                    b.ToTable("Industry");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Prioritys.Priority", b =>
@@ -597,7 +600,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Priority", (string)null);
+                    b.ToTable("Priority");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.SalesProgresses.SalesProgress", b =>
@@ -611,7 +614,7 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SalesProgress", (string)null);
+                    b.ToTable("SalesProgress");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.Finance.Invoices.Invoice", b =>

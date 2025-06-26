@@ -73,7 +73,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
                                 Amount = p.Amount,
                                 PaymentMethod = p.PaymentMethod,
                                 PaymentDate = p.PaymentDate,
-                                ApproverId = p.ApproverId,
+                                //ApproverId = p.ApproverId,
                                 PaymentStatus = p.PaymentStatus,
                                 Remark = p.Remark,
                                 UserId = p.UserId,

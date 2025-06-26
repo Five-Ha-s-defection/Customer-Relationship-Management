@@ -29,16 +29,5 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         public bool OrderDesc { get; set; } = true;
 
         public string? Keyword { get; set; }
-
-        //======================================================================================
-        /// <summary>
-        /// 最后跟进时间(线索外键)
-        /// </summary>
-        public DateTime? LastFollowTime { get; set; }
-
-        /// <summary>
-        /// 下次联系时间(线索外键)
-        /// </summary>
-        public DateTime? NextContactTime { get; set; }
     }
 }
