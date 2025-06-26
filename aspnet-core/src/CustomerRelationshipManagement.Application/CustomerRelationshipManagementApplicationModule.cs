@@ -1,11 +1,12 @@
-﻿using CustomerRelationshipManagement.RBAC.Users;
+﻿using CustomerRelationshipManagement.RBAC.UserInfos;
+using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
 
-namespace CustomerRelationshipManagement.CustomerProcess.Clues;
+namespace CustomerRelationshipManagement;
 [DependsOn(
     typeof(CustomerRelationshipManagementDomainModule),
     typeof(CustomerRelationshipManagementApplicationContractsModule),
@@ -23,5 +24,7 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
         context.Services.AddCaptcha(context.Configuration);
         // ✅ 注册自定义密码加密器
         context.Services.AddScoped<IPasswordHasher<UserInfo>, PasswordHasher<UserInfo>>();
+
+        context.Services.AddScoped<IJwtHelper, JwtHelper>();
     }
 }

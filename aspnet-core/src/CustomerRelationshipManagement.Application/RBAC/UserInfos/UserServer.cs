@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.RolePermissions;
 using CustomerRelationshipManagement.RBAC.Roles;
@@ -6,23 +7,25 @@ using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Users;
-using System.Linq.Dynamic.Core;
-using Microsoft.AspNetCore.Mvc;
-using CustomerRelationshipManagement.RBAC.Menus;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
+    [ApiExplorerSettings(GroupName ="v1")]
+    [Authorize]
     public class UserServer : ApplicationService, IUserServer
     {
         /// <summary>
@@ -54,6 +57,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// </summary>
         /// <param name="createOrUpdateUserInfoDto"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         public async Task<ApiResult<UserInfo>> AddUserInfo(CreateOrUpdateUserInfoDto createOrUpdateUserInfoDto)
         {
             try
@@ -119,6 +123,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// </summary>
         /// <returns></returns>
         [HttpGet("me")]
+        [Authorize]
         public async Task<ApiResult<UserInfoDto>> GetCurrentUserInfoAsync()
         {
             try
