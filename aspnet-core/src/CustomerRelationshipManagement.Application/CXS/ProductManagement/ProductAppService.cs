@@ -1,32 +1,18 @@
 ﻿//using CustomerRelationshipManagement.DTOS.UploadFileDto;
 using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.crmcontracts;
-using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Interfaces.IProductAppService;
-using CustomerRelationshipManagement.CXS.ErrorCode;
-using CustomerRelationshipManagement.CXS.ProductManagementDto;
 using CustomerRelationshipManagement.ProductCategory.Products;
-using CustomerRelationshipManagement.Products;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using NPOI.SS.UserModel;
-using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Text;
 using System.Threading.Tasks;
-using System.Transactions;
-using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
-using Volo.Abp.Validation;
 
 namespace CustomerRelationshipManagement.CXS.ProductManagement
 {
