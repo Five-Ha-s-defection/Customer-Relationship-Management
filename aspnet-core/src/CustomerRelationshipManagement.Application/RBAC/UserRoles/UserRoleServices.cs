@@ -1,5 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.RBACDtos.UserRoles;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.RBAC.UserRoles
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class UserRoleServices : ApplicationService, IUserRoleServices
     {
         /// <summary>

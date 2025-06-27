@@ -1,4 +1,6 @@
-﻿using Volo.Abp.Modularity;
+﻿using CustomerRelationshipManagement.RBAC.UserInfos;
+using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.Modularity;
 using Volo.Abp.ObjectExtending;
 using Volo.Abp.SettingManagement;
 
@@ -14,5 +16,6 @@ public class CustomerRelationshipManagementApplicationContractsModule : AbpModul
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
         CustomerRelationshipManagementDtoExtensions.Configure();
+   
     }
 }

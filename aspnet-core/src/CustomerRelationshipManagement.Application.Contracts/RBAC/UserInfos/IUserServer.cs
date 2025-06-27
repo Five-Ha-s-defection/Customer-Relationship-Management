@@ -31,6 +31,19 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// </summary>
         /// <returns></returns>
         Task<ApiResult<UserInfoDto>> GetCurrentUserInfoAsync();
+        /// <summary>
+        /// 获取用户信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        Task<ApiResult> DeleteUserInfo(Guid id);
+        /// <summary>
+        /// 获取用户信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<ApiResult<UserInfoDto>> UpdateUserInfo(Guid id, CreateOrUpdateUserInfoDto dto);
 
     }
 }

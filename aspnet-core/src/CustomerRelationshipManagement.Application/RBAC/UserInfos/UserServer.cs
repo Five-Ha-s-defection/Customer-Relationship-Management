@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.RolePermissions;
 using CustomerRelationshipManagement.RBAC.Roles;
@@ -6,22 +7,25 @@ using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Users;
-using System.Linq.Dynamic.Core;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
+    [ApiExplorerSettings(GroupName = "v1")]
+    [Authorize]
     public class UserServer : ApplicationService, IUserServer
     {
         /// <summary>
@@ -33,11 +37,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// </summary>
         private readonly IPasswordHasher<UserInfo> passwordHasher;
         private readonly ICurrentUser currentUser;
-        private readonly IRepository<UserRoleInfo, Guid> userRoleRepo;
-        private readonly IRepository<RoleInfo, Guid> roleRepo;
-        private readonly IRepository<RolePermissionInfo, Guid> rolePermissionRepo;
-        private readonly IRepository<PermissionInfo, Guid> permissionRepo;
-        private readonly IRepository<UserPermissionInfo, Guid> userPermissionRepo;
+        private readonly UserProfileManager userProfileManager;
 
         /// <summary>
         /// 构造函数
@@ -45,22 +45,19 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// <param name="userRep"></param>
         /// <param name="passwordHasher"></param>
         /// <param name="currentUser"></param>
-        public UserServer(IRepository<UserInfo, Guid> userRep, IPasswordHasher<UserInfo> passwordHasher, ICurrentUser currentUser, IRepository<UserRoleInfo, Guid> userRoleRepo, IRepository<RoleInfo, Guid> roleRepo, IRepository<RolePermissionInfo, Guid> rolePermissionRepo, IRepository<PermissionInfo, Guid> permissionRepo, IRepository<UserPermissionInfo, Guid> userPermissionRepo)
+        public UserServer(IRepository<UserInfo, Guid> userRep, IPasswordHasher<UserInfo> passwordHasher, ICurrentUser currentUser,UserProfileManager userProfileManager)
         {
             this.userRep = userRep;
             this.passwordHasher = passwordHasher;
             this.currentUser = currentUser;
-            this.userRoleRepo = userRoleRepo;
-            this.roleRepo = roleRepo;
-            this.rolePermissionRepo = rolePermissionRepo;
-            this.permissionRepo = permissionRepo;
-            this.userPermissionRepo = userPermissionRepo;
+            this.userProfileManager = userProfileManager;
         }
         /// <summary>
         /// 添加用户
         /// </summary>
         /// <param name="createOrUpdateUserInfoDto"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         public async Task<ApiResult<UserInfo>> AddUserInfo(CreateOrUpdateUserInfoDto createOrUpdateUserInfoDto)
         {
             try
@@ -122,10 +119,11 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
             }
         }
         /// <summary>
-        /// 获取当前用户信息
+        /// 获取当前用户信息（带角色、权限、菜单）
         /// </summary>
         /// <returns></returns>
         [HttpGet("me")]
+        [Authorize]
         public async Task<ApiResult<UserInfoDto>> GetCurrentUserInfoAsync()
         {
             try
@@ -137,51 +135,9 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 {
                     throw new BusinessException("请先登录");
                 }
-                // 通过用户id来查出我的用户信息
-                var userInfo = await userRep.GetAsync(userId);
-                //转换成query格式
-                var userRoleQuery = await userRoleRepo.GetQueryableAsync();
-                //通过用户id来筛选出我的角色信息
-                var roleIds = await userRoleQuery
-                    .Where(x => x.UserId == userId)
-                    .Select(x => x.RoleId)
-                    .ToListAsync();
-                //通过角色id来获取角色名称
-                var roleInfo = await roleRepo.GetQueryableAsync();
-                var roleNames =await roleInfo.Where(x => roleIds.Contains(x.Id))
-                   .Select(x => x.RoleName)
-                   .ToListAsync();
-                //用户权限的信息
-                var userPermissionInfo = await userPermissionRepo.GetQueryableAsync();
-                //通过用户信息来获取用户权限的id
-                var userpermissionIds =await userPermissionInfo.Where(x => x.UserId == userId)
-                .Select(x => x.PermissionId)
-                .ToListAsync();
+               var profile = await userProfileManager.BuildUserProfileAsync(userId);
 
-
-
-                // 获取角色权限的信息
-                var rolePermissionInfo = await rolePermissionRepo.GetQueryableAsync();
-                //通过角色信息来获取角色权限的id
-                var  rolePermissionIds =await rolePermissionInfo.Where(x => roleIds.Contains(x.RoleId))
-                .Select(x => x.PermissionId)
-                .ToListAsync();
-                // 获取所有权限的id通过用户权限，然后通过union来进行合并用户和角色的权限然后过滤其中一样的权限
-                var allPermissionIds =  userpermissionIds.Union(rolePermissionIds).Distinct().ToList();
-
-                //查询权限信息
-                var permissionInfo = await permissionRepo.GetQueryableAsync();
-                //查询权限的编码
-                var permissionCodes = await permissionInfo.Where(x => allPermissionIds.Contains(x.Id))
-                    .Select(x => x.PermissionCode)
-                    .ToListAsync();
-
-                //将数据存入dto
-                 var userInfoDto = ObjectMapper.Map<UserInfo, UserInfoDto>(userInfo);
-                return ApiResult<UserInfoDto>.Success(ResultCode.Success, userInfoDto);
-
-               
-
+                return ApiResult<UserInfoDto>.Success(ResultCode.Success,profile);
 
             }
             catch (Exception ex)

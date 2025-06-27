@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerRelationshipManagement.RBAC.RoleInfos
 {
-    [ApiExplorerSettings(GroupName = "RBAC-Role")]
+    [ApiExplorerSettings(GroupName = "v1")]
     public class RoleServer : ApplicationService, IRoleServer
     {
         private readonly IRepository<RoleInfo, Guid> rolerepository;
