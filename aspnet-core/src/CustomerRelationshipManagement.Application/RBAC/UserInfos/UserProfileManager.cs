@@ -7,7 +7,9 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,7 @@ using Volo.Abp.Users;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class UserProfileManager:DomainService
     {
         private readonly IRepository<UserInfo, Guid> userRep;
@@ -104,7 +107,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                         .Where(m => m.ParentId == parentId)
                         .Select(x => new MenuDto
                         {
-                            Name = x.MenuName,
+                            MenuName = x.MenuName,
                             Path = x.Path,
                             Component = x.Component,
                             Icon = x.Icon,

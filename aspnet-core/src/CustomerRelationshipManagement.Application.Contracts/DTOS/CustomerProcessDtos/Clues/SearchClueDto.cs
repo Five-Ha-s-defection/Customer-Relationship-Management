@@ -11,6 +11,10 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
 {
     public class SearchClueDto:PagingInfo
     {
+        /// <summary>
+        /// 显示类型 0 显示所有 1 显示我负责的
+        /// </summary>
+        public int type { get; set; } = 0;
         public Guid? CreatedBy { get; set; }         // 创建人
         public Guid? AssignedTo { get; set; }        // 负责人
         public ClueStatus? Status { get; set; }            // 状态（未跟进、跟进中、已转换）

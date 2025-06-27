@@ -13,8 +13,9 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
     /// <summary>
     /// 添加合同Dto
     /// </summary>
-    public class AddCrmContractDto: FullAuditedEntityDto<Guid>
+    public class AddCrmContractDto
     {
+        #region 合同表的字段
         /// <summary>
         /// 所属客户ID
         /// </summary>
@@ -105,12 +106,27 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// </summary>
         public int PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
 
+        #endregion
 
 
+        #region 产品表的字段
+
+        /// <summary>
+        /// 产品信息
+        /// </summary>
+        [Required]
+        public IList<AddCrmcontractandProductDto> AddCrmcontractandProductDto { get; set; } = new List<AddCrmcontractandProductDto>();
+
+        #endregion
+
+
+        #region 收款表
         /// <summary>
         /// 添加应收款表信息
         /// </summary>
+        [Required]
         public CreateUpdateReceibablesDto CreateUpdateReceibablesDto { get; set; } = new CreateUpdateReceibablesDto();
 
+        #endregion
     }
 }

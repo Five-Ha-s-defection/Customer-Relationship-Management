@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,8 +12,9 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
     /// <summary>
     /// 修改合同数据表
     /// </summary>
-    public class UpdateCrmContractDto: FullAuditedEntityDto<Guid>
+    public class UpdateCrmContractDto : FullAuditedEntityDto<Guid>
     {
+        #region 合同表的字段
         /// <summary>
         /// 所属客户ID
         /// </summary>
@@ -102,5 +104,18 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// 收款状态
         /// </summary>
         public int PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
+
+        #endregion
+
+
+        #region 产品表的字段
+
+        /// <summary>
+        /// 添加产品信息
+        /// </summary>
+        public IList<AddCrmcontractandProductDto> AddCrmcontractandProductDto { get; set; } = new List<AddCrmcontractandProductDto>();
+
+
+        #endregion
     }
 }

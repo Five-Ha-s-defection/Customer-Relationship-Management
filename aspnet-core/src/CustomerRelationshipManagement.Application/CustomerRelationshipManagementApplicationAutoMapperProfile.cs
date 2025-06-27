@@ -22,8 +22,10 @@ using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
-using System.Collections.Generic;
+using CustomerRelationshipManagement.CustomerProcess.Cars;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.RBAC.Menus;
+using CustomerRelationshipManagement.RBACDtos.Menus;
 
 namespace CustomerRelationshipManagement;
 
@@ -43,6 +45,11 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
 
+        //车架号表
+        CreateMap<CarFrameNumber, CarDto>().ReverseMap();
+        CreateMap<CarFrameNumber, CreateUpdateCarDto>().ReverseMap();
+
+
         //应收款表
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
         CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
@@ -61,6 +68,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<UserInfo, LoginResultDto>().ReverseMap();
         //菜单信息映射
         CreateMap<MenuInfo, MenuDto>().ReverseMap();
+        CreateMap<CreateOrUpdateMenuDto, MenuInfo>().ReverseMap();
 
 
 
@@ -89,7 +97,8 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //合同表
         CreateMap<AddCrmContractDto, CrmContract>().ReverseMap();
         CreateMap<CrmContract, ShowCrmContractDto>().ReverseMap();
-
+        CreateMap<UpdateCrmContractDto, CrmContract>().ReverseMap();
+        CreateMap<CrmContractandProduct,UpdateCrmcontractandProductDto>().ReverseMap();
 
     }
 }

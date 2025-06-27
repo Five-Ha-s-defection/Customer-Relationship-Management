@@ -21,7 +21,7 @@ namespace CustomerRelationshipManagement.RBAC.RoleMenus
         /// <summary>
         /// 角色导航属性
         /// </summary>
-        public RoleInfo Role { get; set; } = new RoleInfo();
+        public RoleInfo Role { get; set; } 
         /// <summary>
         /// 菜单Id
         /// </summary>
@@ -29,6 +29,6 @@ namespace CustomerRelationshipManagement.RBAC.RoleMenus
         /// <summary>
         /// 菜单导航属性
         /// </summary>
-        public MenuInfo Menu { get; set; } = new MenuInfo();
+        public MenuInfo Menu { get; set; } 
     }
 }
