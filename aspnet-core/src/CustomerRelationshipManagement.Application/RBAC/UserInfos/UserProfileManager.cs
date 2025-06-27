@@ -7,6 +7,7 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -106,7 +107,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                         .Where(m => m.ParentId == parentId)
                         .Select(x => new MenuDto
                         {
-                            Name = x.MenuName,
+                            MenuName = x.MenuName,
                             Path = x.Path,
                             Component = x.Component,
                             Icon = x.Icon,

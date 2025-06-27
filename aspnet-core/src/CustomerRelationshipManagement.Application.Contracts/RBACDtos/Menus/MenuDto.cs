@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.RBACDtos.Users
+namespace CustomerRelationshipManagement.RBACDtos.Menus
 {
     public class MenuDto
     {
         /// <summary>
         /// 菜单名称
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public string MenuName { get; set; } = string.Empty;
         /// <summary>
         /// 路径 如 /order/list
         /// </summary>

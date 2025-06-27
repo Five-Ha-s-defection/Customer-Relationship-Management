@@ -19,6 +19,7 @@
     <ProjectReference Include="..\CustomerRelationshipManagement.Domain.Shared\CustomerRelationshipManagement.Domain.Shared.csproj" />
     <ProjectReference Include="..\CustomerRelationshipManagement.Domain\CustomerRelationshipManagement.Domain.csproj" />
     <ProjectReference Include="..\CustomerRelationshipManagement.Application.Contracts\CustomerRelationshipManagement.Application.Contracts.csproj" />
+    <ProjectReference Include="..\CustomerRelationshipManagement.EntityFrameworkCore\CustomerRelationshipManagement.EntityFrameworkCore.csproj" />
   </ItemGroup>
 
   <ItemGroup>

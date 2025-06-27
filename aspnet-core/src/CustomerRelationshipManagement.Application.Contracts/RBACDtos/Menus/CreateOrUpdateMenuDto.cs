@@ -9,10 +9,6 @@ namespace CustomerRelationshipManagement.RBACDtos.Menus
     public class CreateOrUpdateMenuDto
     {
         /// <summary>
-        /// 菜单主键Id（用于修改时指定菜单）
-        /// </summary>
-        public Guid? Id { get; set; }
-        /// <summary>
         /// 菜单名称
         /// </summary>
         public string MenuName { get; set; }
