@@ -1,4 +1,5 @@
-﻿using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
+﻿using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,19 +7,22 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.CustomerProcess.Customers.Helpers
+namespace CustomerRelationshipManagement.CustomerProcess.Clues.Helpers
 {
-    public static class CustomerCacheKeyHelper
+    public static class ClueCacheKeyHelper
     {
         /// <summary>
         /// 构建可读的缓存Key（推荐：方便调试）
         /// </summary>
-        public static string BuildReadableKey(SearchCustomerDto dto)
+        public static string BuildReadableKey(SearchClueDto dto)
         {
             string safe(string? input) => string.IsNullOrWhiteSpace(input) ? "null" : input.Trim();
 
-            return $"CustomerRedis_" +
+            return $"ClueRedis_" +
                    $"Type_{dto.type}_" +
+                   $"AssignedTo_{(string.IsNullOrWhiteSpace(dto.AssignedTo.Value.ToString()) ? "null" : dto.AssignedTo)}_" +
+                   $"CreatedBy_{(string.IsNullOrWhiteSpace(dto.CreatedBy.Value.ToString()) ? "null" : dto.CreatedBy)}_" +
+                   $"Status_{dto.Status?.ToString() ?? "null"}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"TimeType_{dto.TimeType?.ToString() ?? "null"}_" +
@@ -26,6 +30,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers.Helpers
                    $"OrderDesc_{dto.OrderDesc}_" +
                    $"Keyword_{(string.IsNullOrWhiteSpace(dto.Keyword) ? "All" : dto.Keyword)}_" +
                    $"Page_{dto.PageIndex}_Size_{dto.PageSize}";
+
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBACDtos.Users;
@@ -53,5 +54,11 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers
         /// </summary>
         /// <returns></returns>
         Task<ApiResult<List<UserInfoDto>>> GetUserSelectList();
+
+        /// <summary>
+        /// 获取车架号下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<CarDto>>> GetCarSelectList();
     }
 }

@@ -43,5 +43,10 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
+        /// <summary>
+        /// 关联的收款单
+        /// </summary>
+        public Guid PaymentId { get; set; } = Guid.Empty;  
     }
 }

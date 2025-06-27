@@ -1,7 +1,9 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers.Helpers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
 using CustomerRelationshipManagement.Paging;
@@ -28,15 +30,17 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly IRepository<Customer> repository;
         private readonly IRepository<Clue> clueRepository;
         private readonly IRepository<UserInfo> userRepository;
+        private readonly IRepository<CarFrameNumber> carRepository;
         private readonly ILogger<CustomerService> logger;
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository)
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository)
         {
             this.repository = repository;
             this.logger = logger;
             this.cache = cache;
             this.clueRepository = clueRepository;
             this.userRepository = userRepository;
+            this.carRepository = carRepository;
         }
 
         /// <summary>
@@ -103,6 +107,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                                  ClueWechat = clu != null ? clu.ClueWechat : null,         // 新增
                                  CustomerEmail = cus.CustomerEmail,
                              };
+                    //区分客户池和客户
+                    list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
+
                     //查询条件
                     //根据客户姓名、（联系人）、电话、邮箱、（微信号）模糊查询
                     if (!string.IsNullOrEmpty(dto.Keyword))
@@ -255,7 +262,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                     .Where(u => u.IsActive) // 只取有效用户，如有需要
                     .Select(u => new UserInfoDto
                     {
-                        UserId = u.Id,
+                        Id = u.Id,
                         UserName = u.UserName,
                     })
                     .ToList();
@@ -265,6 +272,32 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             catch (Exception ex)
             {
                 logger.LogError("获取用户下拉框数据出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取车架号下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<CarDto>>> GetCarSelectList()
+        {
+            try
+            {
+                var carlist = await carRepository.GetQueryableAsync();
+                var result= carlist
+                    .Select(u => new CarDto
+                    {
+                        Id = u.Id,
+                        CarFrameNumberName = u.CarFrameNumberName,
+                    })
+                    .ToList();
+                return ApiResult<List<CarDto>>.Success(ResultCode.Success, result);
+            }
+            catch (Exception)
+            {
+
                 throw;
             }
         }
