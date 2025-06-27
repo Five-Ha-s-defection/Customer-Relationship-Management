@@ -52,10 +52,19 @@ namespace CustomerRelationshipManagement.Finance.Payments
                 payment.PaymentCode = $"R{payment.PaymentCode}";
             }
             await repository.InsertAsync(payment);
-            
+
+            //更新应收
+            if(createUpdatePaymentDTO.ReceivableId != Guid.Empty)
+            {
+                var receivables = await receivablesRepository.GetAsync(createUpdatePaymentDTO.ReceivableId);
+                if(receivables != null)
+                {
+                    receivables.PaymentId = payment.Id;
+                    await receivablesRepository.UpdateAsync(receivables);
+                }
+            }
             return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(payment));
         }
-
         /// <summary>
         /// 处理收款记录的审批操作
         /// </summary>

@@ -91,6 +91,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
             return  ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
         }
 
+
         /// <summary>
         /// 获取应收款分页列表
         /// 使用Redis缓存提高查询性能，支持多种查询条件过滤
