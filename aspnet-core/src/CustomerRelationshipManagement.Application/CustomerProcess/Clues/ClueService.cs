@@ -7,7 +7,6 @@ using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
