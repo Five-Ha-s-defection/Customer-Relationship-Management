@@ -14,6 +14,8 @@ namespace CustomerRelationshipManagement.Interfaces.IFinance.Payments
     {
         Task<ApiResult<PaymentDTO>> InsertPayment(CreateUpdatePaymentDTO createUpdatePaymentDTO);
 
+        Task<ApiResult> Approve(Guid paymentId, Guid approverId, bool isPass, string comment);
+
         Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO paymentSearchDTO);
 
         Task<ApiResult<PaymentDTO>> UpdatePayment(Guid id, CreateUpdatePaymentDTO createUpdatePaymentDTO);

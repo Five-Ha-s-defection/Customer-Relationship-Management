@@ -45,5 +45,18 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+
+
+        /// <summary>
+        /// 客户名称
+        /// </summary>
+        public string CustomerName { get; set; }
+
+        /// <summary>
+        /// 合同名称
+        /// </summary>
+        public string ContractName { get; set; }
+
+        public string UserName { get; set; }
     }
 }
