@@ -8,6 +8,7 @@ using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ using Volo.Abp.Users;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class UserProfileManager:DomainService
     {
         private readonly IRepository<UserInfo, Guid> userRep;

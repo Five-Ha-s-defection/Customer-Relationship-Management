@@ -20,8 +20,8 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         public string GenerateToken(Guid userId, string userName)
         {
             IList<Claim> claims = new List<Claim> {
-                                new Claim(JwtClaimTypes.Id, userId.ToString()),
-                                new Claim(JwtClaimTypes.Name, userName)
+                                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                                new Claim(ClaimTypes.Name, userName)
                             };
 
             //JWT密钥

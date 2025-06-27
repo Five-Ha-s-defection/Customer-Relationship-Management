@@ -1,5 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.RBACDtos.RolePermissions;
+using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.RBAC.RolePermissions
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class RolePermissionServices : ApplicationService, IRolePermissionServices
     {
         private readonly IRepository<RolePermissionInfo, Guid> rolePermissionRepository;
