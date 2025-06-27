@@ -19,6 +19,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers.Helpers
 
             return $"CustomerRedis_" +
                    $"Type_{dto.type}_" +
+                   $"AssignedTo_{(string.IsNullOrWhiteSpace(dto.AssignedTo.ToString()) ? "null" : dto.AssignedTo)}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"TimeType_{dto.TimeType?.ToString() ?? "null"}_" +
