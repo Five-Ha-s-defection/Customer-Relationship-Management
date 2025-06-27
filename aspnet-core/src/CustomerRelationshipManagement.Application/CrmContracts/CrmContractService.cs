@@ -112,29 +112,26 @@ namespace CustomerRelationshipManagement.CrmContracts
         }
 
         /// <summary>
-        /// 添加合同的方法(事务实现),思路:先将产品信息预存在前端的页面中,然后写出UI样式后,根据UI调试后端的需求
+        ///  添加合同的方法(事务实现),思路:先将产品信息预存在前端的页面中,然后写出UI样后,根据UI调试后端的需求
         /// </summary>
         /// <param name="addCrmContractDto"></param>
         /// <returns></returns>
-        //public async Task<ApiResult> AddCrmContract(AddCrmContractDto addCrmContractDto)
-        //{
-        //    var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        //    using (scope)
-        //    {
-        //        try
-        //        {
-        //            //合同表操作
-        //            //转换要添加的合同表数据
-        //            var crmcontract = ObjectMapper.Map<AddCrmContractDto, CrmContract>(addCrmContractDto);
+        public async Task<ApiResult> AddCrmContract(AddCrmContractDto addCrmContractDto)
+        {
+            var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            using (scope)
+            {
+                try
+                {
+                    //合同表操作
+                    //转换要添加的合同表数据
+                    var crmcontract = ObjectMapper.Map<AddCrmContractDto, CrmContract>(addCrmContractDto);
 
-        //            //执行插入合同表的数据的操作
-        //            var crmcontractresult = await repository.InsertAsync(crmcontract);
+                    //执行插入合同表的数据的操作
+                    var crmcontractresult = await repository.InsertAsync(crmcontract);
 
 
-        //            //合同产品关系表操作
-        //            //创建要添加的关系表数据集合
-        //            List<CrmContractandProduct> crmcontractproductlist = new List<CrmContractandProduct>();
-
+                    //合同产品关系表操作
                     //创建要添加的关系表数据集合
                     List<CrmContractandProduct> crmcontractproductlist = new List<CrmContractandProduct>();
                     //遍历添加产品id到集合中
@@ -150,22 +147,22 @@ namespace CustomerRelationshipManagement.CrmContracts
                         });
                     }
 
-        //            //批量添加到关系表中
-        //            await crmContractandProductrepository.InsertManyAsync(crmcontractproductlist);
+                    //批量添加到关系表中
+                    await crmContractandProductrepository.InsertManyAsync(crmcontractproductlist);
 
 
-        //            //应收款表操作
-        //            //转换要添加的应收款数据
-        //            var receivables = ObjectMapper.Map<CreateUpdateReceibablesDto, Receivables>(addCrmContractDto.CreateUpdateReceibablesDto);
-        //            receivables.CustomerId = crmcontractresult.CustomerId;
-        //            receivables.ContractId = crmcontractresult.Id;
-        //            receivables.UserId = crmcontractresult.UserId;
+                    //应收款表操作
+                    //转换要添加的应收款数据
+                    var receivables = ObjectMapper.Map<CreateUpdateReceibablesDto, Receivables>(addCrmContractDto.CreateUpdateReceibablesDto);
+                    receivables.CustomerId = crmcontractresult.CustomerId;
+                    receivables.ContractId = crmcontractresult.Id;
+                    receivables.UserId = crmcontractresult.UserId;
 
-        //            //执行插入应收款表的操作
-        //            var receivablesresult = await receivablesrepository.InsertAsync(receivables);
+                    //执行插入应收款表的操作
+                    var receivablesresult = await receivablesrepository.InsertAsync(receivables);
 
-        //            //提交事务
-        //            scope.Complete();
+                    //提交事务
+                    scope.Complete();
 
                     //返回统一返回值
                     return ApiResult.Success(ResultCode.Success);
@@ -213,7 +210,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 {
                     //合同表操作
                     //获取对应id的合同表数据
-                    var crmcontractmodel = await repository.FindAsync(a=>a.Id == id);
+                    var crmcontractmodel = await repository.FindAsync(a => a.Id == id);
 
                     if (crmcontractmodel == null)
                     {
@@ -236,7 +233,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                     newcrmContractandProducts.AddRange(product);
 
                     //删除查到的数据
-                    await crmContractandProductrepository.HardDeleteAsync(product,true);
+                    await crmContractandProductrepository.HardDeleteAsync(product, true);
 
                     //添加新的关系表信息
                     foreach (var item in updateCrmContractDto.AddCrmcontractandProductDto)
@@ -262,7 +259,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 {
                     scope.Dispose();
                 }
-            }                
+            }
         }
 
         /// <summary>
