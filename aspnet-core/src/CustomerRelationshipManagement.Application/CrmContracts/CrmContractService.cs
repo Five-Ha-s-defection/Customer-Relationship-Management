@@ -56,7 +56,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 //查询条件(1.合同名称模糊查询)
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 0, a => a.ContractName.Contains(pageCrmContractDto.ContractName));
                 //创建时间范围查询
-                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.BeginTime)&&pageCrmContractDto.SearchTimeType==0,a=>a.CreationTime >= DateTime.Parse(pageCrmContractDto.BeginTime));
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.BeginTime) && pageCrmContractDto.SearchTimeType == 0, a => a.CreationTime >= DateTime.Parse(pageCrmContractDto.BeginTime));
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.EndTime) && pageCrmContractDto.SearchTimeType == 0, a => a.CreationTime < DateTime.Parse(pageCrmContractDto.BeginTime).AddDays(1));
                 //签订时间范围查询
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.BeginTime) && pageCrmContractDto.SearchTimeType == 1, a => a.SignDate >= DateTime.Parse(pageCrmContractDto.BeginTime));
@@ -77,7 +77,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 //所属客户查询
                 query = query.WhereIf(pageCrmContractDto.CustomerId != Guid.Empty && pageCrmContractDto.CheckType == 1, a => a.UserId.Equals(pageCrmContractDto.CustomerId));
                 //签订日期
-                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.SignDate) && pageCrmContractDto.CheckType == 1, a=>a.SignDate >= DateTime.Parse(pageCrmContractDto.SignDate) && a.SignDate < DateTime.Parse(pageCrmContractDto.SignDate).AddDays(1));
+                query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.SignDate) && pageCrmContractDto.CheckType == 1, a => a.SignDate >= DateTime.Parse(pageCrmContractDto.SignDate) && a.SignDate < DateTime.Parse(pageCrmContractDto.SignDate).AddDays(1));
                 //生效日期
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.CommencementDate) && pageCrmContractDto.CheckType == 1, a => a.CommencementDate >= DateTime.Parse(pageCrmContractDto.CommencementDate) && a.CommencementDate < DateTime.Parse(pageCrmContractDto.CommencementDate).AddDays(1));
                 //截止日期
@@ -124,66 +124,71 @@ namespace CustomerRelationshipManagement.CrmContracts
         /// </summary>
         /// <param name="addCrmContractDto"></param>
         /// <returns></returns>
-        //public async Task<ApiResult> AddCrmContract(AddCrmContractDto addCrmContractDto)
-        //{
-        //    var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
-        //    using (scope)
-        //    {
-        //        try
-        //        {
-        //            //合同表操作
-        //            //转换要添加的合同表数据
-        //            var crmcontract = ObjectMapper.Map<AddCrmContractDto, CrmContract>(addCrmContractDto);
+        public async Task<ApiResult> AddCrmContract(AddCrmContractDto addCrmContractDto)
+        {
+            var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled);
+            using (scope)
+            {
+                try
+                {
+                    //合同表操作
+                    //转换要添加的合同表数据
+                    var crmcontract = ObjectMapper.Map<AddCrmContractDto, CrmContract>(addCrmContractDto);
 
-        //            //执行插入合同表的数据的操作
-        //            var crmcontractresult = await repository.InsertAsync(crmcontract);
-
-
-        //            //合同产品关系表操作
-        //            //创建要添加的关系表数据集合
-        //            List<CrmContractandProduct> crmcontractproductlist = new List<CrmContractandProduct>();
-
-        //            //遍历添加产品id到集合中
-        //            foreach (var item in addCrmContractDto.ProductId) {
-        //                crmcontractproductlist.Add(new CrmContractandProduct
-        //                {
-        //                    CrmContractId = crmcontract.Id,
-        //                    ProductId = item,
-        //                });
-        //            }
-
-        //            //批量添加到关系表中
-        //            await crmContractandProductrepository.InsertManyAsync(crmcontractproductlist);
+                    //执行插入合同表的数据的操作
+                    var crmcontractresult = await repository.InsertAsync(crmcontract);
 
 
-        //            //应收款表操作
-        //            //转换要添加的应收款数据
-        //            var receivables = ObjectMapper.Map<CreateUpdateReceibablesDto, Receivables>(addCrmContractDto.CreateUpdateReceibablesDto);
-        //            receivables.CustomerId = crmcontractresult.CustomerId;
-        //            receivables.ContractId = crmcontractresult.Id;
-        //            receivables.UserId = crmcontractresult.UserId;
+                    //合同产品关系表操作
+                    //根据关系表查询所有
 
-        //            //执行插入应收款表的操作
-        //            var receivablesresult = await receivablesrepository.InsertAsync(receivables);
+                    //创建要添加的关系表数据集合
+                    List<CrmContractandProduct> crmcontractproductlist = new List<CrmContractandProduct>();
+                    //遍历添加产品id到集合中
+                    foreach (var item in addCrmContractDto.ProductIds)
+                    {
+                        crmcontractproductlist.Add(new CrmContractandProduct
+                        {
+                            CrmContractId = crmcontract.Id,
+                            ProductId = item,
+                            BuyProductNum = 0,
+                            SellPrice = 0,
+                            SumPrice = 0
+                        });
+                    }
 
-        //            //提交事务
-        //            scope.Complete();
+                    //批量添加到关系表中
+                    await crmContractandProductrepository.InsertManyAsync(crmcontractproductlist);
 
-        //            //返回统一返回值
-        //            return ApiResult.Success(ResultCode.Success);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            logger.LogError("添加合同事务出错 " + ex.Message);
-        //            throw;
-        //        }
-        //        finally
-        //        {
-        //            scope.Dispose();
-        //        }
-        //    }
-        //}
-                
+
+                    //应收款表操作
+                    //转换要添加的应收款数据
+                    var receivables = ObjectMapper.Map<CreateUpdateReceibablesDto, Receivables>(addCrmContractDto.CreateUpdateReceibablesDto);
+                    receivables.CustomerId = crmcontractresult.CustomerId;
+                    receivables.ContractId = crmcontractresult.Id;
+                    receivables.UserId = crmcontractresult.UserId;
+
+                    //执行插入应收款表的操作
+                    var receivablesresult = await receivablesrepository.InsertAsync(receivables);
+
+                    //提交事务
+                    scope.Complete();
+
+                    //返回统一返回值
+                    return ApiResult.Success(ResultCode.Success);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError("添加合同事务出错 " + ex.Message);
+                    throw;
+                }
+                finally
+                {
+                    scope.Dispose();
+                }
+            }
+        }
+
         /// <summary>
         /// 获取合同表的详情
         /// </summary>
@@ -196,7 +201,7 @@ namespace CustomerRelationshipManagement.CrmContracts
             var crmcontractdto = ObjectMapper.Map<CrmContract, ShowCrmContractDto>(crmcontract);
 
             //根据合同表id获取所有产品关系表
-            var crmcontractproduct = await crmContractandProductrepository.GetListAsync(a=>a.CrmContractId == GetId);
+            var crmcontractproduct = await crmContractandProductrepository.GetListAsync(a => a.CrmContractId == GetId);
 
             //实例化dto
             var getCrmContractDto = new GetCrmContractDto();
@@ -215,8 +220,9 @@ namespace CustomerRelationshipManagement.CrmContracts
         //{
         //    //获取对应id的合同表数据
         //    var crmcontract = await repository.FindAsync(UpdateCrmContractDto.Id);
-
-
+        //
+        //    
+        //
         //}
 
         /// <summary>
@@ -256,7 +262,7 @@ namespace CustomerRelationshipManagement.CrmContracts
             catch (Exception ex)
             {
                 logger.LogError("批量删除合同出错 " + ex.Message);
-                return ApiResult.Fail("删除失败",ResultCode.Fail);
+                return ApiResult.Fail("删除失败", ResultCode.Fail);
                 throw;
             }
         }
