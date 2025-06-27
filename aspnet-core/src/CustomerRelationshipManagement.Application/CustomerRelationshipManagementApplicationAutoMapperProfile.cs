@@ -96,7 +96,8 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //合同表
         CreateMap<AddCrmContractDto, CrmContract>().ReverseMap();
         CreateMap<CrmContract, ShowCrmContractDto>().ReverseMap();
-
+        CreateMap<UpdateCrmContractDto, CrmContract>().ReverseMap();
+        CreateMap<CrmContractandProduct,UpdateCrmcontractandProductDto>().ReverseMap();
 
     }
 }
