@@ -2,10 +2,12 @@
 using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers.Helpers;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
 using CustomerRelationshipManagement.Paging;
+using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.RBACDtos.Users;
+using MathNet.Numerics.LinearAlgebra.Factorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -17,22 +19,24 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
-using Volo.Abp.ObjectMapping;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Customers
 {
+    [ApiExplorerSettings(GroupName = "v1")]
     public class CustomerService:ApplicationService,ICustomerService
     {
         private readonly IRepository<Customer> repository;
         private readonly IRepository<Clue> clueRepository;
+        private readonly IRepository<UserInfo> userRepository;
         private readonly ILogger<CustomerService> logger;
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository)
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository)
         {
             this.repository = repository;
             this.logger = logger;
             this.cache = cache;
             this.clueRepository = clueRepository;
+            this.userRepository = userRepository;
         }
 
         /// <summary>
@@ -67,34 +71,37 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             try
             {
                 //缓存key(动态分页查询不同的key)
-                string cacheKey = CustomerCacheKeyHelper.BuildHashKey(dto);
+                string cacheKey = CustomerCacheKeyHelper.BuildReadableKey(dto);
                 //使用Redis缓存获取或添加数据
                 var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
                 {
                     var customerlist = await repository.GetQueryableAsync();
                     var cluelist = await clueRepository.GetQueryableAsync();
+                    var userlist = await userRepository.GetQueryableAsync();
                     var list=from cus in customerlist
                              join clu in cluelist 
                              on cus.ClueId equals clu.Id
+                             into clueGroup
+                             from clu in clueGroup.DefaultIfEmpty() // 左连接
+                             join user in userlist
+                             on cus.CreatorId equals user.Id
                              select new CustomerDto
                              {
                                  Id=cus.Id,
-                                 CustomerName=cus.CustomerName,
-                                 CustomerPhone=cus.CustomerPhone,
-                                 CustomerEmail=cus.CustomerEmail,
-                                 CustomerLevelId=cus.CustomerLevelId,
-                                 CustomerTypeId=cus.CustomerTypeId,
-                                 CustomerRegionId=cus.CustomerRegionId,
-                                 CustomerSourceId=cus.CustomerSourceId,
-                                 CustomerAddress=cus.CustomerAddress,
-                                 CustomerRemark=cus.CustomerRemark,
+                                 UserId = cus.UserId,
+                                 CustomerName =cus.CustomerName,
+                                 CheckAmount=cus.CheckAmount,
+                                 CustomerLevelId = cus.CustomerLevelId,
+                                 CustomerPhone =cus.CustomerPhone,
+                                 CustomerSourceId = cus.CustomerSourceId,
                                  ClueId=cus.ClueId,
-                                 CustomerExpireTime=cus.CustomerExpireTime,
-                                 ClueWechat=clu.ClueWechat,
-                                 LastFollowTime= clu.LastFollowTime,
-                                 NextContactTime= clu.NextContactTime,
-                                 CreationTime =cus.CreationTime,
-
+                                 LastFollowTime = clu != null ? clu.LastFollowTime : null,
+                                 NextContactTime = clu != null ? clu.NextContactTime : null,
+                                 CreationTime = cus.CreationTime,
+                                 CreatorId = user.Id,
+                                 CreateName = user.UserName,
+                                 ClueWechat = clu != null ? clu.ClueWechat : null,         // 新增
+                                 CustomerEmail = cus.CustomerEmail,
                              };
                     //查询条件
                     //根据客户姓名、（联系人）、电话、邮箱、（微信号）模糊查询
@@ -153,6 +160,111 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             catch (Exception)
             {
 
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取客户详情信息
+        /// </summary>
+        /// <param name="id">要查询的客户ID</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<CustomerDto>> GetCustomerById(Guid id)
+        {
+            try
+            {
+                var customer = await repository.GetAsync(x => x.Id == id);
+                if (customer == null)
+                {
+                    return ApiResult<CustomerDto>.Fail("客户信息不存在", ResultCode.NotFound);
+                }
+                return ApiResult<CustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CustomerDto>(customer));
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 删除客户信息
+        /// </summary>
+        /// <param name="id">要删除的客户ID</param>
+        /// <returns></returns>
+        [HttpDelete]
+        public async Task<ApiResult<CustomerDto>> DelCustomer(Guid id)
+        {
+            try
+            {
+                var customer = await repository.GetAsync(x => x.Id == id);
+                if (customer == null)
+                {
+                    return ApiResult<CustomerDto>.Fail("您要删除的客户信息不存在", ResultCode.NotFound);
+                }
+                customer.IsDeleted = true;
+                await repository.UpdateAsync(customer);
+                return ApiResult<CustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CustomerDto>(customer));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("删除客户信息出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 修改客户信息
+        /// </summary>
+        /// <param name="id">要修改的客户ID</param>
+        /// <param name="dto">客户信息</param>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task<ApiResult<CreateUpdateCustomerDto>> UpdCustomer(Guid id, CreateUpdateCustomerDto dto)
+        {
+            try
+            {
+                var customer = await repository.GetAsync(x => x.Id == id);
+                if (customer == null)
+                {
+                    return ApiResult<CreateUpdateCustomerDto>.Fail("未找到要修改的客户", ResultCode.NotFound);
+                }
+                var customerDto = ObjectMapper.Map(dto, customer);
+                await repository.UpdateAsync(customerDto);
+                return ApiResult<CreateUpdateCustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CreateUpdateCustomerDto>(customerDto));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("修改线索信息出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取用户下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<UserInfoDto>>> GetUserSelectList()
+        {
+            try
+            {
+                var userList = await userRepository.GetQueryableAsync();
+                var result = userList
+                    .Where(u => u.IsActive) // 只取有效用户，如有需要
+                    .Select(u => new UserInfoDto
+                    {
+                        UserId = u.Id,
+                        UserName = u.UserName,
+                    })
+                    .ToList();
+
+                return ApiResult<List<UserInfoDto>>.Success(ResultCode.Success, result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("获取用户下拉框数据出错！" + ex.Message);
                 throw;
             }
         }

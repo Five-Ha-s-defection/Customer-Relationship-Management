@@ -88,11 +88,17 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// <summary>
         /// 最后跟进时间(线索外键)
         /// </summary>
-        public DateTime LastFollowTime { get; set; }
+        public DateTime? LastFollowTime { get; set; }
 
         /// <summary>
         /// 下次联系时间(线索外键)
         /// </summary>
-        public DateTime NextContactTime { get; set; }
+        public DateTime? NextContactTime { get; set; }
+
+        //======================================================================================
+        /// <summary>  
+        /// 创建人姓名（createId外键 连接 用户表Id）  
+        /// </summary>  
+        public string CreateName { get; set; } 
     }
 }

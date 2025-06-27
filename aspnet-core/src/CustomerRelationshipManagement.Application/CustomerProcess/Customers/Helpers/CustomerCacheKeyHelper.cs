@@ -15,6 +15,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers.Helpers
         /// </summary>
         public static string BuildReadableKey(SearchCustomerDto dto)
         {
+            string safe(string? input) => string.IsNullOrWhiteSpace(input) ? "null" : input.Trim();
+
             return $"CustomerRedis_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +

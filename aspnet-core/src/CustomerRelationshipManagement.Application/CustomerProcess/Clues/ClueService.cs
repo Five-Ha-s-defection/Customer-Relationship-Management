@@ -166,12 +166,20 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         [HttpGet]
         public async Task<ApiResult<ClueDto>> GetClueById(Guid id)
         {
-            var clue=await repository.GetAsync(x=>x.Id==id);
-            if(clue==null)
+            try
             {
-                return ApiResult<ClueDto>.Fail("线索信息不存在", ResultCode.NotFound);
+                var clue = await repository.GetAsync(x => x.Id == id);
+                if (clue == null)
+                {
+                    return ApiResult<ClueDto>.Fail("线索信息不存在", ResultCode.NotFound);
+                }
+                return ApiResult<ClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, ClueDto>(clue));
             }
-            return ApiResult<ClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, ClueDto>(clue));
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>

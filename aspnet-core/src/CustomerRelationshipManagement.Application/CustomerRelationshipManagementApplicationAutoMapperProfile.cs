@@ -19,6 +19,8 @@ using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using CustomerRelationshipManagement.CustomerProcess.Cars;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 
 namespace CustomerRelationshipManagement;
 
@@ -37,6 +39,11 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //客户表
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
+
+        //车架号表
+        CreateMap<CarFrameNumber, CarDto>().ReverseMap();
+        CreateMap<CarFrameNumber, CreateUpdateCarDto>().ReverseMap();
+
 
         //应收款表
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
