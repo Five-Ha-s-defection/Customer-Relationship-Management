@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.AspNetCore.Http;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
@@ -23,17 +25,19 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         private readonly IPasswordHasher<UserInfo> passwordHasher;
         private readonly UserProfileManager userProfileManager;
         private readonly IJwtHelper _jwtHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="userInfoRepository"></param>
-        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager,IJwtHelper jwtHelper)
+        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager,IJwtHelper jwtHelper, IHttpContextAccessor httpContextAccessor)
         {
             this.userInfoRepository = userInfoRepository;
             this.passwordHasher = passwordHasher;
             this.userProfileManager = userProfileManager;
             _jwtHelper = jwtHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
         /// <summary>
         /// 登录
@@ -83,6 +87,35 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
             {
                 throw new UserFriendlyException(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// 退出登录
+        /// 前端调用此接口后，后端返回成功，前端应清除本地token并跳转到登录页。
+        /// </summary>
+        /// <remarks>
+        /// 路由：POST /logout
+        /// 1. 前端调用此接口（无需参数，需携带token）
+        /// 2. 后端将token加入Redis黑名单，设置过期时间为2小时
+        /// 3. 前端收到成功后，清除本地token，跳转到登录页
+        /// </remarks>
+        [HttpDelete]
+        [Route("/api/app/logout")]
+        [Authorize]
+        public async Task<ApiResult> Logout()
+        {
+            // 获取当前请求的token
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            if (!string.IsNullOrEmpty(token))
+            {
+                // 将token加入Redis黑名单，设置过期时间为2小时
+                var distributedCache = LazyServiceProvider.LazyGetRequiredService<IDistributedCache>();
+                await distributedCache.SetStringAsync($"jwt_blacklist:{token}", "1", new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2)
+                });
+            }
+            return ApiResult.Success(ResultCode.Success);
         }
     }
 }

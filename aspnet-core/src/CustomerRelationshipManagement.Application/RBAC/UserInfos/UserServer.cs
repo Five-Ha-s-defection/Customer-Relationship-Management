@@ -113,7 +113,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// 获取当前用户信息（带角色、权限、菜单）
         /// </summary>
         /// <returns></returns>
-        [HttpGet("me")]
+        [HttpGet("/api/app/me")]
         [Authorize]
         public async Task<ApiResult<UserInfoDto>> GetCurrentUserInfoAsync()
         {
