@@ -1,5 +1,4 @@
 ﻿using CustomerRelationshipManagement.EntityFrameworkCore;
-using CustomerRelationshipManagement.RBAC.UserInfos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
@@ -14,7 +13,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
@@ -177,6 +175,7 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
     {
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
+            // 注册Application程序集中的所有应用服务为控制器
             options.ConventionalControllers.Create(typeof(CustomerRelationshipManagementApplicationModule).Assembly);
         });
     }
@@ -187,11 +186,8 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "CustomerRelationshipManagement API", Version = "v1" });
 
-            options.DocInclusionPredicate((doc, desc) =>
-            {
-                return desc.GroupName == doc;
-            });
-
+            // 移除所有分组限制，让所有API都能显示
+            // 不再需要DocInclusionPredicate，所有API都会显示在v1分组中
 
             //开启权限小锁
             options.OperationFilter<AddResponseHeadersFilter>();

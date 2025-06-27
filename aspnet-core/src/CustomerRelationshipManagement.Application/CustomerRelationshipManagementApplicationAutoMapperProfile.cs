@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
@@ -19,7 +22,10 @@ using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using CustomerRelationshipManagement.CustomerProcess.Cars;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.RBAC.Menus;
+using CustomerRelationshipManagement.RBACDtos.Menus;
 
 namespace CustomerRelationshipManagement;
 
@@ -39,6 +45,11 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
 
+        //车架号表
+        CreateMap<CarFrameNumber, CarDto>().ReverseMap();
+        CreateMap<CarFrameNumber, CreateUpdateCarDto>().ReverseMap();
+
+
         //应收款表
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
         CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
@@ -57,6 +68,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<UserInfo, LoginResultDto>().ReverseMap();
         //菜单信息映射
         CreateMap<MenuInfo, MenuDto>().ReverseMap();
+        CreateMap<CreateOrUpdateMenuDto, MenuInfo>().ReverseMap();
 
 
 
@@ -81,6 +93,12 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Category, CategoryDtos>().ReverseMap();
         //产品分类添加修改Dto
         CreateMap<Category, CreateUpdateCategoryDtos>().ReverseMap();
+
+        //合同表
+        CreateMap<AddCrmContractDto, CrmContract>().ReverseMap();
+        CreateMap<CrmContract, ShowCrmContractDto>().ReverseMap();
+        CreateMap<UpdateCrmContractDto, CrmContract>().ReverseMap();
+        CreateMap<CrmContractandProduct,UpdateCrmcontractandProductDto>().ReverseMap();
 
     }
 }

@@ -1,19 +1,21 @@
-﻿using CustomerRelationshipManagement.Paging;
+﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.CustomerProcess.Clues.Helpers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues;
+using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
-using Volo.Abp.Domain.Repositories;
-using System.Linq;
 using Volo.Abp.Caching;
-using System.Collections.Generic;
-using Microsoft.Extensions.Caching.Distributed;
-using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Clues;
-using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using Volo.Abp.Domain.Repositories;
 
 
 
@@ -33,7 +35,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         {
             this.repository = repository;
             this.logger = logger;
-      this.cache = cache;
+            this.cache = cache;
         }
 
         /// <summary>
@@ -74,11 +76,23 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             try
             {
                 //构建缓存键名
-                string cacheKey = "ClueRedis";
+                string cacheKey = ClueCacheKeyHelper.BuildReadableKey(dto);
                 //使用Redis缓存获取或添加数据
                 var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
                 {
                     var cluelist = await repository.GetQueryableAsync();
+                    //只在type==1且AssignedTo有值时加条件
+                    //cluelist = cluelist.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
+                    Guid? assignedToGuid = null;
+                    if (!string.IsNullOrWhiteSpace(dto.AssignedTo.ToString()) && Guid.TryParse(dto.AssignedTo.ToString(), out var guid))
+                    {
+                        assignedToGuid = guid;
+                    }
+                    if (dto.type == 1 && assignedToGuid.HasValue)
+                    {
+                        cluelist = cluelist.Where(x => x.UserId == assignedToGuid);
+                    }
+
                     //查询条件
                     //根据姓名、手机、邮箱、公司名称模糊查询
                     if (!string.IsNullOrEmpty(dto.Keyword))
@@ -148,7 +162,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 {
                     SlidingExpiration = TimeSpan.FromMinutes(5)     //设置缓存过期时间为5分钟
                 });
-              
+
                 return ApiResult<PageInfoCount<ClueDto>>.Success(ResultCode.Success,redislist);
             }
             catch (Exception)
@@ -166,12 +180,20 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         [HttpGet]
         public async Task<ApiResult<ClueDto>> GetClueById(Guid id)
         {
-            var clue=await repository.GetAsync(x=>x.Id==id);
-            if(clue==null)
+            try
             {
-                return ApiResult<ClueDto>.Fail("线索信息不存在", ResultCode.NotFound);
+                var clue = await repository.GetAsync(x => x.Id == id);
+                if (clue == null)
+                {
+                    return ApiResult<ClueDto>.Fail("线索信息不存在", ResultCode.NotFound);
+                }
+                return ApiResult<ClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, ClueDto>(clue));
             }
-            return ApiResult<ClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, ClueDto>(clue));
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
         /// <summary>

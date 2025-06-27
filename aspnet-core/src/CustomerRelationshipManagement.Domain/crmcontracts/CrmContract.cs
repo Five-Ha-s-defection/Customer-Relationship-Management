@@ -93,5 +93,6 @@ namespace CustomerRelationshipManagement.crmcontracts
         /// 收款状态
         /// </summary>
         public int PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
+
     }
 }
