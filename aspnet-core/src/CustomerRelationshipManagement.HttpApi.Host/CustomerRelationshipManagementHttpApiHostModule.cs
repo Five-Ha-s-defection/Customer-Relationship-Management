@@ -39,8 +39,7 @@ namespace CustomerRelationshipManagement;
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule),
-    typeof(AbpCachingStackExchangeRedisModule)
+    typeof(AbpSwashbuckleModule)
 )]
 public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 {
@@ -199,7 +198,7 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
             //options.SchemaFilter<SchemaFilter>();
 
             //在header中添加token，传递到后台
-            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = "JWT授权(数据将在请求头中进行传递)直接在下面框中输入Bearer {token}(注意两者之间是一个空格) \"",
                 Name = "Authorization",//jwt默认的参数名称
