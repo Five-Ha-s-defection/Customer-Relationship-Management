@@ -20,8 +20,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues.Helpers
 
             return $"ClueRedis_" +
                    $"Type_{dto.type}_" +
-                   $"AssignedTo_{(string.IsNullOrWhiteSpace(dto.AssignedTo.Value.ToString()) ? "null" : dto.AssignedTo)}_" +
-                   $"CreatedBy_{(string.IsNullOrWhiteSpace(dto.CreatedBy.Value.ToString()) ? "null" : dto.CreatedBy)}_" +
+                   $"AssignedTo_{(string.IsNullOrWhiteSpace(dto.AssignedTo.ToString()) ? "null" : dto.AssignedTo)}_" +
+                   $"CreatedBy_{(dto.CreatedBy.HasValue ? dto.CreatedBy.Value.ToString() : "null")}_" +
                    $"Status_{dto.Status?.ToString() ?? "null"}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +

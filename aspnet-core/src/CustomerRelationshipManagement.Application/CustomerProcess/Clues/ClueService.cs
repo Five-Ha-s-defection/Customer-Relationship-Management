@@ -7,7 +7,6 @@ using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,20 +80,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
                 {
                     var cluelist = await repository.GetQueryableAsync();
-                    //只在type==1且AssignedTo有值时加条件
-                    //cluelist = cluelist.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
-                    Guid? assignedToGuid = null;
-                    if (!string.IsNullOrWhiteSpace(dto.AssignedTo.ToString()) && Guid.TryParse(dto.AssignedTo.ToString(), out var guid))
-                    {
-                        assignedToGuid = guid;
-                    }
-                    if (dto.type == 1 && assignedToGuid.HasValue)
-                    {
-                        cluelist = cluelist.Where(x => x.UserId == assignedToGuid);
-                    }
-
+                    // 只在type==1且AssignedTo有值时加UserId过滤条件
+                    cluelist = cluelist.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
                     //查询条件
-                    //根据姓名、手机、邮箱、公司名称模糊查询
                     if (!string.IsNullOrEmpty(dto.Keyword))
                     {
                         cluelist = cluelist.Where(x => x.ClueName.Contains(dto.Keyword)
@@ -111,11 +99,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                     if (dto.CreatedBy.HasValue)
                     {
                         cluelist = cluelist.Where(x => x.CreatorId == dto.CreatedBy);
-                    }
-                    //根据负责人查询
-                    if (dto.AssignedTo.HasValue)
-                    {
-                        cluelist = cluelist.Where(x => x.UserId == dto.AssignedTo);
                     }
                     // 时间筛选
                     if (dto.StartTime.HasValue && dto.EndTime.HasValue && dto.TimeType.HasValue)
@@ -167,7 +150,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
