@@ -25,6 +25,16 @@ using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBACDtos.Menus;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
+using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
+using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
+using CustomerRelationshipManagement.CustomerProcess.Industrys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
+using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
+using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
 
 namespace CustomerRelationshipManagement;
 
@@ -48,6 +58,25 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<CarFrameNumber, CarDto>().ReverseMap();
         CreateMap<CarFrameNumber, CreateUpdateCarDto>().ReverseMap();
 
+        //客户级别表
+        CreateMap<CustomerLevel, LevelDto>().ReverseMap();
+        CreateMap<CustomerLevel, CreateUpdateLevelDto>().ReverseMap();
+
+        //线索/客户来源表
+        CreateMap<ClueSource, SourceDto>().ReverseMap();
+        CreateMap<ClueSource, CreateUpdateSourceDto>().ReverseMap();
+
+        //线索行业表
+        CreateMap<Industry, IndustryDto>().ReverseMap();
+        CreateMap<Industry, CreateUpdateIndustryDto>().ReverseMap();
+
+        //客户区域表
+        CreateMap<CustomerRegion,RegionDto>().ReverseMap();
+        CreateMap<CustomerRegion, CreateUpdateRegionDto>().ReverseMap();
+
+        //商机表
+        CreateMap<BusinessOpportunity, BusinessOpportunityDto>().ReverseMap();
+        CreateMap<BusinessOpportunity, CreateUpdateBusinessOpportunityDto>().ReverseMap();
 
         //应收款表
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();

@@ -18,6 +18,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// </summary>
         public Guid UserId { get; set; }
 
+        //============================================================================
+        /// <summary>  
+        /// 用户名  
+        /// </summary>  
+        public string UserName { get; set; }
+
         /// <summary>
         /// 姓名
         /// </summary>
@@ -32,6 +38,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// 线索来源
         /// </summary>
         public Guid ClueSourceId { get; set; }
+
+        //===================================================================
+        /// <summary>
+        /// 线索来源名称
+        /// </summary>
+        public string ClueSourceName { get; set; } 
 
         /// <summary>
         /// 邮箱
@@ -57,6 +69,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// 行业
         /// </summary>
         public Guid IndustryId { get; set; }
+
+        //=======================================================================
+        /// <summary>
+        /// 行业名称
+        /// </summary>
+        public string IndustryName { get; set; }
 
         /// <summary>
         /// 地址

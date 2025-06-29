@@ -1,9 +1,15 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Clues.Helpers;
+using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues;
 using CustomerRelationshipManagement.Paging;
+using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -27,14 +33,20 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         /// 依赖注入
         /// </summary>
         private readonly IRepository<Clue> repository;
+        private readonly IRepository<ClueSource> sourceRepository;
+        private readonly IRepository<UserInfo> userRepository;
+        private readonly IRepository<Industry> industryRepository;
         private readonly ILogger<ClueService> logger;
         private readonly IDistributedCache<PageInfoCount<ClueDto>> cache;
 
-        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache)
+        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository)
         {
             this.repository = repository;
             this.logger = logger;
             this.cache = cache;
+            this.sourceRepository = sourceRepository;
+            this.userRepository = userRepository;
+            this.industryRepository = industryRepository;
         }
 
         /// <summary>
@@ -80,12 +92,43 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
                 {
                     var cluelist = await repository.GetQueryableAsync();
+                    var sourcelist=await sourceRepository.GetQueryableAsync();
+                    var userlist=await userRepository.GetQueryableAsync();  
+                    var industrylist=await industryRepository.GetQueryableAsync();
+                    var list = from clu in cluelist
+                               join source in sourcelist
+                               on clu.ClueSourceId equals source.Id
+                               join user in userlist
+                               on clu.UserId equals user.Id
+                               join industry in industrylist
+                               on clu.IndustryId equals industry.Id
+                               select new ClueDto
+                               {
+                                   Id = clu.Id,
+                                   UserId = clu.UserId,
+                                   UserName=user.UserName,
+                                   ClueName = clu.ClueName,
+                                   CluePhone = clu.CluePhone,
+                                   ClueSourceId = clu.ClueSourceId,
+                                   ClueSourceName= source.ClueSourceName,
+                                   ClueEmail = clu.ClueEmail,
+                                   ClueWechat = clu.ClueWechat,
+                                   ClueQQ = clu.ClueQQ,
+                                   CompanyName = clu.CompanyName,
+                                   IndustryId = clu.IndustryId,
+                                   IndustryName = industry.IndustryName,
+                                   Address = clu.Address,
+                                   Remark = clu.Remark,
+                                   Status = clu.Status,
+                                   LastFollowTime = clu.LastFollowTime,
+                                   NextContactTime = clu.NextContactTime
+                               };
                     // 只在type==1且AssignedTo有值时加UserId过滤条件
-                    cluelist = cluelist.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
+                    list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
                     //查询条件
                     if (!string.IsNullOrEmpty(dto.Keyword))
                     {
-                        cluelist = cluelist.Where(x => x.ClueName.Contains(dto.Keyword)
+                        list = list.Where(x => x.ClueName.Contains(dto.Keyword)
                                                || x.ClueEmail.Contains(dto.Keyword)
                                                || x.CluePhone.Contains(dto.Keyword)
                                                || x.CompanyName.Contains(dto.Keyword));
@@ -93,52 +136,50 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                     //根据状态查询
                     if (dto.Status.HasValue)
                     {
-                        cluelist = cluelist.Where(x => x.Status == dto.Status.Value);
+                        list = list.Where(x => x.Status == dto.Status.Value);
                     }
                     //根据创建人查询
                     if (dto.CreatedBy.HasValue)
                     {
-                        cluelist = cluelist.Where(x => x.CreatorId == dto.CreatedBy);
+                        list = list.Where(x => x.CreatorId == dto.CreatedBy);
                     }
                     // 时间筛选
                     if (dto.StartTime.HasValue && dto.EndTime.HasValue && dto.TimeType.HasValue)
                     {
-                        cluelist = dto.TimeType switch
+                        list = dto.TimeType switch
                         {
-                            TimeField.CreateTime => cluelist.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime),
-                            TimeField.NextContact => cluelist.Where(x => x.NextContactTime >= dto.StartTime && x.NextContactTime <= dto.EndTime),
-                            TimeField.LastFollow => cluelist.Where(x => x.LastFollowTime >= dto.StartTime && x.LastFollowTime <= dto.EndTime),
-                            _ => cluelist
+                            TimeField.CreateTime => list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime),
+                            TimeField.NextContact => list.Where(x => x.NextContactTime >= dto.StartTime && x.NextContactTime <= dto.EndTime),
+                            TimeField.LastFollow => list.Where(x => x.LastFollowTime >= dto.StartTime && x.LastFollowTime <= dto.EndTime),
+                            _ => list
                         };
                     }
 
                     // 排序
                     if (dto.OrderBy.HasValue)
                     {
-                        cluelist = (dto.OrderBy.Value, dto.OrderDesc) switch
+                        list = (dto.OrderBy.Value, dto.OrderDesc) switch
                         {
-                            (TimeField.CreateTime, true) => cluelist.OrderByDescending(x => x.CreationTime),
-                            (TimeField.CreateTime, false) => cluelist.OrderBy(x => x.CreationTime),
+                            (TimeField.CreateTime, true) => list.OrderByDescending(x => x.CreationTime),
+                            (TimeField.CreateTime, false) => list.OrderBy(x => x.CreationTime),
 
-                            (TimeField.NextContact, true) => cluelist.OrderByDescending(x => x.NextContactTime),
-                            (TimeField.NextContact, false) => cluelist.OrderBy(x => x.NextContactTime),
+                            (TimeField.NextContact, true) => list.OrderByDescending(x => x.NextContactTime),
+                            (TimeField.NextContact, false) => list.OrderBy(x => x.NextContactTime),
 
-                            (TimeField.LastFollow, true) => cluelist.OrderByDescending(x => x.LastFollowTime),
-                            (TimeField.LastFollow, false) => cluelist.OrderBy(x => x.LastFollowTime),
+                            (TimeField.LastFollow, true) => list.OrderByDescending(x => x.LastFollowTime),
+                            (TimeField.LastFollow, false) => list.OrderBy(x => x.LastFollowTime),
 
-                            _ => cluelist.OrderByDescending(x => x.LastFollowTime)
+                            _ => list.OrderByDescending(x => x.LastFollowTime)
                         };
                     }
                     //用ABP框架的分页
-                    var res = cluelist.PageResult(dto.PageIndex, dto.PageSize);
-                    //实体列表转换成DTO列表
-                    var clueDtos = ObjectMapper.Map<List<Clue>, List<ClueDto>>(res.Queryable.ToList());
+                    var res = list.PageResult(dto.PageIndex, dto.PageSize);
                     //构建分页结果对象
                     var pageInfo = new PageInfoCount<ClueDto>
                     {
                         TotalCount = res.RowCount,
                         PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / dto.PageSize),
-                        Data = clueDtos
+                        Data = res.Queryable.ToList()
                     };
                     return pageInfo;
                 }, () => new DistributedCacheEntryOptions
@@ -227,6 +268,107 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             catch (Exception ex)
             {
                 logger.LogError("修改线索信息出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取来源下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<SourceDto>>> GetSourceSelectList()
+        {
+            try
+            {
+                var sourceList = await sourceRepository.GetQueryableAsync();
+                var result = sourceList
+                    .Select(u => new
+                    {
+                        IdString = u.Id.ToString(),
+                        u.ClueSourceName,
+                        u.ClueSourceStatus,
+                        u.ClueSourceContent,
+                        u.CreateTime
+                    })
+                    .AsEnumerable()
+                    .Where(u => Guid.TryParse(u.IdString, out _))
+                    .Select(u => new SourceDto
+                    {
+                        Id = Guid.Parse(u.IdString),
+                        ClueSourceName = u.ClueSourceName,
+                        ClueSourceStatus = u.ClueSourceStatus,
+                        ClueSourceContent = u.ClueSourceContent,
+                        CreateTime = u.CreateTime
+                    })
+                    .ToList();
+                return ApiResult<List<SourceDto>>.Success(ResultCode.Success, result);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取用户下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<UserInfoDto>>> GetUserSelectList()
+        {
+            try
+            {
+                var userList = await userRepository.GetQueryableAsync();
+                var result = userList
+                    .Where(u => u.IsActive) // 只取有效用户，如有需要
+                    .Select(u => new UserInfoDto
+                    {
+                        Id = u.Id,
+                        UserName = u.UserName,
+                    })
+                    .ToList();
+
+                return ApiResult<List<UserInfoDto>>.Success(ResultCode.Success, result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("获取用户下拉框数据出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取行业下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<IndustryDto>>> GetIndustrySelectList()
+        {
+            try
+            {
+
+                var industryList = await industryRepository.GetQueryableAsync();
+                var result = industryList
+                    .Select(u => new
+                    {
+                        IdString = u.Id.ToString(),
+                        u.IndustryName
+                    })
+                    .AsEnumerable()
+                    .Where(u => Guid.TryParse(u.IdString, out _))
+                    .Select(u => new IndustryDto
+                    {
+                        Id = Guid.Parse(u.IdString),
+                        IndustryName = u.IndustryName,
+                    })
+                    .ToList();
+                return ApiResult<List<IndustryDto>>.Success(ResultCode.Success, result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("获取用户下拉框数据出错！" + ex.Message);
                 throw;
             }
         }
