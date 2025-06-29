@@ -1,5 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using Volo.Abp.Domain.Repositories;
 namespace CustomerRelationshipManagement.RBAC.Permissions
 {
     [ApiExplorerSettings(GroupName = "v1")]
+    [AllowAnonymous]
     public class PermissionServices : ApplicationService, IPermissionServices
     {
         private readonly IRepository<PermissionInfo, Guid> permissionInfoRepo;

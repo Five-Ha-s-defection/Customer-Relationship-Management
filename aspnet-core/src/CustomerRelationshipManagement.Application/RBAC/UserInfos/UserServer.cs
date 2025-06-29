@@ -16,7 +16,6 @@ using Volo.Abp.Users;
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
     [ApiExplorerSettings(GroupName = "v1")]
-    [Authorize]
     public class UserServer : ApplicationService, IUserServer
     {
         /// <summary>
@@ -114,7 +113,6 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// </summary>
         /// <returns></returns>
         [HttpGet("me")]
-        [Authorize]
         public async Task<ApiResult<UserInfoDto>> GetCurrentUserInfoAsync()
         {
             try

@@ -9,6 +9,7 @@ using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -23,6 +24,8 @@ using Volo.Abp.Users;
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
     [ApiExplorerSettings(GroupName = "v1")]
+    //加入jwt不需要验证的特性
+    [AllowAnonymous]
     public class UserProfileManager:DomainService
     {
         private readonly IRepository<UserInfo, Guid> userRep;
