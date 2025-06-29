@@ -303,7 +303,6 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
             c.DefaultModelExpandDepth(-1);
             // API前缀设置为空
             c.RoutePrefix = string.Empty;
-            c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
             // API页面Title
             c.DocumentTitle = "😍接口文档 - 阿星Plus⭐⭐⭐";
         });
