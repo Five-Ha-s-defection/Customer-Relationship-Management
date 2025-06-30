@@ -97,5 +97,10 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// </summary>
         [Required]
         public Guid ClueId { get; set; }
+
+        /// <summary>
+        /// 客户编号（类似C-202506240038-3B7C形式）
+        /// </summary>
+        public string CustomerCode { get; set; }
     }
 }

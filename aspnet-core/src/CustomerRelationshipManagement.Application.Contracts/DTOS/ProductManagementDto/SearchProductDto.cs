@@ -4,14 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
 {
-    /// <summary>
-    /// 产品管理DTOS
-    /// </summary>
-    public class ProductDtos:FullAuditedEntityDto<Guid>
+    public class SearchProductDto: PagingInfo
     {
         /// <summary>
         /// 产品分类

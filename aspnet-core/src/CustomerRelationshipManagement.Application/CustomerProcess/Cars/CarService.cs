@@ -15,6 +15,9 @@ using Volo.Abp.ObjectMapping;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Cars
 {
+    /// <summary>
+    /// 车架号服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class CarService: ApplicationService,ICarService
     {

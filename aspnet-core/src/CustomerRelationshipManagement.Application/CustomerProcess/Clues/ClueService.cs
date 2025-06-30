@@ -26,6 +26,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Clues
 {
+    /// <summary>
+    /// 线索服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class ClueService : ApplicationService, IClueService
     {

@@ -29,6 +29,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Customers
 {
+    /// <summary>
+    /// 客户服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class CustomerService:ApplicationService,ICustomerService
     {
@@ -64,12 +67,32 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         {
             try
             {
-                var customer=ObjectMapper.Map<CreateUpdateCustomerDto, Customer>(dto);
+                // 将前端传来的DTO映射为数据库实体Customer
+                var customer = ObjectMapper.Map<CreateUpdateCustomerDto, Customer>(dto);
+                // 自动生成客户编号 C-年月日时分-四位纯数字或大写字母数字混合
+                var now = DateTime.Now; // 获取当前时间
+                var random = new Random(); // 创建随机数生成器
+                string randomStr;
+                if (random.Next(2) == 0) // 50%概率生成纯数字
+                {
+                    // 生成1000~9999的四位纯数字
+                    randomStr = random.Next(1000, 10000).ToString("D4");
+                }
+                else // 50%概率生成大写字母和数字混合
+                {
+                    // 生成1000~FFFF的四位十六进制字符串（大写，含字母和数字）
+                    randomStr = random.Next(0x1000, 0x10000).ToString("X4");
+                }
+                // 拼接客户编号，格式如C-202506240038-3B7C或C-202506240038-1540
+                customer.CustomerCode = $"C-{now:yyyyMMddHHmm}-{randomStr}";
+                // 插入客户数据到数据库
                 var list = await repository.InsertAsync(customer);
+                // 返回插入后的客户信息（DTO）
                 return ApiResult<CustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CustomerDto>(list));
             }
             catch (Exception ex)
             {
+                // 记录异常日志
                 logger.LogError("添加客户信息出错！" + ex.Message);
                 throw;
             }

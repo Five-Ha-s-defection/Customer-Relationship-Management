@@ -77,13 +77,13 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         /// <exception cref="NotImplementedException"></exception>
         /// 
         [HttpGet]
-        public async Task<ApiResult<IList<ProductDtos>>> GetProduct([FromQuery] ProductDtos productdtos)
+        public async Task<ApiResult<IList<ProductDtos>>> GetProduct([FromQuery] SearchProductDto dto)
         {
             try
             {
                 var query = await productRepository.GetQueryableAsync();
                 //分页
-                var querypaging = query.OrderByDescending(x => x.Id).Skip(productdtos.PageIndex).Take(productdtos.PageSize);
+                var querypaging = query.OrderByDescending(x => x.Id).Skip(dto.PageIndex).Take(dto.PageSize);
                 //将数据通过映射转换
                 var productdto = ObjectMapper.Map<IList<Product>, IList<ProductDtos>>(querypaging.ToList());
                 //返回apiresult

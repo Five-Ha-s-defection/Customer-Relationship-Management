@@ -1,5 +1,9 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -18,5 +22,29 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IBusinessOp
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<ApiResult<BusinessOpportunityDto>> AddBusinessOpportunity(CreateUpdateBusinessOpportunityDto dto);
+
+        /// <summary>
+        /// 获取客户下拉列表
+        /// </summary>
+        /// <returns></returns>
+       Task<ApiResult<List<CustomerSimpleDto>>> GetCustomerSelectList();
+
+        /// <summary>
+        /// 获取商机优先级下拉列表
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<PriorityDto>>> GetPrioritySelectList();
+
+        /// <summary>
+        /// 获取商机销售进度下拉列表
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<SalesProgressDto>>> GetSalesProgressSelectList();
+
+        /// <summary>
+        /// 获取产品下拉列表
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<ProductDtos>>> GetProductSelectList();
     }
 }

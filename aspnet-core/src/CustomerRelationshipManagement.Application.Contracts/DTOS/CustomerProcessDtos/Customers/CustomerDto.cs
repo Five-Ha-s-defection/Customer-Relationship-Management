@@ -80,6 +80,11 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// </summary>
         public Guid ClueId { get; set; }
 
+        /// <summary>
+        /// 客户编号（类似C-202506240038-3B7C形式）
+        /// </summary>
+        public string CustomerCode { get; set; }
+
         //======================================================================================
         /// <summary>
         /// 微信号(线索外键)
