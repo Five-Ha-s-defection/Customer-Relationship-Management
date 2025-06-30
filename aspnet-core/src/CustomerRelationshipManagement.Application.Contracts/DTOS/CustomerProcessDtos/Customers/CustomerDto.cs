@@ -18,7 +18,7 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// <summary>
         /// 客户名称
         /// </summary>
-        public string CustomerName { get; set; } = string.Empty;
+        public string CustomerName { get; set; }
 
         /// <summary>
         /// 体检金额
