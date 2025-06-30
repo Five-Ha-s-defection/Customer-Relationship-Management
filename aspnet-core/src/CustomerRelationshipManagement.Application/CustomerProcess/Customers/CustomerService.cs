@@ -2,14 +2,19 @@
 using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
+using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
+using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers.Helpers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
-using MathNet.Numerics.LinearAlgebra.Factorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -31,9 +36,12 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly IRepository<Clue> clueRepository;
         private readonly IRepository<UserInfo> userRepository;
         private readonly IRepository<CarFrameNumber> carRepository;
+        private readonly IRepository<CustomerLevel> levelRepository;
+        private readonly IRepository<ClueSource> sourceRepository;
+        private readonly IRepository<CustomerRegion> regionRepository;
         private readonly ILogger<CustomerService> logger;
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository)
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository)
         {
             this.repository = repository;
             this.logger = logger;
@@ -41,6 +49,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             this.clueRepository = clueRepository;
             this.userRepository = userRepository;
             this.carRepository = carRepository;
+            this.levelRepository = levelRepository;
+            this.sourceRepository = sourceRepository;
+            this.regionRepository = regionRepository;
         }
 
         /// <summary>
@@ -286,18 +297,133 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             try
             {
                 var carlist = await carRepository.GetQueryableAsync();
-                var result= carlist
+
+                var result = carlist
+                    .Select(u => new
+                    {
+                        IdString = u.Id.ToString(), // 转为 string
+                        u.CarFrameNumberName
+                    })
+                    .AsEnumerable() // 从数据库取出后处理 Guid
+                    .Where(u => Guid.TryParse(u.IdString, out _)) // 过滤非法 Guid
                     .Select(u => new CarDto
                     {
-                        Id = u.Id,
-                        CarFrameNumberName = u.CarFrameNumberName,
+                        Id = Guid.Parse(u.IdString),
+                        CarFrameNumberName = u.CarFrameNumberName
                     })
                     .ToList();
+
                 return ApiResult<List<CarDto>>.Success(ResultCode.Success, result);
             }
             catch (Exception)
             {
+                throw;
+            }
+        }
 
+        /// <summary>
+        /// 获取客户级别下拉框
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<LevelDto>>> GetLevelSelectList()
+        {
+            try
+            {
+                var levelList = await levelRepository.GetQueryableAsync();
+                var result = levelList
+                    .Select(u => new 
+                    {
+                        IdString = u.Id.ToString(), // 转为 string
+                        u.CustomerLevelName
+                    })
+                      .AsEnumerable() // 从数据库取出后处理 Guid
+                    .Where(u => Guid.TryParse(u.IdString, out _)) // 过滤非法 Guid
+                    .Select(u => new LevelDto
+                    {
+                        Id = Guid.Parse(u.IdString),
+                        CustomerLevelName = u.CustomerLevelName
+                    })
+                    .ToList();  
+                return ApiResult<List<LevelDto>>.Success(ResultCode.Success, result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("获取客户级别下拉框数据出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取来源下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<SourceDto>>> GetSourceSelectList()
+        {
+            try
+            {
+                var sourceList = await sourceRepository.GetQueryableAsync();
+                var result = sourceList
+                    .Select(u => new
+                    {
+                        IdString=u.Id.ToString(),
+                        u.ClueSourceName,
+                        u.ClueSourceStatus,
+                        u.ClueSourceContent,
+                        u.CreateTime
+                    })
+                    .AsEnumerable()
+                    .Where(u=>Guid.TryParse(u.IdString,out _))
+                    .Select(u=>new SourceDto
+                    {
+                        Id=Guid.Parse(u.IdString),
+                        ClueSourceName=u.ClueSourceName,
+                        ClueSourceStatus=u.ClueSourceStatus,
+                        ClueSourceContent=u.ClueSourceContent,
+                        CreateTime=u.CreateTime
+                    })
+                    .ToList();
+                return ApiResult<List<SourceDto>>.Success(ResultCode.Success,result);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取客户地区下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<RegionDto>>> GetRegionCascadeList()
+        {
+            try
+            {
+                var allRegions = await regionRepository.GetListAsync();
+                // 递归构建树
+                List<RegionDto> BuildTree(Guid parentId)
+                {
+                    return allRegions
+                        .Where(r => r.ParentId == parentId)
+                        .Select(r => new RegionDto
+                        {
+                            Id = r.Id,
+                            CustomerRegionName = r.CustomerRegionName,
+                            ParentId = r.ParentId,
+                            Children = BuildTree(r.Id)
+                        })
+                        .ToList();
+                }
+                // 假设根节点ParentId为Guid.Empty
+                var tree = BuildTree(Guid.Empty);
+                return ApiResult<List<RegionDto>>.Success(ResultCode.Success, tree);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("获取客户地区级联数据出错！" + ex.Message);
                 throw;
             }
         }

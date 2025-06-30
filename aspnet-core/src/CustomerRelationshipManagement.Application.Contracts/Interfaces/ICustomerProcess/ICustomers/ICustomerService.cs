@@ -1,6 +1,9 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Mvc;
@@ -60,5 +63,24 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers
         /// </summary>
         /// <returns></returns>
         Task<ApiResult<List<CarDto>>> GetCarSelectList();
+
+        /// <summary>
+        /// 获取客户级别下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<LevelDto>>> GetLevelSelectList();
+
+        /// <summary>
+        /// 获取来源下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<SourceDto>>> GetSourceSelectList();
+
+
+        /// <summary>
+        /// 获取客户地区下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<RegionDto>>> GetRegionCascadeList();
     }
 }

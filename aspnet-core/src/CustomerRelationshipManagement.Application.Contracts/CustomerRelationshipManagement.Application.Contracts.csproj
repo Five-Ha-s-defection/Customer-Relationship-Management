@@ -26,10 +26,4 @@
     <ProjectReference Include="..\CustomerRelationshipManagement.Domain\CustomerRelationshipManagement.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOS\CustomerProcessDtos\BusinessOpportunitys\" />
-    <Folder Include="Interfaces\ICustomerProcess\IBusinessOpportunitys\" />
-    <Folder Include="Interfaces\I\" />
-  </ItemGroup>
-
 </Project>

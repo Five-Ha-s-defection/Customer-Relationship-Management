@@ -1,8 +1,11 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
@@ -45,5 +48,17 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
         /// <param name="dto"></param>
         /// <returns></returns>
         Task<ApiResult<CreateUpdateClueDto>> UpdClue(Guid id, CreateUpdateClueDto dto);
+
+        /// <summary>
+        /// 获取来源下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<SourceDto>>> GetSourceSelectList();
+
+        /// <summary>
+        /// 获取行业下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<IndustryDto>>> GetIndustrySelectList();
     }
 }
