@@ -13,6 +13,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
@@ -116,7 +117,28 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 
                         ClockSkew = TimeSpan.FromSeconds(30)   //平滑过期偏移时间
                     };
+
+                    // ✅ 添加下面的调试代码
+                    option.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            Console.WriteLine("❌ JWT 验证失败：" + context.Exception.Message);
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            Console.WriteLine("✅ JWT 验证成功，用户：" + context.Principal?.Identity?.Name);
+                            return Task.CompletedTask;
+                        },
+                        OnMessageReceived = context =>
+                        {
+                            Console.WriteLine("📥 收到 Token：" + context.Token);
+                            return Task.CompletedTask;
+                        }
+                    };
                 }
+
             );
     }
 
@@ -208,23 +230,9 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
                 Scheme = "Bearer",
             });
 
-            // ✅ 将其应用到所有接口上
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-                {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                Array.Empty<string>()
-        }
-    });
 
-
+            
+       
             //就是这里！！！！！！！！！
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var xmlPath = Path.Combine(basePath, "CustomerRelationshipManagement.Application.xml");//这个就是刚刚配置的xml文件名
@@ -288,7 +296,6 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         }*/
         app.UseUnitOfWork();
         app.UseDynamicClaims();
-        app.UseAuthorization();
         app.UseAuthorization();
         app.UseSwagger();
         app.UseSwaggerUI(c =>
