@@ -1,11 +1,14 @@
 ﻿//using CustomerRelationshipManagement.DTOS.UploadFileDto;
 using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Interfaces.IProductAppService;
+using CustomerRelationshipManagement.ProductCategory.Categorys;
 using CustomerRelationshipManagement.ProductCategory.Products;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using NPOI.POIFS.Properties;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,14 +23,16 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
     public class ProductAppService : ApplicationService, IProductAppService
     {
         private readonly IRepository<Product, Guid> productRepository;
+        private readonly IRepository<Category,Guid> ctegoryRepository;
         public IHttpContextAccessor httpContextAccessor;
         private readonly ILogger<ProductAppService> logger;
 
-        public ProductAppService(IRepository<Product, Guid> productRepository, IHttpContextAccessor httpContextAccessor, ILogger<ProductAppService> logger)
+        public ProductAppService(IRepository<Product, Guid> productRepository, IHttpContextAccessor httpContextAccessor, ILogger<ProductAppService> logger, IRepository<Category, Guid> ctegoryRepository)
         {
             this.productRepository = productRepository;
             this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
+            this.ctegoryRepository = ctegoryRepository;
         }
         /// <summary>
         /// 新增产品
@@ -82,6 +87,13 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
             try
             {
                 var query = await productRepository.GetQueryableAsync();
+                //查询条件
+                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductBrand)||!string.IsNullOrEmpty(productdtos.ProductCode),x => x.ProductBrand.Contains(productdtos.ProductBrand)||x.ProductCode.Contains(productdtos.ProductCode));
+                
+                query = query.WhereIf(productdtos.CategoryId != Guid.Empty, x => x.CategoryId == productdtos.CategoryId);
+
+
+                //
                 //分页
                 var querypaging = query.OrderByDescending(x => x.Id).Skip(productdtos.PageIndex).Take(productdtos.PageSize);
                 //将数据通过映射转换
@@ -148,8 +160,44 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         }
 
 
+       
 
 
 
+        [HttpGet]
+        public async Task<ApiResult<List<CategoryDtos>>> GetCategeryCascadeList()
+        {
+            try
+            {
+                var allCategories = await ctegoryRepository.GetListAsync(); 
+                //递归构建树
+                List<CategoryDtos> BuildTree(Guid parentId)
+                {
+                    return allCategories
+                        .Where(c => c.ParentId == parentId)
+                        .Select(x => new CategoryDtos
+                        {
+                            Id = x.Id,
+                            CategoryName = x.CategoryName,
+                            EnglishName = x.EnglishName,
+                            Description = x.Description,
+                            ParentId = x.ParentId,
+                            Children = BuildTree(x.Id)
+                        })
+                        .ToList();
+                }
+                //假设根节点ParentId为Guid.Empty
+                var tree= BuildTree(Guid.Empty);
+                return ApiResult<List<CategoryDtos>>.Success(ResultCode.Success, tree);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+
+       
     }
 }
