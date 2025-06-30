@@ -23,8 +23,8 @@ namespace CustomerRelationshipManagement.CrmContracts.Helpers
         {
             // 辅助函数，用于处理可能为空的字符串或Guid列表，确保Key的连贯性
             string safeString(string? input) => string.IsNullOrWhiteSpace(input) ? "null" : input.Trim();
-            string safeGuidList(IEnumerable<Guid> guids) => guids != null && guids.Any() ? string.Join(",", guids.OrderBy(g => g)) : "null";
-            string safeGuid(Guid id) => id == Guid.Empty ? "null" : id.ToString();
+            string safeGuidList(IEnumerable<Guid>? guids) => guids != null && guids.Any() ? string.Join(",", guids.OrderBy(g => g)) : "null";
+            string safeGuid(Guid? id) => id == null || id == Guid.Empty ? "null" : id.ToString();
 
             // 由于时间范围查询可能使用不同的时间类型，这里将所有可能的时间字段都包含进来，
             // 并根据 SearchTimeType 标记哪个时间类型在生效。
