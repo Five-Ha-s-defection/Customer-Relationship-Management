@@ -10,6 +10,7 @@ namespace CustomerRelationshipManagement.DTOS.CategoryMangamentDto
 {
     public class CategoryDtos:PagingInfo
     {
+        public Guid Id { get; set; } = Guid.Empty;
         /// <summary>
         /// 分类名称
         /// </summary>
@@ -29,5 +30,10 @@ namespace CustomerRelationshipManagement.DTOS.CategoryMangamentDto
         /// 分类描述
         /// </summary>
         public string Description { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 子分类集合（树形结构的关键，递归嵌套）
+        /// </summary>
+        public List<CategoryDtos> Children { get; set; } = new List<CategoryDtos>();
     }
 }

@@ -57,6 +57,8 @@ namespace CustomerRelationshipManagement.CXS.CategoryMangament
             await categoryRepository.DeleteAsync(category);
             return ApiResult.Success(ResultCode.Success);
         }
+
+
         /// <summary>
         /// 获取产品类型列表
         /// </summary>
@@ -71,7 +73,7 @@ namespace CustomerRelationshipManagement.CXS.CategoryMangament
                 //对产品类型进行预查询
                 var categorylist = await categoryRepository.GetQueryableAsync();
                 //查询条件
-
+              
                 //分页
                 var categorypaging = categorylist.OrderByDescending(x => x.Id).Skip(CategoryDtos.PageIndex).Take(CategoryDtos.PageSize);
 
