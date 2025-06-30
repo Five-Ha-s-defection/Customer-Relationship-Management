@@ -36,10 +36,10 @@ namespace CustomerRelationshipManagement.CrmContracts
         private readonly IRepository<CrmContract, Guid> repository;
         private readonly IRepository<Receivables, Guid> receivablesrepository;
         private readonly IRepository<CrmContractandProduct, Guid> crmContractandProductrepository;
-        private readonly IDistributedCache<IList<ShowCrmContractDto>> cache;
+        private readonly IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache;
         private readonly ILogger<CrmContractService> logger;
 
-        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, IDistributedCache<IList<ShowCrmContractDto>> cache,ILogger<CrmContractService> logger)
+        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache,ILogger<CrmContractService> logger)
         {
             this.repository = repository;
             this.receivablesrepository = receivablesrepository;
@@ -54,7 +54,7 @@ namespace CustomerRelationshipManagement.CrmContracts
         /// <param name="pageCrmContractDto"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResult<IList<ShowCrmContractDto>>> ShowCrmContractList([FromQuery] PageCrmContractDto pageCrmContractDto)
+        public async Task<ApiResult<PageInfoCount<ShowCrmContractDto>>> ShowCrmContractList([FromQuery] PageCrmContractDto pageCrmContractDto)
         {
             //构建缓存键名
             string cacheKey = CrmContractHelper.BuildReadableKey(pageCrmContractDto);
@@ -115,33 +115,33 @@ namespace CustomerRelationshipManagement.CrmContracts
                 query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName) && pageCrmContractDto.CheckType == 2, a => a.ContractName.Contains(pageCrmContractDto.ContractName));
                 #endregion
 
-                ////abp分页
-                //var querypaging = query.PageResult(pageCrmContractDto.PageIndex, pageCrmContractDto.PageSize);
-
-                ////将数据通过映射转换
-                //var crmcontractdto = ObjectMapper.Map<IList<CrmContract>, IList<ShowCrmContractDto>>(querypaging.Queryable.ToList());
-
-                //var pageInfo = new PageInfoCount<ShowCrmContractDto>
-                //{
-                //    TotalCount = querypaging.RowCount,
-                //    PageCount = (int)Math.Ceiling(querypaging.RowCount * 1.0 / pageCrmContractDto.PageSize),
-                //    Data = crmcontractdto
-                //};
-
-                //分页
-                var querypaging = query.OrderByDescending(a => a.Id).Skip(pageCrmContractDto.PageIndex).Take(pageCrmContractDto.PageSize);
+                //abp分页
+                var querypaging = query.PageResult(pageCrmContractDto.PageIndex, pageCrmContractDto.PageSize);
 
                 //将数据通过映射转换
-                var crmcontractdto = ObjectMapper.Map<IList<CrmContract>, IList<ShowCrmContractDto>>(querypaging.ToList());
+                var crmcontractdto = ObjectMapper.Map<IList<CrmContract>, IList<ShowCrmContractDto>>(querypaging.Queryable.ToList());
 
-                return crmcontractdto;
+                var pageInfo = new PageInfoCount<ShowCrmContractDto>
+                {
+                    TotalCount = querypaging.RowCount,
+                    PageCount = (int)Math.Ceiling(querypaging.RowCount * 1.0 / pageCrmContractDto.PageSize),
+                    Data = crmcontractdto
+                };
+
+                //分页
+                //var querypaging = query.OrderByDescending(a => a.Id).Skip(pageCrmContractDto.PageIndex).Take(pageCrmContractDto.PageSize);
+
+                //将数据通过映射转换
+                //var crmcontractdto = ObjectMapper.Map<IList<CrmContract>, IList<ShowCrmContractDto>>(querypaging.ToList());
+
+                return pageInfo;
             }, () => new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromMinutes(10)     //设置缓存过期时间为5分钟
             });
 
             //返回apiresult
-            return ApiResult<IList<ShowCrmContractDto>>.Success(ResultCode.Success, redislist);
+            return ApiResult<PageInfoCount<ShowCrmContractDto>>.Success(ResultCode.Success, redislist);
         }
 
         /// <summary>
