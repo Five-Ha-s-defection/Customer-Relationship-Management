@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Microsoft.AspNetCore.Http;
+using StackExchange.Redis;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
@@ -23,17 +25,21 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         private readonly IPasswordHasher<UserInfo> passwordHasher;
         private readonly UserProfileManager userProfileManager;
         private readonly IJwtHelper _jwtHelper;
+        private readonly IDatabase _redisDb;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="userInfoRepository"></param>
-        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager,IJwtHelper jwtHelper)
+        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager,IJwtHelper jwtHelper, IConnectionMultiplexer redis, IHttpContextAccessor httpContextAccessor)
         {
             this.userInfoRepository = userInfoRepository;
             this.passwordHasher = passwordHasher;
             this.userProfileManager = userProfileManager;
             _jwtHelper = jwtHelper;
+            _redisDb = redis.GetDatabase();
+            _httpContextAccessor = httpContextAccessor;
         }
         /// <summary>
         /// 登录
@@ -66,7 +72,10 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 
                 var token = _jwtHelper.GenerateToken(userInfo.Id, userInfo.UserName);
                 var expireTime = DateTime.UtcNow.AddHours(2);
-                var profile = await userProfileManager.BuildUserProfileAsync(userInfo.Id);              
+                var profile = await userProfileManager.BuildUserProfileAsync(userInfo.Id); 
+                //成功之后给我的token存入redis
+                await _redisDb.StringSetAsync($"jwt_token:{token}", userInfo.Id.ToString());
+
                
                 //登录成功，返回用户信息和令牌
                 var userInfoDto = ObjectMapper.Map<UserInfo, LoginResultDto>(userInfo);
@@ -83,6 +92,31 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
             {
                 throw new UserFriendlyException(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// 退出登录
+        /// 前端调用此接口后，后端返回成功，前端应清除本地token并跳转到登录页。
+        /// </summary>
+        /// <remarks>
+        /// 路由：POST /logout
+        /// 1. 前端调用此接口（无需参数，需携带token）
+        /// 2. 后端可做token失效处理（如加入黑名单），此处仅返回成功
+        /// 3. 前端收到成功后，清除本地token，跳转到登录页
+        /// </remarks>
+        [HttpDelete]
+        [Route("/api/app/logout")]
+        [Authorize]
+        public async Task<ApiResult> Logout()
+        {
+            // 1. 获取当前请求的token
+            var token = _httpContextAccessor.HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            // 2. 将token存入Redis黑名单，设置过期时间为token剩余有效期
+            // 这里假设token有效期2小时
+            await _redisDb.StringSetAsync($"jwt_blacklist:{token}", "1", TimeSpan.FromHours(2));
+
+            return ApiResult.Success(ResultCode.Success);
         }
     }
 }

@@ -47,7 +47,7 @@ namespace CustomerRelationshipManagement.RBAC.UserRoles
                         if (userRoleInfo.Count > 0)
                         {
                             //先删除原有的用户角色
-                            await userRoleRepository.DeleteAsync(x => x.UserId == createUserRoleDto.UserId);
+                            //await userRoleRepository.DeleteAsync(x => x.UserId == createUserRoleDto.UserId);
                         }
                         
                         //添加新的用户角色
