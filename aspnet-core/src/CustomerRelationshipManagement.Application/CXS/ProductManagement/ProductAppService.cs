@@ -23,7 +23,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
     public class ProductAppService : ApplicationService, IProductAppService
     {
         private readonly IRepository<Product, Guid> productRepository;
-        private readonly IRepository<Category,Guid> ctegoryRepository;
+        private readonly IRepository<Category, Guid> ctegoryRepository;
         public IHttpContextAccessor httpContextAccessor;
         private readonly ILogger<ProductAppService> logger;
 
@@ -88,9 +88,19 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
             {
                 var query = await productRepository.GetQueryableAsync();
                 //查询条件
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductBrand)||!string.IsNullOrEmpty(productdtos.ProductCode),x => x.ProductBrand.Contains(productdtos.ProductBrand)||x.ProductCode.Contains(productdtos.ProductCode));
-                
+                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductBrand) || !string.IsNullOrEmpty(productdtos.ProductCode), x => x.ProductBrand.Contains(productdtos.ProductBrand) || x.ProductCode.Contains(productdtos.ProductCode));
+
                 query = query.WhereIf(productdtos.CategoryId != Guid.Empty, x => x.CategoryId == productdtos.CategoryId);
+
+                query = query.WhereIf(productdtos.ProductStatus, x => x.ProductStatus == productdtos.ProductStatus);
+                query = query.WhereIf(productdtos.ParentId != Guid.Empty, x => x.ParentId == productdtos.ParentId);
+                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductImageUrl), x => x.ProductImageUrl.Contains(productdtos.ProductImageUrl));
+                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductDescription), x => x.ProductDescription.Contains(productdtos.ProductDescription));
+                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductRemark), x => x.ProductRemark.Contains(productdtos.ProductRemark));
+                query = query.WhereIf(productdtos.SuggestedPrice > 0, x => x.SuggestedPrice == productdtos.SuggestedPrice);
+                query = query.WhereIf(productdtos.DealPrice > 0, x => x.DealPrice == productdtos.DealPrice);
+                query = query.WhereIf(productdtos.SuggestedPrice > 0, x => x.SuggestedPrice == productdtos.SuggestedPrice);
+                
 
 
                 //
@@ -160,7 +170,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         }
 
 
-       
+
 
 
 
@@ -169,7 +179,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         {
             try
             {
-                var allCategories = await ctegoryRepository.GetListAsync(); 
+                var allCategories = await ctegoryRepository.GetListAsync();
                 //递归构建树
                 List<CategoryDtos> BuildTree(Guid parentId)
                 {
@@ -187,7 +197,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                         .ToList();
                 }
                 //假设根节点ParentId为Guid.Empty
-                var tree= BuildTree(Guid.Empty);
+                var tree = BuildTree(Guid.Empty);
                 return ApiResult<List<CategoryDtos>>.Success(ResultCode.Success, tree);
             }
             catch (Exception)
@@ -198,6 +208,6 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         }
 
 
-       
+
     }
 }
