@@ -88,9 +88,9 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
             {
                 var query = await productRepository.GetQueryableAsync();
                 //查询条件
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductBrand)||!string.IsNullOrEmpty(productdtos.ProductCode),x => x.ProductBrand.Contains(productdtos.ProductBrand)||x.ProductCode.Contains(productdtos.ProductCode));
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductBrand)||!string.IsNullOrEmpty(dto.ProductCode),x => x.ProductBrand.Contains(dto.ProductBrand)||x.ProductCode.Contains(dto.ProductCode));
                 
-                query = query.WhereIf(productdtos.CategoryId != Guid.Empty, x => x.CategoryId == productdtos.CategoryId);
+                query = query.WhereIf(dto.CategoryId != Guid.Empty, x => x.CategoryId == dto.CategoryId);
 
 
                 //
