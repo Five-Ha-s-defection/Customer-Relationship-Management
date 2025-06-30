@@ -1,4 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,8 +14,8 @@ namespace CustomerRelationshipManagement.Interfaces.IProductAppService
 {
     public interface IProductAppService : IApplicationService
     {
-        
-        
+
+        Task<ApiResult<List<CategoryDtos>>> GetCategeryCascadeList();
 
 
     }
