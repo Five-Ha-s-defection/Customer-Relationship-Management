@@ -39,15 +39,14 @@ namespace CustomerRelationshipManagement;
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
     typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule),
-    typeof(AbpCachingStackExchangeRedisModule)
+    typeof(AbpSwashbuckleModule)
 )]
 public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 {
 
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        
+
     }
     /// <summary>
     /// 配置服务
@@ -66,7 +65,7 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-        
+
 
         //// 配置 Redis 连接
         //Configure<AbpDistributedCacheOptions>(options =>
@@ -199,13 +198,32 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
             //options.SchemaFilter<SchemaFilter>();
 
             //在header中添加token，传递到后台
-            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = "JWT授权(数据将在请求头中进行传递)直接在下面框中输入Bearer {token}(注意两者之间是一个空格) \"",
                 Name = "Authorization",//jwt默认的参数名称
                 In = ParameterLocation.Header,//jwt默认存放Authorization信息的位置(请求头中)
-                Type = SecuritySchemeType.ApiKey
+                BearerFormat = "JWT",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
             });
+
+            // ✅ 将其应用到所有接口上
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+        }
+    });
+
 
             //就是这里！！！！！！！！！
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -273,7 +291,8 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         app.UseAuthorization();
         app.UseAuthorization();
         app.UseSwagger();
-        app.UseSwaggerUI(c => {
+        app.UseSwaggerUI(c =>
+        {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "CustomerRelationshipManagement API");
 
             // 模型的默认扩展深度，设置为 -1 完全隐藏模型

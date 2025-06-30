@@ -10,6 +10,7 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
@@ -125,7 +126,8 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //合同表
         CreateMap<AddCrmContractDto, CrmContract>().ReverseMap();
         CreateMap<CrmContract, ShowCrmContractDto>().ReverseMap();
-
+        CreateMap<UpdateCrmContractDto, CrmContract>().ReverseMap();
+        CreateMap<CrmContractandProduct,UpdateCrmcontractandProductDto>().ReverseMap();
 
     }
 }

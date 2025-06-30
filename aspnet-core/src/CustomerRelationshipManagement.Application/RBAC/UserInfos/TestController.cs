@@ -10,7 +10,6 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
     [ApiExplorerSettings(GroupName = "v1")]
     [Route("api/test")]
-    [Authorize]
     public class TestController : ControllerBase
     {
         [HttpGet("ping")]

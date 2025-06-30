@@ -2,6 +2,7 @@
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.RoleMenus;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,6 +20,7 @@ namespace CustomerRelationshipManagement.RBAC.RoleMenus
     /// 实现角色与菜单关联的管理功能，包括分配菜单给角色和查询角色的菜单权限
     /// </summary>
     [ApiExplorerSettings(GroupName ="v1")]
+    [AllowAnonymous]
     public class RoleMenuService : ApplicationService, IRoleMenuService
     {
         // 角色菜单关联仓储，用于数据库操作

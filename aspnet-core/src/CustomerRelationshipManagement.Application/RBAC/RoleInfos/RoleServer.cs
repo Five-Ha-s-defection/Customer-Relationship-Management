@@ -1,6 +1,8 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBACDtos.Roles;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,11 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CustomerRelationshipManagement.RBAC.RoleInfos
 {
     [ApiExplorerSettings(GroupName = "v1")]
+    [AllowAnonymous]
     public class RoleServer : ApplicationService, IRoleServer
     {
         private readonly IRepository<RoleInfo, Guid> rolerepository;

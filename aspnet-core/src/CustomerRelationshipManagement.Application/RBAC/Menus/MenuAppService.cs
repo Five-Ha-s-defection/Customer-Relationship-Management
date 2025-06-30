@@ -1,15 +1,16 @@
+using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.Application.Contracts.RBAC.Menus;
+using CustomerRelationshipManagement.RBAC.Menus;
+using CustomerRelationshipManagement.RBACDtos.Menus;
+using CustomerRelationshipManagement.RBACDtos.Users;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CustomerRelationshipManagement.Application.Contracts.RBAC.Menus;
-using CustomerRelationshipManagement.RBACDtos.Menus;
-using CustomerRelationshipManagement.RBACDtos.Users;
-using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.RBAC.Menus;
-using Volo.Abp.Domain.Repositories;
-using Microsoft.AspNetCore.Mvc;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.Application.RBAC.Menus
 {
@@ -18,6 +19,7 @@ namespace CustomerRelationshipManagement.Application.RBAC.Menus
     /// 使用ABP框架的标准应用服务模式
     /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
+    [AllowAnonymous]
     public class MenuAppService :ApplicationService, IMenuAppService
     {
         // 菜单仓储，用于数据库操作
