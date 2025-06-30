@@ -57,7 +57,7 @@ namespace CustomerRelationshipManagement.RBAC.RoleMenus
                 if (roleMenus.Any())
                 {
                     // 先删除该角色的所有现有菜单权限，确保权限的准确性
-                    await _roleMenuRepo.DeleteAsync(x => x.RoleId == input.RoleId);
+                //    await _roleMenuRepo.DeleteAsync(x => x.RoleId == input.RoleId);
                 }
                 // 根据传入的菜单ID列表，创建新的角色菜单关联实体
                 var entities = input.MenuIds.Select(menuId => new RoleMenuInfo

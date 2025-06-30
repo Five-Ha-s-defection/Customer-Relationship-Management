@@ -148,7 +148,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                 // 过滤条件
                 query = query.WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableCode), x => x.ReceivableCode.Contains(receivablesSearchDto.ReceivableCode))
                     .WhereIf(receivablesSearchDto.StartTime.HasValue, x => x.ReceivableDate >= receivablesSearchDto.StartTime.Value)
-                    .WhereIf(receivablesSearchDto.EndTime.HasValue, x => x.ReceivableDate <= receivablesSearchDto.EndTime.Value)
+                    .WhereIf(receivablesSearchDto.EndTime.HasValue, x => x.ReceivableDate <= receivablesSearchDto.EndTime.Value.AddDays(1))
                     .WhereIf(receivablesSearchDto.UserId.HasValue, x => x.UserId == receivablesSearchDto.UserId.Value)
                     .WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId.Value)
                     .WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId.Value)
@@ -231,23 +231,31 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
             return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
         }
         /// <summary>
-        /// 删除应收款的信息
+        /// 批量删除应收款信息
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<ApiResult<ReceivablesDTO>> DeleteAsync(Guid id)
+        /// <param name="ids">要删除的应收款ID数组</param>
+        /// <returns>操作结果</returns>
+        public async Task<ApiResult<ReceivablesDTO>> DeleteAsync([FromBody]Guid[] ids)
         {
             try
             {
-                await repository.DeleteAsync(id);
-                
-                await _cacheById.RemoveAsync($"receivable:{id}");
+                //if (ids == null || ids.Length == 0)
+                //{
+                //    return ApiResult<ReceivablesDTO>.Fail("请选择要删除的数据", ResultCode.Fail);
+                //}
+
+                // 批量删除数据库记录
+                foreach (var id in ids)
+                {
+                    await repository.DeleteAsync(id);
+                    // 清除对应的缓存
+                    await _cacheById.RemoveAsync($"receivable:{id}");
+                }
 
                 return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, null);
             }
             catch (Exception)
             {
-
                 throw;
             }
         }

@@ -16,6 +16,7 @@ using Volo.Abp.Users;
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
     [ApiExplorerSettings(GroupName = "v1")]
+    [Authorize]
     public class UserServer : ApplicationService, IUserServer
     {
         /// <summary>
@@ -112,7 +113,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// 获取当前用户信息（带角色、权限、菜单）
         /// </summary>
         /// <returns></returns>
-        [HttpGet("me")]
+        [HttpGet("/api/app/me")]
         public async Task<ApiResult<UserInfoDto>> GetCurrentUserInfoAsync()
         {
             try
@@ -144,7 +145,9 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
             try
             {
                 var users = await userRep.GetListAsync();
+
                 var dtos = ObjectMapper.Map<List<UserInfo>, List<UserInfoDto>>(users.ToList());
+
                 return ApiResult<List<UserInfoDto>>.Success(ResultCode.Success, dtos);
             }
             catch (Exception ex)
