@@ -78,10 +78,6 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// </summary>
         public string CreatorRealName { get; set; }
 
-        /// <summary>
-        /// 修改者真实姓名
-        /// </summary>
-        public string LastModifierRealName { get; set; }
 
     }
 }
