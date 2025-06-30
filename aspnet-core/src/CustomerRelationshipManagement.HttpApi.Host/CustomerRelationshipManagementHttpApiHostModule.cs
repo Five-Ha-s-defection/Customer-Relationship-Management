@@ -67,12 +67,6 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
 
-        //// 配置 Redis 连接
-        //Configure<AbpDistributedCacheOptions>(options =>
-        //{
-        //    options.KeyPrefix = "CRM:"; // Redis key 前缀，可自定义
-        //});
-
 
 
         ConfigureAuthentication(context);

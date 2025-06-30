@@ -123,6 +123,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                             from d in cd.DefaultIfEmpty()
                             join e in crmcontract on r.ContractId equals e.Id into de
                             from e in de.DefaultIfEmpty()
+                            join creator in userinfo on r.CreatorId equals creator.Id into creatorJoin
+                            from creator in creatorJoin.DefaultIfEmpty()
                             select new ReceivablesDTO
                             {
                                 Id = r.Id, // 用应收款Id
@@ -130,22 +132,27 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                                 ReceivablePay = r.ReceivablePay,
                                 ReceivableDate = r.ReceivableDate,
                                 CustomerId = r.CustomerId,
-                                CustomerName = d.CustomerName,
+                                CustomerName = d != null ? d.CustomerName : string.Empty,
                                 ContractId = r.ContractId,
-                                ContractName = e.ContractName,
-                                UserId = r.UserId,
-                                UserName = c.UserName,
+                                ContractName = e != null ? e.ContractName : string.Empty,
                                 CreationTime = r.CreationTime,
+                                UserId = r.UserId,
+                                RealName = c != null ? c.RealName : string.Empty,
+                                PaymentId = r.PaymentId,
+                                Amount = p != null ? p.Amount : 0m,
+                                CreatorId = r.CreatorId,
+                                CreatorRealName = creator.UserName,
+
                             };
 
                 // 过滤条件
                 query = query.WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableCode), x => x.ReceivableCode.Contains(receivablesSearchDto.ReceivableCode))
-                    .WhereIf(receivablesSearchDto.StartTime.HasValue, x => x.ReceivableDate >= receivablesSearchDto.StartTime)
-                    .WhereIf(receivablesSearchDto.EndTime.HasValue, x => x.ReceivableDate <= receivablesSearchDto.EndTime)
-                    .WhereIf(receivablesSearchDto.UserId.HasValue, x => x.UserId == receivablesSearchDto.UserId)
-                    .WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId)
-                    .WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId)
-                    .WhereIf(receivablesSearchDto.ReceivablePay.HasValue, x => x.ReceivablePay == receivablesSearchDto.ReceivablePay);
+                    .WhereIf(receivablesSearchDto.StartTime.HasValue, x => x.ReceivableDate >= receivablesSearchDto.StartTime.Value)
+                    .WhereIf(receivablesSearchDto.EndTime.HasValue, x => x.ReceivableDate <= receivablesSearchDto.EndTime.Value)
+                    .WhereIf(receivablesSearchDto.UserId.HasValue, x => x.UserId == receivablesSearchDto.UserId.Value)
+                    .WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId.Value)
+                    .WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId.Value)
+                    .WhereIf(receivablesSearchDto.ReceivablePay.HasValue, x => x.ReceivablePay == receivablesSearchDto.ReceivablePay.Value);
 
                 // 使用ABP框架的分页方法进行分页查询
                 var res = query.PageResult(receivablesSearchDto.PageIndex, receivablesSearchDto.PageSize);
@@ -160,7 +167,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                 return pageInfo;
             }, () => new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromMinutes(10)
+                SlidingExpiration = TimeSpan.FromSeconds(10)
             }); // 设置缓存过期时间为5分钟
             
             // 返回成功结果
@@ -266,6 +273,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                         from d in cd.DefaultIfEmpty()
                         join e in crmcontract on r.ContractId equals e.Id into de
                         from e in de.DefaultIfEmpty()
+                        join creator in userinfo on r.CreatorId equals creator.Id into creatorJoin
+                        from creator in creatorJoin.DefaultIfEmpty()
                         select new ReceivablesDTO
                         {
                             Id = r.Id, // 用应收款Id
@@ -275,10 +284,11 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                             CustomerId = r.CustomerId,
                             CustomerName = d.CustomerName,
                             ContractId = r.ContractId,
-                            ContractName = e.ContractName,
+                            ContractName = e != null ? e.ContractName : string.Empty,
                             UserId = r.UserId,
-                            UserName = c.UserName,
+                            RealName = c != null ? c.RealName : string.Empty,
                             CreationTime = r.CreationTime,
+                            CreatorRealName = creator.UserName,
                         };
             var data = query.ToList();
 
@@ -299,7 +309,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                 p => p.ReceivableDate.ToString("yyyy-MM-dd"),
                 p => p.CustomerName,
                 p => p.ContractName,
-                p => p.UserName
+                p => p.RealName
             };
 
             // 调用通用导出方法，生成Excel字节流

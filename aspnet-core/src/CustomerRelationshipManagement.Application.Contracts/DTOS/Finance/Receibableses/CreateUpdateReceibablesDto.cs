@@ -49,5 +49,9 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// </summary>
         
         public string Remark { get; set; }
+        /// <summary>
+        /// 关联的收款单
+        /// </summary>
+        public Guid PaymentId { get; set; }
     }
 }

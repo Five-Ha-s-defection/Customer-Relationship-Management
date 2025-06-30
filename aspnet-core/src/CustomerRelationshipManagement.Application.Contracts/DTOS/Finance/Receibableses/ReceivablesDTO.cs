@@ -45,6 +45,20 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// 备注
         /// </summary>
         public string Remark { get; set; }
+        /// <summary>
+        /// 关联的收款单
+        /// </summary>
+        public Guid PaymentId { get; set; }
+
+
+
+        /// <summary>
+        /// 收款金额
+        /// </summary>
+        public decimal Amount { get; set; }
+
+
+
 
 
         /// <summary>
@@ -57,6 +71,17 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// </summary>
         public string ContractName { get; set; }
 
-        public string UserName { get; set; }
+        public string RealName { get; set; }
+
+        /// <summary>
+        /// 创建者真实姓名
+        /// </summary>
+        public string CreatorRealName { get; set; }
+
+        /// <summary>
+        /// 修改者真实姓名
+        /// </summary>
+        public string LastModifierRealName { get; set; }
+
     }
 }
