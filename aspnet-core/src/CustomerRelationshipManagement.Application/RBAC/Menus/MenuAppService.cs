@@ -115,7 +115,7 @@ namespace CustomerRelationshipManagement.Application.RBAC.Menus
         /// 从数据库获取所有菜单数据，构建树形结构返回给前端
         /// </summary>
         /// <returns>树形结构的菜单列表，包含完整的父子关系</returns>
-        [HttpGet]
+        [HttpGet("/api/v1/menus/routes")]
         public async Task<ApiResult<List<MenuDto>>> GetMenuTreeAsync()
         {
             try

@@ -2,6 +2,7 @@
 using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
@@ -26,5 +27,13 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
         context.Services.AddScoped<IPasswordHasher<UserInfo>, PasswordHasher<UserInfo>>();
 
         context.Services.AddScoped<IJwtHelper, JwtHelper>();
+
+        var configuration = context.Services.GetConfiguration();
+
+        var redisConfig = configuration["Redis:Configuration"];
+        context.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            return ConnectionMultiplexer.Connect(redisConfig);
+        });
     }
 }
