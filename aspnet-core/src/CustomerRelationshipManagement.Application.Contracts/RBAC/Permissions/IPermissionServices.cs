@@ -20,5 +20,11 @@ namespace CustomerRelationshipManagement.RBAC.Permissions
         /// <param name="createPermissionDto"></param>
         /// <returns></returns>
         Task<ApiResult<PermissionDto>> AddPermission(CreatePermissionDto createPermissionDto);
+
+        /// <summary>
+        /// 获取系统中所有权限（含分组字段），用于前端构建权限树
+        /// </summary>
+        /// <returns></returns>
+        Task<List<PermissionDto>> GetAllPermissionsAsync();
     }
 }
