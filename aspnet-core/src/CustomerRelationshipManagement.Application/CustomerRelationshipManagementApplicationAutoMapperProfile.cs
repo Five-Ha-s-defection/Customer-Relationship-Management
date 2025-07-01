@@ -42,6 +42,10 @@ using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using CustomerRelationshipManagement.CustomerProcess.Prioritys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
+using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
 
 namespace CustomerRelationshipManagement;
 
