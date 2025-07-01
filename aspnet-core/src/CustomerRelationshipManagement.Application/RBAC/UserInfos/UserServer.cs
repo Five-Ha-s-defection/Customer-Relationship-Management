@@ -53,11 +53,6 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         {
             try
             {
-                // 判断密码是否一致
-                if (createOrUpdateUserInfoDto.Password != createOrUpdateUserInfoDto.ConfirmPassword)
-                {
-                    return ApiResult<UserInfo>.Fail("密码不一致", ResultCode.Fail);
-                }
                 // 判断用户是否存在
                 var userInfo = await userRep.FindAsync(x => x.UserName == createOrUpdateUserInfoDto.UserName);
                 if (userInfo != null)
@@ -140,19 +135,20 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         /// 获取用户列表
         /// </summary>
         /// <returns>用户信息列表</returns>
-        public async Task<ApiResult<List<UserInfoDto>>> GetUserInfoList()
+        [AllowAnonymous]
+        public async Task<ApiResult<List<UserDto>>> GetUserInfoList()
         {
             try
             {
                 var users = await userRep.GetListAsync();
 
-                var dtos = ObjectMapper.Map<List<UserInfo>, List<UserInfoDto>>(users.ToList());
+                var dtos = ObjectMapper.Map<List<UserInfo>, List<UserDto>>(users.ToList());
 
-                return ApiResult<List<UserInfoDto>>.Success(ResultCode.Success, dtos);
+                return ApiResult<List<UserDto>>.Success(ResultCode.Success, dtos);
             }
             catch (Exception ex)
             {
-                return ApiResult<List<UserInfoDto>>.Fail(ex.Message, ResultCode.Fail);
+                return ApiResult<List<UserDto>>.Fail(ex.Message, ResultCode.Fail);
             }
         }
 

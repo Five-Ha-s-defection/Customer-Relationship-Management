@@ -6,22 +6,20 @@ using System.Threading.Tasks;
 
 namespace CustomerRelationshipManagement.RBACDtos.Users
 {
-    public class CreateOrUpdateUserInfoDto
+    public class UserDto
     {
-        /// <summary>
-        /// 手机号
+        /// <summary>  
+        /// 用户信息  
         /// </summary>
-        public string PhoneInfo { get; set; } = string.Empty;
-
-        /// <summary>
-        /// 用户名
-        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>  
+        /// 用户名  
+        /// </summary>  
         public string UserName { get; set; } = string.Empty;
-
         /// <summary>
-        /// 密码
+        /// 邮箱
         /// </summary>
-        public string Password { get; set; } = string.Empty;
+        public string Email { get; set; }=string.Empty;
 
         /// <summary>
         /// 真实姓名
@@ -32,14 +30,10 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         /// 头像
         /// </summary>
         public string? Avatar { get; set; }
-        /// <summary>
-        /// 邮箱
-        /// </summary>
-        public string? Email { get; set; } = string.Empty;
 
         /// <summary>
-        /// 是否激活
+        /// 手机号
         /// </summary>
-        public bool IsActive { get; set; } = true;
+        public string? PhoneInfo { get; set; }
     }
 }

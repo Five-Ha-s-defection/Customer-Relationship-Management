@@ -27,6 +27,12 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         /// 头像
         /// </summary>
         public string? Avatar { get; set; }
+
+        /// <summary>
+        /// 手机号
+        /// </summary>
+        public string? PhoneInfo { get; set; }
+
         /// <summary>
         /// 用户的所有角色名称的集合
         /// </summary>
