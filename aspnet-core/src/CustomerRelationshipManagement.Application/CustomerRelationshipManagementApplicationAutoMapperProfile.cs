@@ -4,7 +4,9 @@ using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+
 using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
+
 using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
@@ -14,7 +16,9 @@ using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
+
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
@@ -91,6 +95,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
 
         #region RBAC
         //用户信息映射
+        CreateMap<UserInfo,UserDto>().ReverseMap();
         CreateMap<UserInfo, UserInfoDto>().ReverseMap();
         CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
         //角色信息映射
