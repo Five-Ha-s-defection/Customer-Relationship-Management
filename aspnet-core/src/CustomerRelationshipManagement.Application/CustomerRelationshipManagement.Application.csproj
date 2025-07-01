@@ -28,6 +28,7 @@
     <PackageReference Include="Lazy.Captcha.Core" Version="2.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Volo.Abp.Caching" Version="9.2.0" />
     <PackageReference Include="Volo.Abp.Caching.StackExchangeRedis" Version="9.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.6" />

@@ -15,6 +15,12 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
     public interface IClueService:IApplicationService
     {
         /// <summary>
+        /// 清楚关于c:PageInfo,k的所有信息
+        /// </summary>
+        /// <returns></returns>
+        Task ClearAbpCacheAsync();
+
+        /// <summary>
         /// 添加线索信息
         /// </summary>
         /// <param name="dto"></param>

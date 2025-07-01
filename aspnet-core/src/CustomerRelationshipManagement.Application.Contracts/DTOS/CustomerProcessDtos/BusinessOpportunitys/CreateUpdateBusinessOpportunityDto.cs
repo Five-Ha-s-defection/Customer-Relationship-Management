@@ -47,5 +47,10 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpport
         /// 产品Id
         /// </summary>
         public Guid ProductId { get; set; }
+
+        /// <summary>
+        /// 商机编号
+        /// </summary>
+        public string BusinessOpportunityCode { get; set; }
     }
 }

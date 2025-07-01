@@ -4,6 +4,9 @@ using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+
+using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
+
 using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
@@ -13,6 +16,9 @@ using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
+
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
@@ -22,6 +28,7 @@ using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+//using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
@@ -78,9 +85,24 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<BusinessOpportunity, BusinessOpportunityDto>().ReverseMap();
         CreateMap<BusinessOpportunity, CreateUpdateBusinessOpportunityDto>().ReverseMap();
 
+        //商机表
+        CreateMap<BusinessOpportunity, BusinessOpportunityDto>().ReverseMap();
+        CreateMap<BusinessOpportunity, CreateUpdateBusinessOpportunityDto>().ReverseMap();
+
+        //商机优先级表
+        CreateMap<Priority, PriorityDto>().ReverseMap();
+        CreateMap<Priority, CreateUpdatePriorityDto>().ReverseMap();
+
+        //商机销售进度表
+        CreateMap<SalesProgress, SalesProgressDto>().ReverseMap();
+        CreateMap<SalesProgress, CreateUpdateSalesProgressDto>().ReverseMap();
+
         //应收款表
         CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
         CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
+
+      
+
 
         #region RBAC
         //用户信息映射
@@ -128,6 +150,15 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<CrmContract, ShowCrmContractDto>().ReverseMap();
         CreateMap<UpdateCrmContractDto, CrmContract>().ReverseMap();
         CreateMap<CrmContractandProduct,UpdateCrmcontractandProductDto>().ReverseMap();
+
+
+        //联系人
+        CreateMap<CustomerContactDto,CustomerContact>().ReverseMap();
+        CreateMap<CreateUpdateCustomerContactDto, CustomerContact>().ReverseMap();
+        CreateMap<SearchCustomerContactDto, CustomerContact>().ReverseMap();
+
+        //联系人关系
+        CreateMap<CustomerRegionDto, CustomerRegion >().ReverseMap();
 
     }
 }

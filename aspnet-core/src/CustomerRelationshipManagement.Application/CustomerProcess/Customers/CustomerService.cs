@@ -18,6 +18,7 @@ using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Customers
 {
+    /// <summary>
+    /// 客户服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class CustomerService:ApplicationService,ICustomerService
     {
@@ -41,7 +45,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly IRepository<CustomerRegion> regionRepository;
         private readonly ILogger<CustomerService> logger;
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository)
+        private readonly IConnectionMultiplexer connectionMultiplexer;
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer)
         {
             this.repository = repository;
             this.logger = logger;
@@ -52,6 +57,25 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             this.levelRepository = levelRepository;
             this.sourceRepository = sourceRepository;
             this.regionRepository = regionRepository;
+            this.connectionMultiplexer = connectionMultiplexer;
+        }
+
+        /// <summary>
+        /// 清楚关于c:PageInfo,k的所有信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearAbpCacheAsync()
+        {
+            var endpoints = connectionMultiplexer.GetEndPoints();
+            foreach (var endpoint in endpoints)
+            {
+                var server = connectionMultiplexer.GetServer(endpoint);
+                var keys = server.Keys(pattern: "c:PageInfo,k:*");//填写自己的缓存前缀
+                foreach (var key in keys)
+                {
+                    await connectionMultiplexer.GetDatabase().KeyDeleteAsync(key);
+                }
+            }
         }
 
         /// <summary>
@@ -64,12 +88,34 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         {
             try
             {
-                var customer=ObjectMapper.Map<CreateUpdateCustomerDto, Customer>(dto);
+                // 将前端传来的DTO映射为数据库实体Customer
+                var customer = ObjectMapper.Map<CreateUpdateCustomerDto, Customer>(dto);
+                // 自动生成客户编号 C-年月日时分-四位纯数字或大写字母数字混合
+                var now = DateTime.Now; // 获取当前时间
+                var random = new Random(); // 创建随机数生成器
+                string randomStr;
+                if (random.Next(2) == 0) // 50%概率生成纯数字
+                {
+                    // 生成1000~9999的四位纯数字
+                    randomStr = random.Next(1000, 10000).ToString("D4");
+                }
+                else // 50%概率生成大写字母和数字混合
+                {
+                    // 生成1000~FFFF的四位十六进制字符串（大写，含字母和数字）
+                    randomStr = random.Next(0x1000, 0x10000).ToString("X4");
+                }
+                // 拼接客户编号，格式如C-202506240038-3B7C或C-202506240038-1540
+                customer.CustomerCode = $"C-{now:yyyyMMddHHmm}-{randomStr}";
+                // 插入客户数据到数据库
                 var list = await repository.InsertAsync(customer);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
+                // 返回插入后的客户信息（DTO）
                 return ApiResult<CustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CustomerDto>(list));
             }
             catch (Exception ex)
             {
+                // 记录异常日志
                 logger.LogError("添加客户信息出错！" + ex.Message);
                 throw;
             }

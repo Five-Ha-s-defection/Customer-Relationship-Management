@@ -14,6 +14,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Levels
 {
+    /// <summary>
+    /// 客户等级服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class LevelService:ApplicationService,ILevelService
     {
