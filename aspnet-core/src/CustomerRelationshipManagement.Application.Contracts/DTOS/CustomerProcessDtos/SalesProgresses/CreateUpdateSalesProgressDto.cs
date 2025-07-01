@@ -3,16 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Domain.Entities;
-using Volo.Abp.Domain.Entities.Auditing;
 
-
-namespace CustomerRelationshipManagement.CustomerProcess.SalesProgresses
+namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses
 {
-    /// <summary>
-    /// 销售进度表
-    /// </summary>
-    public class SalesProgress:FullAuditedEntity<Guid>
+    public class CreateUpdateSalesProgressDto
     {
         /// <summary>
         /// 销售进度名称

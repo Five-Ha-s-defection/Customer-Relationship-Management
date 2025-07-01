@@ -13,6 +13,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Industrys
 {
+    /// <summary>
+    /// 行业服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class IndustryService:ApplicationService, IIndustryService
     {

@@ -14,6 +14,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Sources
 {
+    /// <summary>
+    /// 客户源服务/线索源服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class SourceService:ApplicationService,ISourceService
     {

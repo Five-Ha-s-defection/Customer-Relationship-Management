@@ -4,16 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
 {
-    /// <summary>
-    /// 产品管理DTOS
-    /// </summary>
-    public class ProductDtos:FullAuditedEntityDto<Guid>
+    public class SearchProductDto: PagingInfo
     {
-        public Guid Id { get; set; } = Guid.Empty;
         /// <summary>
         /// 产品分类
         /// </summary>
@@ -59,11 +54,5 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
         /// 成交价
         /// </summary>
         public decimal? DealPrice { get; set; } = 0;
-
-
-        /// <summary>
-        /// 子产品集合（如有产品树结构）
-        /// </summary>
-        public List<ProductDtos> Children { get; set; } = new List<ProductDtos>();
     }
 }
