@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -46,5 +47,19 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IBusinessOp
         /// </summary>
         /// <returns></returns>
         Task<ApiResult<List<ProductDtos>>> GetProductSelectList();
+
+        /// <summary>
+        /// 显示商机列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        Task<ApiResult<PageInfoCount<BusinessOpportunityDto>>> ShowBusinessOpportunity([FromQuery] SearchBusinessOpportunityDto dto);
+
+        /// <summary>
+        /// 删除商机列表
+        /// </summary>
+        /// <typeparam name="BusinessOpportunity"></typeparam>
+        /// <returns></returns>
+        Task<ApiResult<BusinessOpportunityDto>> DelBusinessOpportunity(Guid id);
     }
 }

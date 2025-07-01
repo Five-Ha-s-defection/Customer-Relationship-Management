@@ -1,24 +1,31 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys.Helps;
+using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.Prioritys;
 using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IBusinessOpportunitys;
+using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.ProductCategory.Products;
+using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
+using Newtonsoft.Json;
 
 namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
 {
@@ -33,8 +40,13 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
         private readonly IRepository<Priority> priorityrepository;
         private readonly IRepository<SalesProgress> salesprogressrepository;
         private readonly IRepository<Product> productrepository;
+        private readonly IRepository<Clue> cluerepository;
+        private readonly IRepository<UserInfo> userrepository;
+        //private readonly IDistributedCache<PageInfoCount<BusinessOpportunityDto>> cache;
+        // 依赖注入
+        private readonly IDistributedCache cache;
         private readonly ILogger<BusinessOpportunityService> logger;
-        public BusinessOpportunityService(IRepository<BusinessOpportunity> businessopportunityrepository, ILogger<BusinessOpportunityService> logger, IRepository<Customer> customerrepository, IRepository<Priority> priorityrepository, IRepository<SalesProgress> salesprogressrepository, IRepository<Product> productrepository)
+        public BusinessOpportunityService(IRepository<BusinessOpportunity> businessopportunityrepository, ILogger<BusinessOpportunityService> logger, IRepository<Customer> customerrepository, IRepository<Priority> priorityrepository, IRepository<SalesProgress> salesprogressrepository, IRepository<Product> productrepository, IRepository<Clue> cluerepository, IRepository<UserInfo> userrepository, IDistributedCache cache)
         {
             this.businessopportunityrepository = businessopportunityrepository;
             this.logger = logger;
@@ -42,6 +54,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
             this.priorityrepository = priorityrepository;
             this.salesprogressrepository = salesprogressrepository;
             this.productrepository = productrepository;
+            this.cluerepository = cluerepository;
+            this.userrepository = userrepository;
+            this.cache = cache;
         }
 
         /// <summary>
@@ -55,6 +70,22 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
             try
             {
                 var businessopportunity = ObjectMapper.Map<CreateUpdateBusinessOpportunityDto, BusinessOpportunity>(dto);
+                // 自动生成客户编号 C-年月日时分-四位纯数字或大写字母数字混合
+                var now = DateTime.Now; // 获取当前时间
+                var random = new Random(); // 创建随机数生成器
+                string randomStr;
+                if (random.Next(2) == 0) // 50%概率生成纯数字
+                {
+                    // 生成1000~9999的四位纯数字
+                    randomStr = random.Next(1000, 10000).ToString("D4");
+                }
+                else // 50%概率生成大写字母和数字混合
+                {
+                    // 生成1000~FFFF的四位十六进制字符串（大写，含字母和数字）
+                    randomStr = random.Next(0x1000, 0x10000).ToString("X4");
+                }
+                // 拼接客户编号，格式如C-202506240038-3B7C或C-202506240038-1540
+                businessopportunity.BusinessOpportunityCode = $"S-{now:yyyyMMddHHmm}-{randomStr}";
                 var list = await businessopportunityrepository.InsertAsync(businessopportunity);
                 return ApiResult<BusinessOpportunityDto>.Success(ResultCode.Success, ObjectMapper.Map<BusinessOpportunity, BusinessOpportunityDto>(list));
             }
@@ -178,6 +209,163 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
             {
                 logger.LogError(ex, "获取产品下拉列表失败");
                 return ApiResult<List<ProductDtos>>.Fail("获取产品下拉列表失败", ResultCode.Fail);
+            }
+        }
+
+        /// <summary>
+        /// 显示商机列表
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<PageInfoCount<BusinessOpportunityDto>>> ShowBusinessOpportunity([FromQuery] SearchBusinessOpportunityDto dto)
+        {
+            try
+            {
+                string cacheKey = BusinessOpportunityCacheKeyHelper.BuildReadableKey(dto);
+                // 1. 读取缓存
+                var bytes = await cache.GetAsync(cacheKey);
+                PageInfoCount<BusinessOpportunityDto> redislist = null;
+                if (bytes != null)
+                {
+                    // 2. 反序列化
+                    var json = Encoding.UTF8.GetString(bytes);
+                    redislist = JsonConvert.DeserializeObject<PageInfoCount<BusinessOpportunityDto>>(json);
+                }
+
+                if (redislist == null)
+                {
+                    // 3. 查询数据库
+                    redislist = await GetBusinessOpportunityList(dto);
+
+                    // 4. 序列化并写入缓存
+                    var jsonStr = JsonConvert.SerializeObject(redislist);
+                    var bytesToCache = Encoding.UTF8.GetBytes(jsonStr);
+                    await cache.SetAsync(cacheKey, bytesToCache, new DistributedCacheEntryOptions
+                    {
+                        SlidingExpiration = TimeSpan.FromMinutes(5)
+                    });
+                }
+                return ApiResult<PageInfoCount<BusinessOpportunityDto>>.Success(ResultCode.Success, redislist);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        // 私有方法，封装原有LINQ查询和数据处理逻辑
+        private async Task<PageInfoCount<BusinessOpportunityDto>> GetBusinessOpportunityList(SearchBusinessOpportunityDto dto)
+        {
+            var userlist = await userrepository.GetQueryableAsync();
+            var cluelist = await cluerepository.GetQueryableAsync();
+            var customerlist = await customerrepository.GetQueryableAsync();
+            var productlist = await productrepository.GetQueryableAsync();
+            var businessopportunitylist = await businessopportunityrepository.GetQueryableAsync();
+            var list = from bus in businessopportunitylist
+                       join cus in customerlist on bus.CustomerId equals cus.Id
+                       join clu in cluelist on cus.ClueId equals clu.Id into clueGroup
+                       from clu in clueGroup.DefaultIfEmpty()
+                       join user in userlist on cus.UserId equals user.Id into userGroup
+                       from user in userGroup.DefaultIfEmpty()
+                       join creator in userlist on bus.CreatorId equals creator.Id into creatorGroup
+                       from creator in creatorGroup.DefaultIfEmpty()
+                       select new BusinessOpportunityDto
+                       {
+                           Id = bus.Id,
+                           PriorityId = bus.PriorityId,
+                           BusinessOpportunityName = bus.BusinessOpportunityName,
+                           CustomerId = bus.CustomerId,
+                           SalesProgressId = bus.SalesProgressId,
+                           LastFollowTime = clu != null ? clu.LastFollowTime : null,
+                           NextContactTime = clu != null ? clu.NextContactTime : null,
+                           CreationTime = bus.CreationTime,
+                           CreatorId = bus.CreatorId,
+                           CreateName = creator == null ? "" : creator.UserName,
+                           UserId = cus.UserId,
+                           UserName = user == null ? "" : user.UserName,
+                           BusinessOpportunityCode = bus.BusinessOpportunityCode
+                       };
+            // 查看范围过滤
+            if (dto.type == 1 && dto.AssignedTo.HasValue) // 我负责的
+            {
+                list = list.Where(x => x.UserId == dto.AssignedTo.Value);
+            }
+            else if (dto.type == 2 && dto.AssignedTo.HasValue) // 我创建的
+            {
+                list = list.Where(x => x.CreatorId == dto.AssignedTo.Value);
+            }
+            // 查询条件
+            if (!string.IsNullOrEmpty(dto.Keyword))
+            {
+                list = list.Where(x => x.BusinessOpportunityCode.Contains(dto.Keyword)
+                               || x.BusinessOpportunityName.Contains(dto.Keyword));
+            }
+            // 根据销售进度查询
+            if (dto.SalesProgressList != null && dto.SalesProgressList.Any())
+            {
+                list = list.Where(x => dto.SalesProgressList.Contains(x.SalesProgressId));
+            }
+            // 时间筛选
+            if (dto.StartTime.HasValue && dto.EndTime.HasValue && dto.TimeType.HasValue)
+            {
+                list = dto.TimeType switch
+                {
+                    TimeField.CreateTime => list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime),
+                    TimeField.NextContact => list.Where(x => x.NextContactTime >= dto.StartTime && x.NextContactTime <= dto.EndTime),
+                    TimeField.LastFollow => list.Where(x => x.LastFollowTime >= dto.StartTime && x.LastFollowTime <= dto.EndTime),
+                    _ => list
+                };
+            }
+            // 排序
+            if (dto.OrderBy.HasValue)
+            {
+                list = (dto.OrderBy.Value, dto.OrderDesc) switch
+                {
+                    (TimeField.CreateTime, true) => list.OrderByDescending(x => x.CreationTime),
+                    (TimeField.CreateTime, false) => list.OrderBy(x => x.CreationTime),
+                    (TimeField.NextContact, true) => list.OrderByDescending(x => x.NextContactTime),
+                    (TimeField.NextContact, false) => list.OrderBy(x => x.NextContactTime),
+                    (TimeField.LastFollow, true) => list.OrderByDescending(x => x.LastFollowTime),
+                    (TimeField.LastFollow, false) => list.OrderBy(x => x.LastFollowTime),
+                    _ => list.OrderByDescending(x => x.LastFollowTime)
+                };
+            }
+            //用ABP框架的分页
+            var res = list.PageResult(dto.PageIndex, dto.PageSize);
+            //构建分页结果对象
+            return new PageInfoCount<BusinessOpportunityDto>
+            {
+                TotalCount = res.RowCount,
+                PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / dto.PageSize),
+                Data = res.Queryable.ToList()
+            };
+        }
+
+
+        /// <summary>
+        /// 删除商机列表
+        /// </summary>
+        /// <typeparam name="BusinessOpportunity"></typeparam>
+        /// <returns></returns>
+        [HttpDelete]
+        public async Task<ApiResult<BusinessOpportunityDto>> DelBusinessOpportunity(Guid id)
+        {
+            try
+            {
+                var bus = await businessopportunityrepository.GetAsync(x => x.Id == id);
+                if (bus == null)
+                {
+                    return ApiResult<BusinessOpportunityDto>.Fail("您要删除的商机信息不存在", ResultCode.NotFound);
+                }
+                bus.IsDeleted = true;
+                await businessopportunityrepository.UpdateAsync(bus);
+                return ApiResult<BusinessOpportunityDto>.Success(ResultCode.Success, ObjectMapper.Map<BusinessOpportunity, BusinessOpportunityDto>(bus));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("删除商机信息出错！" + ex.Message);
+                throw;
             }
         }
     }

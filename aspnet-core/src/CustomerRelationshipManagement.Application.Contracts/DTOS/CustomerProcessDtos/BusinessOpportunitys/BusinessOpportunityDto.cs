@@ -14,10 +14,38 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpport
         /// </summary>
         public Guid CustomerId { get; set; }
 
+        //===============================================================================
+        /// <summary>
+        /// 最后跟进时间(线索外键)
+        /// </summary>
+        public DateTime? LastFollowTime { get; set; }
+
+        /// <summary>
+        /// 下次联系时间(线索外键)
+        /// </summary>
+        public DateTime? NextContactTime { get; set; }
+
+        /// <summary>
+        /// 客户负责人(外键)
+        /// </summary>
+        public Guid UserId { get; set; }
+
+        /// <summary>
+        /// 客户负责人名称
+        /// </summary>
+        public string UserName { get; set; }
+        
+
         /// <summary>
         /// 优先级
         /// </summary>
         public Guid PriorityId { get; set; }
+
+        //===============================================================================
+        /// <summary>
+        /// 优先级名称
+        /// </summary>
+        public string PriorityName { get; set; }
 
         /// <summary>
         /// 商机名称
@@ -28,6 +56,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpport
         /// 销售进度
         /// </summary>
         public Guid SalesProgressId { get; set; }
+
+        //===============================================================================
+        /// <summary>
+        /// 销售进度名称
+        /// </summary>
+        public string SalesProgressName { get; set; }
 
         /// <summary>
         /// 预算金额
@@ -48,5 +82,16 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpport
         /// 产品Id
         /// </summary>
         public Guid ProductId { get; set; }
+
+        //======================================================================================
+        /// <summary>  
+        /// 创建人姓名（createId外键 连接 用户表Id）  
+        /// </summary>  
+        public string CreateName { get; set; }
+
+        /// <summary>
+        /// 商机编号
+        /// </summary>
+        public string BusinessOpportunityCode { get; set; }
     }
 }

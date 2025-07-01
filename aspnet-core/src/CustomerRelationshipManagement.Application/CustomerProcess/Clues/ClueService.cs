@@ -21,6 +21,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
+using StackExchange.Redis;
 
 
 
@@ -41,8 +42,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         private readonly IRepository<Industry> industryRepository;
         private readonly ILogger<ClueService> logger;
         private readonly IDistributedCache<PageInfoCount<ClueDto>> cache;
+        private readonly IConnectionMultiplexer connectionMultiplexer;
 
-        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository)
+        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository, IConnectionMultiplexer connectionMultiplexer)
         {
             this.repository = repository;
             this.logger = logger;
@@ -50,6 +52,25 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             this.sourceRepository = sourceRepository;
             this.userRepository = userRepository;
             this.industryRepository = industryRepository;
+            this.connectionMultiplexer = connectionMultiplexer;
+        }
+
+        /// <summary>
+        /// 清楚关于c:PageInfo,k的所有信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearAbpCacheAsync()
+        {
+            var endpoints=connectionMultiplexer.GetEndPoints();
+            foreach(var endpoint in endpoints)
+            {
+                var server = connectionMultiplexer.GetServer(endpoint);
+                var keys = server.Keys(pattern:"c:PageInfo,k:*");//填写自己的缓存前缀
+                foreach(var key in keys)
+                {
+                    await connectionMultiplexer.GetDatabase().KeyDeleteAsync(key);
+                }
+            }
         }
 
         /// <summary>
@@ -69,6 +90,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 clue.UserId = Guid.NewGuid();
                 //保存到数据库
                 var list=await repository.InsertAsync(clue);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
                 //将数据库操作成功后的CLue实体转换为CLueDto对象
                 return ApiResult<ClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, ClueDto>(list));
             }

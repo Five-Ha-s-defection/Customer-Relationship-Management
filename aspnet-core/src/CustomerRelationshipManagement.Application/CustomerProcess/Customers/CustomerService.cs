@@ -18,6 +18,7 @@ using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly IRepository<CustomerRegion> regionRepository;
         private readonly ILogger<CustomerService> logger;
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository)
+        private readonly IConnectionMultiplexer connectionMultiplexer;
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer)
         {
             this.repository = repository;
             this.logger = logger;
@@ -55,6 +57,25 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             this.levelRepository = levelRepository;
             this.sourceRepository = sourceRepository;
             this.regionRepository = regionRepository;
+            this.connectionMultiplexer = connectionMultiplexer;
+        }
+
+        /// <summary>
+        /// 清楚关于c:PageInfo,k的所有信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearAbpCacheAsync()
+        {
+            var endpoints = connectionMultiplexer.GetEndPoints();
+            foreach (var endpoint in endpoints)
+            {
+                var server = connectionMultiplexer.GetServer(endpoint);
+                var keys = server.Keys(pattern: "c:PageInfo,k:*");//填写自己的缓存前缀
+                foreach (var key in keys)
+                {
+                    await connectionMultiplexer.GetDatabase().KeyDeleteAsync(key);
+                }
+            }
         }
 
         /// <summary>
@@ -87,6 +108,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                 customer.CustomerCode = $"C-{now:yyyyMMddHHmm}-{randomStr}";
                 // 插入客户数据到数据库
                 var list = await repository.InsertAsync(customer);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
                 // 返回插入后的客户信息（DTO）
                 return ApiResult<CustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CustomerDto>(list));
             }
