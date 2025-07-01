@@ -1,12 +1,23 @@
 ﻿using AutoMapper;
 using CustomerRelationshipManagement.crmcontracts;
+using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
+using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
+using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
+using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
-using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
-using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
+using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
@@ -16,26 +27,14 @@ using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.ProductCategory.Categorys;
 using CustomerRelationshipManagement.ProductCategory.Products;
+using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Permissions;
 using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
-using CustomerRelationshipManagement.CustomerProcess.Cars;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
-using CustomerRelationshipManagement.RBAC.Menus;
-using CustomerRelationshipManagement.RBACDtos.Menus;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
-using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
-using CustomerRelationshipManagement.CustomerProcess.ClueSources;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
-using CustomerRelationshipManagement.CustomerProcess.Industrys;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
-using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
-using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
 
 namespace CustomerRelationshipManagement;
 
@@ -85,6 +84,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
 
         #region RBAC
         //用户信息映射
+        CreateMap<UserInfo,UserDto>().ReverseMap();
         CreateMap<UserInfo, UserInfoDto>().ReverseMap();
         CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
         //角色信息映射
