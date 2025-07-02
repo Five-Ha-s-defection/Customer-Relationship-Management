@@ -29,9 +29,9 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         public string RealName { get; set; } = string.Empty;
 
         /// <summary>
-        /// 确认密码
+        /// 头像
         /// </summary>
-        public string? ConfirmPassword { get; set; } = string.Empty;
+        public string? Avatar { get; set; }
         /// <summary>
         /// 邮箱
         /// </summary>

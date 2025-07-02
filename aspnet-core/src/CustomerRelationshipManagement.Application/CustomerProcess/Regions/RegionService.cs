@@ -12,6 +12,9 @@ using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CustomerProcess.CustomerRegions
 {
+    /// <summary>
+    /// 客户地区服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class RegionService:ApplicationService, IRegionService
     {

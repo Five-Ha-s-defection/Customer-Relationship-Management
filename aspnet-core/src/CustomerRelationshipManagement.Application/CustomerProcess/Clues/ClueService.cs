@@ -21,11 +21,15 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
+using StackExchange.Redis;
 
 
 
 namespace CustomerRelationshipManagement.CustomerProcess.Clues
 {
+    /// <summary>
+    /// 线索服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class ClueService : ApplicationService, IClueService
     {
@@ -38,8 +42,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         private readonly IRepository<Industry> industryRepository;
         private readonly ILogger<ClueService> logger;
         private readonly IDistributedCache<PageInfoCount<ClueDto>> cache;
+        private readonly IConnectionMultiplexer connectionMultiplexer;
 
-        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository)
+        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository, IConnectionMultiplexer connectionMultiplexer)
         {
             this.repository = repository;
             this.logger = logger;
@@ -47,6 +52,25 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             this.sourceRepository = sourceRepository;
             this.userRepository = userRepository;
             this.industryRepository = industryRepository;
+            this.connectionMultiplexer = connectionMultiplexer;
+        }
+
+        /// <summary>
+        /// 清楚关于c:PageInfo,k的所有信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearAbpCacheAsync()
+        {
+            var endpoints=connectionMultiplexer.GetEndPoints();
+            foreach(var endpoint in endpoints)
+            {
+                var server = connectionMultiplexer.GetServer(endpoint);
+                var keys = server.Keys(pattern:"c:PageInfo,k:*");//填写自己的缓存前缀
+                foreach(var key in keys)
+                {
+                    await connectionMultiplexer.GetDatabase().KeyDeleteAsync(key);
+                }
+            }
         }
 
         /// <summary>
@@ -66,6 +90,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 clue.UserId = Guid.NewGuid();
                 //保存到数据库
                 var list=await repository.InsertAsync(clue);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
                 //将数据库操作成功后的CLue实体转换为CLueDto对象
                 return ApiResult<ClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, ClueDto>(list));
             }
@@ -102,6 +128,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                on clu.UserId equals user.Id
                                join industry in industrylist
                                on clu.IndustryId equals industry.Id
+                               join creator in userlist
+                               on clu.CreatorId equals creator.Id
                                select new ClueDto
                                {
                                    Id = clu.Id,
@@ -121,7 +149,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                    Remark = clu.Remark,
                                    Status = clu.Status,
                                    LastFollowTime = clu.LastFollowTime,
-                                   NextContactTime = clu.NextContactTime
+                                   NextContactTime = clu.NextContactTime,
+                                   CreateName = creator.RealName,
+
                                };
                     // 只在type==1且AssignedTo有值时加UserId过滤条件
                     list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
@@ -134,9 +164,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                                || x.CompanyName.Contains(dto.Keyword));
                     }
                     //根据状态查询
-                    if (dto.Status.HasValue)
+                    if (dto.Status != null && dto.Status.Count > 0)
                     {
-                        list = list.Where(x => x.Status == dto.Status.Value);
+                        list = list.Where(x => dto.Status.Contains(x.Status));
                     }
                     //根据创建人查询
                     if (dto.CreatedBy.HasValue)
@@ -184,7 +214,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                     return pageInfo;
                 }, () => new DistributedCacheEntryOptions
                 {
-                    SlidingExpiration = TimeSpan.FromMinutes(5)     //设置缓存过期时间为5分钟
+                    SlidingExpiration = TimeSpan.FromSeconds(5)     //设置缓存过期时间为5分钟
                 });
 
                 return ApiResult<PageInfoCount<ClueDto>>.Success(ResultCode.Success,redislist);

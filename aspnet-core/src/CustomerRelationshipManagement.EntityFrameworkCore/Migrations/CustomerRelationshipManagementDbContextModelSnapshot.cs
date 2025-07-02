@@ -32,6 +32,10 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<decimal>("Budget")
                         .HasColumnType("decimal(65,30)");
 
+                    b.Property<string>("BusinessOpportunityCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("BusinessOpportunityName")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -506,6 +510,10 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<string>("CustomerAddress")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("CustomerCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("CustomerEmail")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -604,6 +612,36 @@ namespace CustomerRelationshipManagement.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
 
                     b.Property<string>("SalesProgressName")
                         .IsRequired()

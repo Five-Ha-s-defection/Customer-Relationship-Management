@@ -82,30 +82,30 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         /// <exception cref="NotImplementedException"></exception>
         /// 
         [HttpGet]
-        public async Task<ApiResult<IList<ProductDtos>>> GetProduct([FromQuery] ProductDtos productdtos)
+        public async Task<ApiResult<IList<ProductDtos>>> GetProduct([FromQuery] SearchProductDto dto)
         {
             try
             {
                 var query = await productRepository.GetQueryableAsync();
                 //查询条件
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductBrand) || !string.IsNullOrEmpty(productdtos.ProductCode), x => x.ProductBrand.Contains(productdtos.ProductBrand) || x.ProductCode.Contains(productdtos.ProductCode));
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductBrand)||!string.IsNullOrEmpty(dto.ProductCode),x => x.ProductBrand.Contains(dto.ProductBrand)||x.ProductCode.Contains(dto.ProductCode));
+                
+                query = query.WhereIf(dto.CategoryId != Guid.Empty, x => x.CategoryId == dto.CategoryId);
 
-                query = query.WhereIf(productdtos.CategoryId != Guid.Empty, x => x.CategoryId == productdtos.CategoryId);
-
-                query = query.WhereIf(productdtos.ProductStatus, x => x.ProductStatus == productdtos.ProductStatus);
-                query = query.WhereIf(productdtos.ParentId != Guid.Empty, x => x.ParentId == productdtos.ParentId);
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductImageUrl), x => x.ProductImageUrl.Contains(productdtos.ProductImageUrl));
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductDescription), x => x.ProductDescription.Contains(productdtos.ProductDescription));
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductRemark), x => x.ProductRemark.Contains(productdtos.ProductRemark));
-                query = query.WhereIf(productdtos.SuggestedPrice > 0, x => x.SuggestedPrice == productdtos.SuggestedPrice);
-                query = query.WhereIf(productdtos.DealPrice > 0, x => x.DealPrice == productdtos.DealPrice);
-                query = query.WhereIf(productdtos.SuggestedPrice > 0, x => x.SuggestedPrice == productdtos.SuggestedPrice);
+                query = query.WhereIf(dto.ProductStatus, x => x.ProductStatus == dto.ProductStatus);
+                query = query.WhereIf(dto.ParentId != Guid.Empty, x => x.ParentId == dto.ParentId);
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductImageUrl), x => x.ProductImageUrl.Contains(dto.ProductImageUrl));
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductDescription), x => x.ProductDescription.Contains(dto.ProductDescription));
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductRemark), x => x.ProductRemark.Contains(dto.ProductRemark));
+                query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
+                query = query.WhereIf(dto.DealPrice > 0, x => x.DealPrice == dto.DealPrice);
+                query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
                 
 
 
                 //
                 //分页
-                var querypaging = query.OrderByDescending(x => x.Id).Skip(productdtos.PageIndex).Take(productdtos.PageSize);
+                var querypaging = query.OrderByDescending(x => x.Id).Skip(dto.PageIndex).Take(dto.PageSize);
                 //将数据通过映射转换
                 var productdto = ObjectMapper.Map<IList<Product>, IList<ProductDtos>>(querypaging.ToList());
                 //返回apiresult
