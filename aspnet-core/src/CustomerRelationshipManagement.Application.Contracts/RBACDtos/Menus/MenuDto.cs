@@ -9,6 +9,10 @@ namespace CustomerRelationshipManagement.RBACDtos.Menus
     public class MenuDto
     {
         /// <summary>
+        /// 菜单Id
+        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>
         /// 菜单名称
         /// </summary>
         public string MenuName { get; set; } = string.Empty;
