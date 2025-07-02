@@ -8,6 +8,7 @@ namespace CustomerRelationshipManagement.RBACDtos.RolePermissions
 {
     public class AssignPermissionsDto
     {
+
         /// <summary>
         /// 角色Id
         /// </summary>
