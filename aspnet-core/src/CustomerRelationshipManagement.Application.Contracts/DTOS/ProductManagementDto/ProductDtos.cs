@@ -11,7 +11,7 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
     /// <summary>
     /// 产品管理DTOS
     /// </summary>
-    public class ProductDtos:PagingInfo
+    public class ProductDtos:FullAuditedEntityDto<Guid>
     {
         public Guid Id { get; set; } = Guid.Empty;
         /// <summary>

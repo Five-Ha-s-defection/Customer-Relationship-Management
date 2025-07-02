@@ -52,5 +52,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
         /// 产品Id
         /// </summary>
         public Guid ProductId { get; set; }
+
+        /// <summary>
+        /// 商机编号
+        /// </summary>
+        public string BusinessOpportunityCode { get; set; }
     }
 }
