@@ -100,5 +100,11 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// 下次联系时间
         /// </summary>
         public DateTime NextContactTime { get; set; }
+
+
+        /// <summary>
+        /// 创建人名称
+        /// </summary>
+        public string CreateName { get; set; }
     }
 }

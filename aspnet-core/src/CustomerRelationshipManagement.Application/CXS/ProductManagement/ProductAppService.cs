@@ -92,14 +92,14 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 
                 query = query.WhereIf(dto.CategoryId != Guid.Empty, x => x.CategoryId == dto.CategoryId);
 
-                query = query.WhereIf(productdtos.ProductStatus, x => x.ProductStatus == productdtos.ProductStatus);
-                query = query.WhereIf(productdtos.ParentId != Guid.Empty, x => x.ParentId == productdtos.ParentId);
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductImageUrl), x => x.ProductImageUrl.Contains(productdtos.ProductImageUrl));
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductDescription), x => x.ProductDescription.Contains(productdtos.ProductDescription));
-                query = query.WhereIf(!string.IsNullOrEmpty(productdtos.ProductRemark), x => x.ProductRemark.Contains(productdtos.ProductRemark));
-                query = query.WhereIf(productdtos.SuggestedPrice > 0, x => x.SuggestedPrice == productdtos.SuggestedPrice);
-                query = query.WhereIf(productdtos.DealPrice > 0, x => x.DealPrice == productdtos.DealPrice);
-                query = query.WhereIf(productdtos.SuggestedPrice > 0, x => x.SuggestedPrice == productdtos.SuggestedPrice);
+                query = query.WhereIf(dto.ProductStatus, x => x.ProductStatus == dto.ProductStatus);
+                query = query.WhereIf(dto.ParentId != Guid.Empty, x => x.ParentId == dto.ParentId);
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductImageUrl), x => x.ProductImageUrl.Contains(dto.ProductImageUrl));
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductDescription), x => x.ProductDescription.Contains(dto.ProductDescription));
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductRemark), x => x.ProductRemark.Contains(dto.ProductRemark));
+                query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
+                query = query.WhereIf(dto.DealPrice > 0, x => x.DealPrice == dto.DealPrice);
+                query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
                 
 
 

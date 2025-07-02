@@ -22,7 +22,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues.Helpers
                    $"Type_{dto.type}_" +
                    $"AssignedTo_{(string.IsNullOrWhiteSpace(dto.AssignedTo.ToString()) ? "null" : dto.AssignedTo)}_" +
                    $"CreatedBy_{(dto.CreatedBy.HasValue ? dto.CreatedBy.Value.ToString() : "null")}_" +
-                   $"Status_{dto.Status?.ToString() ?? "null"}_" +
+                   $"Status_{(dto.Status != null && dto.Status.Count > 0 ? string.Join("-", dto.Status) : "null")}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"TimeType_{dto.TimeType?.ToString() ?? "null"}_" +

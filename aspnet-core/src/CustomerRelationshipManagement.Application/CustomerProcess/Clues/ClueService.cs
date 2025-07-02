@@ -128,6 +128,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                on clu.UserId equals user.Id
                                join industry in industrylist
                                on clu.IndustryId equals industry.Id
+                               join creator in userlist
+                               on clu.CreatorId equals creator.Id
                                select new ClueDto
                                {
                                    Id = clu.Id,
@@ -147,7 +149,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                    Remark = clu.Remark,
                                    Status = clu.Status,
                                    LastFollowTime = clu.LastFollowTime,
-                                   NextContactTime = clu.NextContactTime
+                                   NextContactTime = clu.NextContactTime,
+                                   CreateName = creator.RealName,
+
                                };
                     // 只在type==1且AssignedTo有值时加UserId过滤条件
                     list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
@@ -160,9 +164,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                                || x.CompanyName.Contains(dto.Keyword));
                     }
                     //根据状态查询
-                    if (dto.Status.HasValue)
+                    if (dto.Status != null && dto.Status.Count > 0)
                     {
-                        list = list.Where(x => x.Status == dto.Status.Value);
+                        list = list.Where(x => dto.Status.Contains(x.Status));
                     }
                     //根据创建人查询
                     if (dto.CreatedBy.HasValue)
@@ -210,7 +214,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                     return pageInfo;
                 }, () => new DistributedCacheEntryOptions
                 {
-                    SlidingExpiration = TimeSpan.FromMinutes(5)     //设置缓存过期时间为5分钟
+                    SlidingExpiration = TimeSpan.FromSeconds(5)     //设置缓存过期时间为5分钟
                 });
 
                 return ApiResult<PageInfoCount<ClueDto>>.Success(ResultCode.Success,redislist);
