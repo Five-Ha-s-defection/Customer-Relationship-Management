@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Json.SystemTextJson.JsonConverters;
 
 namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
 {
@@ -41,7 +42,7 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         public IList<Guid>? CreateUserIds { get; set; } = new List<Guid>();
 
         /// <summary>
-        /// 所属客户
+        /// 所属客户id
         /// </summary>
         public Guid? CustomerId {  get; set; } = Guid.Empty;
 
@@ -69,5 +70,10 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// 经销商
         /// </summary>
         public string? Dealer { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 合同金额
+        /// </summary>
+        public decimal? ContractProceeds {  get; set; } = 0;
     }
 }
