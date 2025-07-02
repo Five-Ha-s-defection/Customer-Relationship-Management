@@ -37,7 +37,7 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// <summary>
         /// 发票编号
         /// </summary>
-        public string? InvoiceNumberCode { get; set; } = string.Empty;
+        public string? InvoiceNumberCode { get; set; }
 
 
 

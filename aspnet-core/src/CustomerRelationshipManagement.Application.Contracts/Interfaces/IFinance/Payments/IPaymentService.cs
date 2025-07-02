@@ -1,12 +1,13 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.Finance.Payments;
+using CustomerRelationshipManagement.Paging;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Paging;
 using System.Threading.Tasks;
-using CustomerRelationshipManagement.DTOS.Finance.Payments;
 
 namespace CustomerRelationshipManagement.Interfaces.IFinance.Payments
 {
@@ -21,6 +22,8 @@ namespace CustomerRelationshipManagement.Interfaces.IFinance.Payments
         Task<ApiResult<PaymentDTO>> UpdatePayment(Guid id, CreateUpdatePaymentDTO createUpdatePaymentDTO);
 
         Task<ApiResult<PaymentDTO>> DeleteAsync(Guid id);
+
+        Task<ApiResult<PaymentDTO>> DeleteAllAsync([FromBody] Guid[] ids);
 
         Task<ApiResult<PaymentDTO>> GetByIdAsync(Guid id);
     }

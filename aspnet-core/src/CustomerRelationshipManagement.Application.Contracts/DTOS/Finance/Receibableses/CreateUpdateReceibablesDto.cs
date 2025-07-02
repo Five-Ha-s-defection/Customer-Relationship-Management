@@ -47,11 +47,11 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// <summary>
         /// 备注
         /// </summary>
-        
         public string Remark { get; set; }
         /// <summary>
         /// 关联的收款单
         /// </summary>
+        [Required]
         public Guid PaymentId { get; set; }
     }
 }

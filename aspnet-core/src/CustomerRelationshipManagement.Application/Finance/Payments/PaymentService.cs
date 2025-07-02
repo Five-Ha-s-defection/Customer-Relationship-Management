@@ -1,5 +1,9 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.crmcontracts;
+using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
+using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Interfaces.IFinance.Payments;
 using CustomerRelationshipManagement.Paging;
@@ -7,6 +11,8 @@ using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
+using NPOI.POIFS.Properties;
+using Org.BouncyCastle.Crypto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,16 +28,22 @@ namespace CustomerRelationshipManagement.Finance.Payments
     public class PaymentService:ApplicationService, IPaymentService
     {
         private readonly IRepository<Payment, Guid> repository;
+        private readonly IRepository<PaymentMethod, Guid> paymentmethodeceivables;
         private readonly IRepository<Receivables, Guid> receivablesRepository;
         private readonly IRepository<UserInfo, Guid> userinforeceivables;
+        private readonly IRepository<Customer, Guid> customerrepository;
+        private readonly IRepository<CrmContract, Guid> crmcontractreceivables;
         private readonly IDistributedCache<PageInfoCount<PaymentDTO>> cache;
 
-        public PaymentService(IRepository<Payment, Guid> repository, IDistributedCache<PageInfoCount<PaymentDTO>> cache, IRepository<Receivables, Guid> receivablesRepository, IRepository<UserInfo, Guid> userinforeceivables)
+        public PaymentService(IRepository<Payment, Guid> repository, IDistributedCache<PageInfoCount<PaymentDTO>> cache, IRepository<Receivables, Guid> receivablesRepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<PaymentMethod, Guid> paymentmethodeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables)
         {
             this.repository = repository;
             this.cache = cache;
             this.receivablesRepository = receivablesRepository;
             this.userinforeceivables = userinforeceivables;
+            this.paymentmethodeceivables = paymentmethodeceivables;
+            this.customerrepository = customerrepository;
+            this.crmcontractreceivables = crmcontractreceivables;
         }
         /// <summary>
         /// 新增收款
@@ -64,6 +76,31 @@ namespace CustomerRelationshipManagement.Finance.Payments
                 }
             }
             return ApiResult<PaymentDTO>.Success(ResultCode.Success, ObjectMapper.Map<Payment, PaymentDTO>(payment));
+        }
+        
+        /// <summary>
+        /// 添加付款方式
+        /// </summary>
+        /// <param name="paymentMethod"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<PaymentMethod>> InsertPaymentMethod(PaymentMethod paymentMethod)
+        {
+            await paymentmethodeceivables.InsertAsync(paymentMethod);
+            return ApiResult<PaymentMethod>.Success(ResultCode.Success, paymentMethod);
+        }
+        /// <summary>
+        /// 获取付款方式
+        /// </summary>
+        /// <param name="paymentMethod"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<List<PaymentMethod>>> GetPaymentMethod()
+        {
+            var paymentMethodInfo =await paymentmethodeceivables.GetListAsync();
+            if(paymentMethodInfo == null)
+            {
+                return ApiResult<List<PaymentMethod>>.Fail("未找到数据",ResultCode.NotFound);
+            }
+            return ApiResult<List<PaymentMethod>>.Success(ResultCode.Success, paymentMethodInfo);
         }
         /// <summary>
         /// 处理收款记录的审批操作
@@ -129,69 +166,100 @@ namespace CustomerRelationshipManagement.Finance.Payments
         /// <returns></returns>
         public async Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO searchDTO)
         {
-            string cacheKey = $"GetPayment";
-            var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
+            //string cacheKey = $"GetPayment";
+            //var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
+            //{
+               
+            //    return pageInfo;
+            //}, () => new DistributedCacheEntryOptions
+            //{
+            //    SlidingExpiration = TimeSpan.FromSeconds(10)
+            //});
+            var payments = await repository.GetQueryableAsync();
+            var receivables = await receivablesRepository.GetQueryableAsync();
+            var userinfo = await userinforeceivables.GetQueryableAsync();
+            var customer = await customerrepository.GetQueryableAsync();
+            var crmcontract = await crmcontractreceivables.GetQueryableAsync();
+            var paymentmethod = await paymentmethodeceivables.GetQueryableAsync();
+
+            // 联合查询
+            var query = from p in payments
+                        join r in receivables on p.ReceivableId equals r.Id into pr
+                        from r in pr.DefaultIfEmpty() // left join，如果要inner join去掉DefaultIfEmpty
+                        join c in userinfo on r.UserId equals c.Id into rc
+                        from c in rc.DefaultIfEmpty()
+                        join d in customer on r.CustomerId equals d.Id into rd
+                        from d in rd.DefaultIfEmpty()
+                        join e in crmcontract on p.ContractId equals e.Id into re
+                        from e in re.DefaultIfEmpty()
+                        join f in paymentmethod on p.PaymentMethod equals f.Id into pf
+                        from f in pf.DefaultIfEmpty()
+                        join creator in userinfo on r.CreatorId equals creator.Id into creatorJoin
+                        from creator in creatorJoin.DefaultIfEmpty()
+                        select new PaymentDTO
+                        {
+                            Id = p.Id,
+                            PaymentCode = p.PaymentCode,
+                            Amount = p.Amount,
+                            PaymentMethod = p.PaymentMethod,
+                            PaymentMethodName = f.PaymentMethodName,
+                            PaymentDate = p.PaymentDate,
+                            ApproverIds = p.ApproverIds,
+                            CurrentStep = p.CurrentStep,
+                            ApproveComments = p.ApproveComments,
+                            ApproveTimes = p.ApproveTimes,
+                            PaymentStatus = p.PaymentStatus,
+                            Remark = p.Remark,
+                            UserId = p.UserId,
+                            RealName = c.RealName,
+                            CustomerId = p.CustomerId,
+                            ContractId = p.ContractId,
+                            ReceivableId = p.ReceivableId,
+                            ReceivablePay = r.ReceivablePay,
+                            ContractName = e.ContractName,
+                            CustomerName = d.CustomerName,
+                            CreatorRealName = creator.RealName,
+                            CreationTime = p.CreationTime,
+                        };
+
+            // 使用ABP框架的分页方法进行分页查询
+            var res = query.PageResult(searchDTO.PageIndex, searchDTO.PageSize);
+            // 这里可以加上你的where条件，对p.xxx和r.xxx都可以筛选
+            query = query
+                .WhereIf(!string.IsNullOrEmpty(searchDTO.PaymentCode), x => x.PaymentCode.Contains(searchDTO.PaymentCode))
+                .WhereIf(searchDTO.PaymentStatus != null, x => x.PaymentStatus == searchDTO.PaymentStatus)
+                .WhereIf(searchDTO.PaymentMethod.HasValue, x => x.PaymentMethod == searchDTO.PaymentMethod)
+                .WhereIf(searchDTO.PaymentDate != null, x => x.PaymentDate >= searchDTO.StartTime && x.PaymentDate <= searchDTO.EndTime)
+                .WhereIf(searchDTO.UserId.HasValue, x => x.UserId == searchDTO.UserId)
+                .WhereIf(searchDTO.CustomerId.HasValue, x => x.CustomerId == searchDTO.CustomerId)
+                .WhereIf(searchDTO.ContractId.HasValue, x => x.ContractId == searchDTO.ContractId)
+                .WhereIf(searchDTO.ApproverIds != null && searchDTO.ApproverIds.Any(), x => x.ApproverIds.Any(id => searchDTO.ApproverIds.Contains(id)));
+
+
+
+            // 先ToList，后处理AuditorNames
+            var userList = userinfo.ToList();
+            var dataList = res.Queryable.ToList();
+            foreach (var item in dataList)
             {
-                var payments = await repository.GetQueryableAsync();
-                var receivables = await receivablesRepository.GetQueryableAsync();
-                var userinfo = await userinforeceivables.GetQueryableAsync();
-
-                // 联合查询
-                var query = from p in payments
-                            join r in receivables on p.ReceivableId equals r.Id into pr
-                            from r in pr.DefaultIfEmpty() // left join，如果要inner join去掉DefaultIfEmpty
-                            join c in userinfo on r.UserId equals c.Id into rc
-                            from c in rc.DefaultIfEmpty()
-                            select new PaymentDTO
-                            {
-                                Id = p.Id,
-                                PaymentCode = p.PaymentCode,
-                                Amount = p.Amount,
-                                PaymentMethod = p.PaymentMethod,
-                                PaymentDate = p.PaymentDate,
-                                ApproverIds = p.ApproverIds,
-                                CurrentStep = p.CurrentStep,
-                                ApproveComments = p.ApproveComments,
-                                ApproveTimes = p.ApproveTimes,
-                                PaymentStatus = p.PaymentStatus,
-                                Remark = p.Remark,
-                                UserId = p.UserId,
-                                CustomerId = p.CustomerId,
-                                ContractId = p.ContractId,
-                                ReceivableId = p.ReceivableId,
-                                ReceivablePay = r.ReceivablePay,
-
-                            };
-                // 这里可以加上你的where条件，对p.xxx和r.xxx都可以筛选
-                query = query
-                    .WhereIf(!string.IsNullOrEmpty(searchDTO.PaymentCode), x => x.PaymentCode.Contains(searchDTO.PaymentCode))
-                    .WhereIf(searchDTO.PaymentStatus != 0, x => x.PaymentStatus == searchDTO.PaymentStatus)
-                    .WhereIf(searchDTO.PaymentMethod.HasValue, x => x.PaymentMethod == searchDTO.PaymentMethod)
-                    .WhereIf(searchDTO.PaymentDate != null, x => x.PaymentDate >= searchDTO.StartTime && x.PaymentDate <= searchDTO.EndTime)
-                    .WhereIf(searchDTO.UserId.HasValue, x => x.UserId == searchDTO.UserId)
-                    .WhereIf(searchDTO.CustomerId.HasValue, x => x.CustomerId == searchDTO.CustomerId)
-                    .WhereIf(searchDTO.ContractId.HasValue, x => x.ContractId == searchDTO.ContractId)
-                    .WhereIf(searchDTO.ApproverIds != null && searchDTO.ApproverIds.Any(),
-         x => x.ApproverIds.Any(id => searchDTO.ApproverIds.Contains(id)));
-
-                // 使用ABP框架的分页方法进行分页查询
-                var res = query.PageResult(searchDTO.PageIndex, searchDTO.PageSize);
-
-
-                // 构建分页结果对象
-                var pageInfo = new PageInfoCount<PaymentDTO>
+                if (item.ApproverIds != null && item.ApproverIds.Count > 0)
                 {
-                    TotalCount = res.RowCount, // 总记录数
-                    PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / searchDTO.PageSize), // 总页数
-                    Data = res.Queryable.ToList() // 当前页数据
-                };
-                return pageInfo;
-            }, () => new DistributedCacheEntryOptions
+                    item.AuditorNames = string.Join(",", userList.Where(u => item.ApproverIds.Contains(u.Id)).Select(u => u.RealName));
+                }
+                else
+                {
+                    item.AuditorNames = string.Empty;
+                }
+            }
+
+            // 构建分页结果对象
+            var pageInfo = new PageInfoCount<PaymentDTO>
             {
-                AbsoluteExpiration = DateTimeOffset.Now.AddMinutes(10),
-                SlidingExpiration = TimeSpan.FromMinutes(5)
-            });
-            return ApiResult<PageInfoCount<PaymentDTO>>.Success(ResultCode.Success, redislist);
+                TotalCount = res.RowCount, // 总记录数
+                PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / searchDTO.PageSize), // 总页数
+                Data = dataList // 当前页数据
+            };
+            return ApiResult<PageInfoCount<PaymentDTO>>.Success(ResultCode.Success, pageInfo);
         }
         /// <summary>
         /// 修改收款
@@ -222,6 +290,34 @@ namespace CustomerRelationshipManagement.Finance.Payments
             {
                 await repository.DeleteAsync(id);
 
+                return ApiResult<PaymentDTO>.Success(ResultCode.Success, null);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 批量删除收款的信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<PaymentDTO>> DeleteAllAsync([FromBody]Guid[] ids)
+        {
+            try
+            {
+                if (ids == null || ids.Length == 0)
+                {
+                    return ApiResult<PaymentDTO>.Fail("请选择要删除的数据", ResultCode.Fail);
+                }
+
+                // 批量删除数据库记录
+                foreach (var id in ids)
+                {
+                    await repository.DeleteAsync(id);
+                }
                 return ApiResult<PaymentDTO>.Success(ResultCode.Success, null);
             }
             catch (Exception)

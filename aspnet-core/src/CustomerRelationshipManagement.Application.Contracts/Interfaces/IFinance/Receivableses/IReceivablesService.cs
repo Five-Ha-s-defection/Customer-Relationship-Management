@@ -49,5 +49,7 @@ namespace CustomerRelationshipManagement.Interfaces.IFinance.Receivableses
         /// <param name="ids">要删除的应收款ID数组</param>
         /// <returns>操作结果</returns>
         Task<ApiResult<ReceivablesDTO>> DeleteAsync(Guid[] ids);
+
+        Task<ApiResult<ReceivablesDTO>> DeleteGetIdAsync(Guid id);
     }
 }

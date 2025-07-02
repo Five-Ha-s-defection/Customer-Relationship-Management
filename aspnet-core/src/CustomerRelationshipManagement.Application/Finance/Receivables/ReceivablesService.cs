@@ -239,10 +239,10 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         {
             try
             {
-                //if (ids == null || ids.Length == 0)
-                //{
-                //    return ApiResult<ReceivablesDTO>.Fail("请选择要删除的数据", ResultCode.Fail);
-                //}
+                if (ids == null || ids.Length == 0)
+                {
+                    return ApiResult<ReceivablesDTO>.Fail("请选择要删除的数据", ResultCode.Fail);
+                }
 
                 // 批量删除数据库记录
                 foreach (var id in ids)
@@ -259,8 +259,32 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                 throw;
             }
         }
+        /// <summary>
+        /// 删除
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public async Task<ApiResult<ReceivablesDTO>> DeleteGetIdAsync(Guid id)
+        {
+            try
+            {
+                await repository.DeleteAsync(id);
+                // 清除对应的缓存
+                await _cacheById.RemoveAsync($"receivable:{id}");
 
+                return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, null);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
+        /// <summary>
+        /// 导出应收款信息
+        /// </summary>
+        /// <returns></returns>
         public async Task<IActionResult> GetExportReceivablesAsyncExcel()
         {
             // 从数据库查询所有产品
