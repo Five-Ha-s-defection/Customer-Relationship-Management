@@ -151,7 +151,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                    LastFollowTime = clu.LastFollowTime,
                                    NextContactTime = clu.NextContactTime,
                                    CreateName = creator.RealName,
-
+                                   CreationTime = clu.CreationTime,
                                };
                     // 只在type==1且AssignedTo有值时加UserId过滤条件
                     list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
