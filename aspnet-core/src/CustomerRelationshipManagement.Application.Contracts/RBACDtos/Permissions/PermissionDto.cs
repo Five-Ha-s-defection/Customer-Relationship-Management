@@ -24,6 +24,9 @@ namespace CustomerRelationshipManagement.RBACDtos.Permissions
         /// 权限分组
         /// </summary>
         public string GroupName { get; set; } = string.Empty;
-        
+        /// <summary>
+        /// 权限描述
+        /// </summary>
+        public string Description { get; set; } = string.Empty;
     }
 }

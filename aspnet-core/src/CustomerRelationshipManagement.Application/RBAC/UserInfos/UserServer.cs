@@ -190,7 +190,13 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 {
                     return ApiResult<UserInfoDto>.Fail("未找到要修改的用户", ResultCode.NotFound);
                 }
+
+
                 ObjectMapper.Map(dto, user);
+                if (!string.IsNullOrEmpty(dto.Password))
+                {
+                    user.Password = passwordHasher.HashPassword(user, dto.Password);
+                }
                 var updated = await userRep.UpdateAsync(user);
                 return ApiResult<UserInfoDto>.Success(ResultCode.Success, ObjectMapper.Map<UserInfo, UserInfoDto>(updated));
             }
