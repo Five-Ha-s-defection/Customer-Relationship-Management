@@ -2,7 +2,6 @@ using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.Application.Contracts.RBAC.Menus;
 using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBACDtos.Menus;
-using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

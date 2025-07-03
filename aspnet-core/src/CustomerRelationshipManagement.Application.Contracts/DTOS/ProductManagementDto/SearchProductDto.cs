@@ -49,7 +49,7 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
         /// <summary>
         /// 上架未上架
         /// </summary>
-        public bool? ProductStatus { get; set; } 
+        public bool ProductStatus { get; set; } 
         /// <summary>
         /// 成交价
         /// </summary>
