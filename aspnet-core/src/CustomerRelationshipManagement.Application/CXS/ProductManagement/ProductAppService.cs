@@ -102,8 +102,17 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 var query = await productRepository.GetQueryableAsync();
 
                 #region 查询条件
-                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductBrand) || !string.IsNullOrEmpty(dto.ProductCode), x => x.ProductBrand.Contains(dto.ProductBrand) || x.ProductCode.Contains(dto.ProductCode));
+                // 单独判断 ProductBrand
+                query = query.WhereIf(
+                    !string.IsNullOrEmpty(dto.ProductBrand),
+                    x => x.ProductBrand.Contains(dto.ProductBrand)
+                );
 
+                // 单独判断 ProductCode
+                query = query.WhereIf(
+                    !string.IsNullOrEmpty(dto.ProductCode),
+                    x => x.ProductCode.Contains(dto.ProductCode)
+                );
                 query = query.WhereIf(dto.CategoryId != Guid.Empty, x => x.CategoryId == dto.CategoryId);
 
                 query = query.WhereIf(dto.ProductStatus, x => x.ProductStatus == dto.ProductStatus);
