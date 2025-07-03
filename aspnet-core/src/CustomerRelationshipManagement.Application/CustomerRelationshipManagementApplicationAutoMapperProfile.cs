@@ -6,10 +6,7 @@ using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
 using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
-using CustomerRelationshipManagement.CustomerProcess.ClueSources;
 using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
-using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
-using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.CustomerProcess.Prioritys;
@@ -21,7 +18,6 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
@@ -46,10 +42,8 @@ using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
-using CustomerRelationshipManagement.CustomerProcess.Prioritys;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
-using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
+using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 
 namespace CustomerRelationshipManagement;
 
@@ -88,6 +82,10 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //客户区域表
         CreateMap<CustomerRegion,RegionDto>().ReverseMap();
         CreateMap<CustomerRegion, CreateUpdateRegionDto>().ReverseMap();
+
+        //客户类型表
+        CreateMap<CustomerType, CustomerTypeDto>().ReverseMap();
+        CreateMap<CustomerType, CreateUpdateCustomerTypeDto>().ReverseMap();
 
         //商机表
         CreateMap<BusinessOpportunity, BusinessOpportunityDto>().ReverseMap();

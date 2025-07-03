@@ -2,6 +2,7 @@
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Paging;
@@ -82,5 +83,11 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers
         /// </summary>
         /// <returns></returns>
         Task<ApiResult<List<RegionDto>>> GetRegionCascadeList();
+
+        /// <summary>
+        /// 获取客户类别下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        Task<ApiResult<List<CustomerTypeDto>>> GetCustomerType();
     }
 }

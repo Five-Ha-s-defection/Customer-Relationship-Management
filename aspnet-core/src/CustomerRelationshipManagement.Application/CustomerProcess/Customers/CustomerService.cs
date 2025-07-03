@@ -6,9 +6,11 @@ using CustomerRelationshipManagement.CustomerProcess.ClueSources;
 using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers.Helpers;
+using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
@@ -43,10 +45,11 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly IRepository<CustomerLevel> levelRepository;
         private readonly IRepository<ClueSource> sourceRepository;
         private readonly IRepository<CustomerRegion> regionRepository;
+        private readonly IRepository<CustomerType> typeRepository;
         private readonly ILogger<CustomerService> logger;
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
         private readonly IConnectionMultiplexer connectionMultiplexer;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer)
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository)
         {
             this.repository = repository;
             this.logger = logger;
@@ -58,6 +61,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             this.sourceRepository = sourceRepository;
             this.regionRepository = regionRepository;
             this.connectionMultiplexer = connectionMultiplexer;
+            this.typeRepository = typeRepository;
         }
 
         /// <summary>
@@ -470,6 +474,39 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             catch (Exception ex)
             {
                 logger.LogError("获取客户地区级联数据出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取客户类别下拉框数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<List<CustomerTypeDto>>> GetCustomerType()
+        {
+            try
+            {
+                var typeList = await typeRepository.GetQueryableAsync();
+                var result = typeList
+                    .Select(u => new
+                    {
+                        IdString = u.Id.ToString(), // 转为 string
+                        u.CustomerTypeName,
+                    })
+                      .AsEnumerable() // 从数据库取出后处理 Guid
+                    .Where(u => Guid.TryParse(u.IdString, out _)) // 过滤非法 Guid
+                    .Select(u => new CustomerTypeDto
+                    {
+                        Id = Guid.Parse(u.IdString),
+                        CustomerTypeName = u.CustomerTypeName
+                    })
+                    .ToList();
+                return ApiResult<List<CustomerTypeDto>>.Success(ResultCode.Success, result);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("获取客户级别下拉框数据出错！" + ex.Message);
                 throw;
             }
         }
