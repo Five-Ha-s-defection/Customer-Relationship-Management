@@ -41,7 +41,7 @@ namespace CustomerRelationshipManagement.RBAC.RolePermissions
                     if (rolePermissionInfo.Count > 0)
                     {
                         //先删除原有的权限
-                       // await rolePermissionRepository.DeleteAsync(x => x.RoleId == input.RoleId);
+                       await rolePermissionRepository.DeleteAsync(x => x.RoleId == input.RoleId);
                         //throw new Exception("角色已存在权限");
                     }
                    

@@ -9,6 +9,10 @@ namespace CustomerRelationshipManagement.RBACDtos.Permissions
     public class PermissionDto
     {
         /// <summary>
+        /// 权限Id
+        /// </summary>
+        public Guid Id { get; set; }
+        /// <summary>
         /// 权限名称
         /// </summary>
         public string PermissionName { get; set; } = string.Empty;
