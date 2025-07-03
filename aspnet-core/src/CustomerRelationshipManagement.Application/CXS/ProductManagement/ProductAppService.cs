@@ -213,6 +213,10 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
             }
         }
 
+        /// <summary>
+        /// 导出所有产品
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IRemoteStreamContent> ExportAllProductCategoryToAsync()
         {
@@ -225,7 +229,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                            {
                                Id = a.Id,
                                CategoryId = a.CategoryId,
-                               CategoryName = b != null ? b.CategoryName : "", // 这里做了判空
+                               CategoryName =b.CategoryName, // 这里做了判空
                                ParentId = a.ParentId,
                                ProductImageUrl = a.ProductImageUrl,
                                ProductBrand = a.ProductBrand,
