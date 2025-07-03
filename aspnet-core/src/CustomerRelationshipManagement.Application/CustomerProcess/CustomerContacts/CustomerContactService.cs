@@ -236,6 +236,13 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
             }
         }
 
+        /// <summary>
+        /// 显示联系人列表信息
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        [HttpGet]
         public Task<ApiResult<PageInfoCount<CustomerContactDto>>> ShowCustomerContact([FromQuery] SearchCustomerContactDto dto)
         {
             throw new NotImplementedException();
