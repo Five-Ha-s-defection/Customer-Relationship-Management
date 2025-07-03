@@ -77,7 +77,6 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// <summary>
         /// 备注（富文本）
         /// </summary>
-        [Required,StringLength(500)]
         public string Remark { get; set; }
 
         /// <summary>
@@ -89,20 +88,17 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// <summary>
         /// 最后跟进时间
         /// </summary>
-        [Required]
         public DateTime LastFollowTime { get; set; }
 
         /// <summary>
         /// 下次联系时间
         /// </summary>
-        [Required]
         public DateTime NextContactTime { get; set; }
 
 
         /// <summary>
         /// 线索编号
         /// </summary>
-        [Required]
-        public string ClueCode { get; set; }
+        public string? ClueCode { get; set; }
     }
 }

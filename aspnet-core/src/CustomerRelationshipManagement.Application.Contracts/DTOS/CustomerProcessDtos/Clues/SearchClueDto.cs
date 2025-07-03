@@ -13,7 +13,7 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
     public class SearchClueDto:PagingInfo
     {
         /// <summary>
-        /// 显示类型 0 显示所有 1 显示我负责的
+        /// 显示类型 0 显示所有 1 显示我负责的 2显示我创建的
         /// </summary>
         public int type { get; set; } = 0;
         public Guid? CreatedBy { get; set; }         // 创建人

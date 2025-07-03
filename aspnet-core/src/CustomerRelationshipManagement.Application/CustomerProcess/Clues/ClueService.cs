@@ -87,8 +87,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             {
                 //将接收到的对象转换成实体
                 var clue = ObjectMapper.Map<CreateUpdateClueDto, Clue>(dto);
-                // 设置UserId为随机 GUID
-                clue.UserId = Guid.NewGuid();
                 // 自动生成客户编号 C-年月日时分-四位纯数字或大写字母数字混合
                 var now = DateTime.Now; // 获取当前时间
                 var random = new Random(); // 创建随机数生成器
@@ -172,8 +170,15 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                    CreationTime = clu.CreationTime,
                                    ClueCode=clu.ClueCode,
                                };
-                    // 只在type==1且AssignedTo有值时加UserId过滤条件
-                    list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
+                    // type: 0=全部，1=我负责的，2=我创建的
+                    if (dto.type == 1 && dto.AssignedTo.HasValue)
+                    {
+                        list = list.Where(x => x.UserId == dto.AssignedTo);
+                    }
+                    else if (dto.type == 2 && dto.CreatedBy.HasValue)
+                    {
+                        list = list.Where(x => x.CreatorId == dto.CreatedBy);
+                    }
                     //查询条件
                     if (!string.IsNullOrEmpty(dto.Keyword))
                     {
@@ -236,7 +241,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                     {
                         list = list.Where(x =>
                             (dto.UserIds != null && dto.UserIds.Count > 0 && dto.UserIds.Contains(x.UserId)) ||
-                            (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0 && dto.CreatedByIds.Contains(x.UserId)) ||
+                            (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0 && dto.CreatedByIds.Contains(x.CreatorId.Value)) ||
                             (dto.ClueSourceId != Guid.Empty && x.ClueSourceId == dto.ClueSourceId) ||
                             (dto.IndustryId != Guid.Empty && x.IndustryId == dto.IndustryId) ||
                             (!string.IsNullOrEmpty(dto.ClueCode) && x.ClueCode.Contains(dto.ClueCode)) ||
