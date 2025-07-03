@@ -1,6 +1,7 @@
 ﻿//using CustomerRelationshipManagement.DTOS.UploadFileDto;
 using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
+using CustomerRelationshipManagement.DTOS.Export;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Interfaces.IProductAppService;
 using CustomerRelationshipManagement.ProductCategory.Categorys;
@@ -17,6 +18,8 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
+using Volo.Abp.Content;
+
 namespace CustomerRelationshipManagement.CXS.ProductManagement
 {
     [ApiExplorerSettings(GroupName = "v1")]
@@ -27,12 +30,15 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         public IHttpContextAccessor httpContextAccessor;
         private readonly ILogger<ProductAppService> logger;
 
-        public ProductAppService(IRepository<Product, Guid> productRepository, IHttpContextAccessor httpContextAccessor, ILogger<ProductAppService> logger, IRepository<Category, Guid> ctegoryRepository)
+        private readonly IExportAppService exportAppService;
+
+        public ProductAppService(IRepository<Product, Guid> productRepository, IHttpContextAccessor httpContextAccessor, ILogger<ProductAppService> logger, IRepository<Category, Guid> ctegoryRepository, IExportAppService exportAppService)
         {
             this.productRepository = productRepository;
             this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
             this.ctegoryRepository = ctegoryRepository;
+            this.exportAppService = exportAppService;
         }
         /// <summary>
         /// 新增产品
@@ -41,7 +47,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-
+     
         public async Task<ApiResult> AddProduct(CreateUpdateProductDtos createProduct)
         {
             //转换要添加的合同表数据
@@ -88,8 +94,8 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
             {
                 var query = await productRepository.GetQueryableAsync();
                 //查询条件
-                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductBrand)||!string.IsNullOrEmpty(dto.ProductCode),x => x.ProductBrand.Contains(dto.ProductBrand)||x.ProductCode.Contains(dto.ProductCode));
-                
+                query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductBrand) || !string.IsNullOrEmpty(dto.ProductCode), x => x.ProductBrand.Contains(dto.ProductBrand) || x.ProductCode.Contains(dto.ProductCode));
+
                 query = query.WhereIf(dto.CategoryId != Guid.Empty, x => x.CategoryId == dto.CategoryId);
 
                 query = query.WhereIf(dto.ProductStatus, x => x.ProductStatus == dto.ProductStatus);
@@ -100,7 +106,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
                 query = query.WhereIf(dto.DealPrice > 0, x => x.DealPrice == dto.DealPrice);
                 query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
-                
+
 
 
                 //
@@ -207,7 +213,58 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
             }
         }
 
+        [HttpGet]
+        public async Task<IRemoteStreamContent> ExportAllProductCategoryToAsync()
+        {
+            var list = await productRepository.GetListAsync();
+            var categorylist = await ctegoryRepository.GetListAsync();
+            var category = from a in list
+                           join b in categorylist on a.CategoryId equals b.Id into temp
+                           from b in temp.DefaultIfEmpty()
+                           select new ProductDtos
+                           {
+                               Id = a.Id,
+                               CategoryId = a.CategoryId,
+                               CategoryName = b != null ? b.CategoryName : "", // 这里做了判空
+                               ParentId = a.ParentId,
+                               ProductImageUrl = a.ProductImageUrl,
+                               ProductBrand = a.ProductBrand,
+                               ProductSupplier = a.ProductSupplier,
+                               ProductCode = a.ProductCode,
+                               ProductDescription = a.ProductDescription,
+                               SuggestedPrice = a.SuggestedPrice,
+                               ProductRemark = a.ProductRemark,
+                               ProductStatus = a.ProductStatus,
+                               DealPrice = a.DealPrice
+                           };
 
-
+            var exportData = new ExportDataDto<ProductDtos>
+            {
+                FileName = "产品管理",
+                Items = category.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    { "Id", "产品ID" },
+                    { "CategoryId", "分类ID" },
+                    { "CategoryName", "分类名称" },
+                    { "ParentId", "父级ID" },
+                    { "ProductImageUrl", "产品图片" },
+                    { "ProductBrand", "品牌" },
+                    { "ProductSupplier", "供应商" },
+                    { "ProductCode", "产品编号" },
+                    { "ProductDescription", "产品描述" },
+                    { "SuggestedPrice", "建议售价" },
+                    { "ProductRemark", "备注" },
+                    { "ProductStatus", "产品状态" },
+                    { "DealPrice", "成交价" }
+                }
+            };
+            return await exportAppService.ExportToExcelAsync(exportData);
+        }
     }
+
 }
+
+
+
+
