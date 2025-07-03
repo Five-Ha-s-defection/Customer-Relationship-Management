@@ -77,7 +77,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         /// <summary>
         /// 获取产品
         /// </summary>
-        /// <param name="apiPaging"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         /// 

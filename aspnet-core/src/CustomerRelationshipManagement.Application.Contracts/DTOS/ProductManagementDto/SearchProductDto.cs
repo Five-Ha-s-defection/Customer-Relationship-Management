@@ -24,9 +24,9 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
         /// <summary>
         /// 门幅
         /// </summary>
-        public string ProductBrand { get; set; } = string.Empty;
+        public string? ProductBrand { get; set; } = string.Empty;
         /// <summary>
-        //// 供应商
+        /// 供应商
         /// </summary>
         public string ProductSupplier { get; set; } = string.Empty;
         /// <summary>
