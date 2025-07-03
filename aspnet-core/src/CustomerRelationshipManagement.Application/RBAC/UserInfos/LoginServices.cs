@@ -12,6 +12,10 @@ using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Redis;
+using CustomerRelationshipManagement.RBAC.Roles;
+using CustomerRelationshipManagement.RBAC.UserRoles;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
@@ -27,12 +31,13 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         private readonly IJwtHelper _jwtHelper;
         private readonly IDatabase _redisDb;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IRepository<UserRoleInfo> userRoleRepoistory;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="userInfoRepository"></param>
-        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager,IJwtHelper jwtHelper, IConnectionMultiplexer redis, IHttpContextAccessor httpContextAccessor)
+        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager,IJwtHelper jwtHelper, IConnectionMultiplexer redis, IHttpContextAccessor httpContextAccessor,IRepository<UserRoleInfo> userRoleRepoistory)
         {
             this.userInfoRepository = userInfoRepository;
             this.passwordHasher = passwordHasher;
@@ -40,6 +45,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
             _jwtHelper = jwtHelper;
             _redisDb = redis.GetDatabase();
             _httpContextAccessor = httpContextAccessor;
+            this.userRoleRepoistory = userRoleRepoistory;
         }
         /// <summary>
         /// 登录
@@ -68,11 +74,22 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 {
                     throw new UserFriendlyException("用户已被禁用");
                 }
+
+
                 // 登录成功，返回用户信息和令牌
                 
                 var token = _jwtHelper.GenerateToken(userInfo.Id, userInfo.UserName);
                 var expireTime = DateTime.UtcNow.AddHours(2);
-                var profile = await userProfileManager.BuildUserProfileAsync(userInfo.Id); 
+                var profile = await userProfileManager.BuildUserProfileAsync(userInfo.Id);
+
+                //判断管理员角色
+                bool isAdmin = profile.Roles.Any(r => r == "ROOT" || r == "超级管理员");
+
+                if (profile.Roles.Contains("超级管理员") && !profile.Permissions.Contains("*:*:*"))
+                {
+                    profile.Permissions.Add("*:*:*");
+                }
+
                 //成功之后给我的token存入redis
                 await _redisDb.StringSetAsync($"jwt_token:{token}", userInfo.Id.ToString());
 
