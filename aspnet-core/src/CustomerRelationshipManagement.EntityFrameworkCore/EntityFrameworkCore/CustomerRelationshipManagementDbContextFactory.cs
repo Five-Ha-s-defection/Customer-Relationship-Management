@@ -19,11 +19,7 @@ public class CustomerRelationshipManagementDbContextFactory : IDesignTimeDbConte
         var configuration = BuildConfiguration();
 
         var builder = new DbContextOptionsBuilder<CustomerRelationshipManagementDbContext>()
-            .UseMySql(configuration.GetConnectionString("Default"),new MySqlServerVersion(new Version(8,0,42)), options =>
-            {
-                options.EnableStringComparisonTranslations(); // 示例其他扩展
-                                                              // MySQL EF Core暂时不支持 EnablePrimitiveCollections
-            });
+            .UseMySql(configuration.GetConnectionString("Default"),new MySqlServerVersion(new Version(8,0,42)));
         return new CustomerRelationshipManagementDbContext(builder.Options);
     }
 
