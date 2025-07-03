@@ -2,6 +2,7 @@
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -106,6 +107,26 @@ namespace CustomerRelationshipManagement.RBAC.Permissions
             catch (Exception ex)
             {
                 return ApiResult<PermissionInfo>.Fail(ex.Message, ResultCode.Fail);
+            }
+        }
+        /// <summary>
+        /// 获取系统中所有权限（含分组字段），用于前端构建权限树
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<PermissionDto>> GetAllPermissionsAsync()
+        {
+            try
+            {
+                // 查出所有权限
+                var permissions = await permissionInfoRepo.GetListAsync();
+                //映射dto
+                var permissionDtos = ObjectMapper.Map<List<PermissionInfo>, List<PermissionDto>>(permissions);
+                return permissionDtos;
+               
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }

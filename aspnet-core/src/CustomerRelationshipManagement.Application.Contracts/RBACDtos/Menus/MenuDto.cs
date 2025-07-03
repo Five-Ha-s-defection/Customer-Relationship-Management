@@ -12,6 +12,11 @@ namespace CustomerRelationshipManagement.RBACDtos.Menus
         /// 菜单Id
         /// </summary>
         public Guid Id { get; set; }
+
+        /// <summary>
+        /// 父级菜单Id
+        /// </summary>
+        public Guid? ParentId { get; set; }
         /// <summary>
         /// 菜单名称
         /// </summary>
