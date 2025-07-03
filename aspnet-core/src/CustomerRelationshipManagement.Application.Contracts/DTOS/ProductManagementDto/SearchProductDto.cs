@@ -12,7 +12,12 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
         /// <summary>
         /// 产品分类
         /// </summary>
-        public Guid?  CategoryId { get; set; } 
+        public Guid?  CategoryId { get; set; }
+
+        /// <summary>
+        /// 分类名称名称
+        /// </summary>
+        public string? CategoryName { get; set; } 
         /// <summary>
         /// 父级分类ID (可为空，顶级分类没有父级)
         /// </summary>
@@ -49,7 +54,7 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
         /// <summary>
         /// 上架未上架
         /// </summary>
-        public bool? ProductStatus { get; set; } 
+        public bool ProductStatus { get; set; } 
         /// <summary>
         /// 成交价
         /// </summary>
