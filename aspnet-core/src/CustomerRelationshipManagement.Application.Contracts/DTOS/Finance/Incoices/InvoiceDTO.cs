@@ -143,5 +143,10 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// 审核人姓名（逗号分隔）
         /// </summary>
         public string AuditorNames { get; set; }
+
+        /// <summary>
+        /// 已有发票信息名称
+        /// </summary>
+        public string InoviceTitle { get; set; }
     }
 } 

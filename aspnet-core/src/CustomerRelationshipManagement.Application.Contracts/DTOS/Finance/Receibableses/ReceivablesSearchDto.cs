@@ -32,7 +32,7 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// <summary>
         /// 创建人
         /// </summary>
-        public Guid? CreateId { get; set; }
+        public Guid? CreatorId { get; set; }
 
         /// <summary>
         /// 所属客户
@@ -45,9 +45,9 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         public Guid? ContractId { get; set; }
 
         /// <summary>
-        /// 应收款金额
+        /// 应收款时间
         /// </summary>
-        public decimal? ReceivablePay { get; set; }
+        public DateTime? ReceivableDate { get; set; }
 
     }
 }

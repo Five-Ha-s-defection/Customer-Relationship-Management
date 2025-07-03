@@ -1,8 +1,10 @@
-﻿using System;
-using System.IO;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using System;
+using System.IO;
+using Volo.Abp.Data;
 
 namespace CustomerRelationshipManagement.EntityFrameworkCore;
 
@@ -17,8 +19,11 @@ public class CustomerRelationshipManagementDbContextFactory : IDesignTimeDbConte
         var configuration = BuildConfiguration();
 
         var builder = new DbContextOptionsBuilder<CustomerRelationshipManagementDbContext>()
-            .UseMySql(configuration.GetConnectionString("Default"),new MySqlServerVersion(new Version(8,0,42)));
-
+            .UseMySql(configuration.GetConnectionString("Default"),new MySqlServerVersion(new Version(8,0,42)), options =>
+            {
+                options.EnableStringComparisonTranslations(); // 示例其他扩展
+                                                              // MySQL EF Core暂时不支持 EnablePrimitiveCollections
+            });
         return new CustomerRelationshipManagementDbContext(builder.Options);
     }
 

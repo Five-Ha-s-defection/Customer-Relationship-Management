@@ -10,6 +10,7 @@ using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -38,6 +39,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         private readonly IRepository<Customer, Guid> customerrepository;
         private readonly IRepository<CrmContract, Guid> crmcontractreceivables;
 
+        private readonly IConnectionMultiplexer connectionMultiplexer;
+
         /// <summary>
         /// Redis缓存服务接口
         /// </summary>
@@ -50,7 +53,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// </summary>
         /// <param name="repository">应收款数据仓储</param>
         /// <param name="redisCacheService">Redis缓存服务</param>
-        public ReceivablesService(IRepository<Receivables, Guid> repository, IDistributedCache<PageInfoCount<ReceivablesDTO>> cache, IDistributedCache<ReceivablesDTO> cacheById, IRepository<Payment, Guid> paymentrepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables)
+        public ReceivablesService(IRepository<Receivables, Guid> repository, IDistributedCache<PageInfoCount<ReceivablesDTO>> cache, IDistributedCache<ReceivablesDTO> cacheById, IRepository<Payment, Guid> paymentrepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables, IConnectionMultiplexer connectionMultiplexer)
         {
             this.repository = repository;
             _cache = cache;
@@ -59,6 +62,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
             this.userinforeceivables = userinforeceivables;
             this.customerrepository = customerrepository;
             this.crmcontractreceivables = crmcontractreceivables;
+            this.connectionMultiplexer = connectionMultiplexer;
         }
 
         /// <summary>
@@ -101,6 +105,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         public async Task<ApiResult<PageInfoCount<ReceivablesDTO>>> GetPageAsync([FromQuery] ReceivablesSearchDto receivablesSearchDto)
         {
             // 构建缓存键名
+            await ClearAbpCacheAsync();
             string cacheKey ="Getreceivables";
 
             // 使用Redis缓存获取或添加数据
@@ -152,7 +157,9 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                     .WhereIf(receivablesSearchDto.UserId.HasValue, x => x.UserId == receivablesSearchDto.UserId.Value)
                     .WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId.Value)
                     .WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId.Value)
-                    .WhereIf(receivablesSearchDto.ReceivablePay.HasValue, x => x.ReceivablePay == receivablesSearchDto.ReceivablePay.Value);
+                    .WhereIf(receivablesSearchDto.CreatorId.HasValue, x => x.CreatorId == receivablesSearchDto.CreatorId.Value)
+                    .WhereIf(receivablesSearchDto.ReceivableDate.HasValue, x =>x.ReceivableDate >= receivablesSearchDto.ReceivableDate.Value &&x.ReceivableDate < receivablesSearchDto.ReceivableDate.Value.AddDays(1))
+                    .WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableCode), x => x.ReceivableCode.Contains(receivablesSearchDto.ReceivableCode));
 
                 // 使用ABP框架的分页方法进行分页查询
                 var res = query.PageResult(receivablesSearchDto.PageIndex, receivablesSearchDto.PageSize);
@@ -167,8 +174,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                 return pageInfo;
             }, () => new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromSeconds(10)
-            }); // 设置缓存过期时间为5分钟
+                SlidingExpiration = TimeSpan.FromMinutes(10)
+            }); // 设置缓存过期时间为10分钟
             
             // 返回成功结果
             return ApiResult<PageInfoCount<ReceivablesDTO>>.Success(ResultCode.Success, redislist);
@@ -224,9 +231,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
             await repository.UpdateAsync(receivables);
 
             // 4. 清除相关缓存
-            //await ClearReceivablesCacheAsync();
-            await _cacheById.RemoveAsync($"receivable:{id}");
-            
+            await ClearAbpCacheAsync();
+
             // 5. 返回更新后的数据
             return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
         }
@@ -249,7 +255,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                 {
                     await repository.DeleteAsync(id);
                     // 清除对应的缓存
-                    await _cacheById.RemoveAsync($"receivable:{id}");
+                    await ClearAbpCacheAsync();
                 }
 
                 return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, null);
@@ -271,7 +277,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
             {
                 await repository.DeleteAsync(id);
                 // 清除对应的缓存
-                await _cacheById.RemoveAsync($"receivable:{id}");
+                await ClearAbpCacheAsync();
 
                 return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, null);
             }
@@ -354,6 +360,22 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
             };
         }
 
-
+        /// <summary>
+        /// 清除关于c:PageInfo,k的所有信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearAbpCacheAsync()
+        {
+            var endpoints=connectionMultiplexer.GetEndPoints();
+            foreach(var endpoint in endpoints)
+            {
+                var server = connectionMultiplexer.GetServer(endpoint);
+                var keys = server.Keys(pattern:"c:PageInfo,k:*");//填写自己的缓存前缀
+                foreach(var key in keys)
+                {
+                    await connectionMultiplexer.GetDatabase().KeyDeleteAsync(key);
+                }
+            }
+        }
     }
 }

@@ -83,6 +83,8 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                             from e in re.DefaultIfEmpty()
                             join creator in userinfo on i.CreatorId equals creator.Id into creatorJoin
                             from creator in creatorJoin.DefaultIfEmpty()
+                            join io in invoice on i.InvoiceInformationId equals io.Id into ie
+                            from io in ie.DefaultIfEmpty()
                             select new InvoiceDTO
                             {
                                 Id = i.Id,
@@ -103,6 +105,14 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                                 ContractName = e.ContractName,
                                 CreatorRealName = creator.RealName,
                                 Title = i.Title,
+                                TaxNumber = i.TaxNumber,
+                                Bank = i.Bank,
+                                BillingAddress = i.BillingAddress,
+                                BankAccount = i.BankAccount,
+                                BillingPhone = i.BillingPhone,
+                                InvoiceImg = i.InvoiceImg,
+                                Remark = i.Remark,
+                                InoviceTitle = io.Title
                                 
                             };
                 query = query.WhereIf(!string.IsNullOrEmpty(invoiceSearchDto.InvoiceNumberCode), x => x.InvoiceNumberCode.Contains(invoiceSearchDto.InvoiceNumberCode))
@@ -138,8 +148,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                 return pageInfo;
             }, () => new DistributedCacheEntryOptions
             {
-                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
-                SlidingExpiration = TimeSpan.FromMinutes(10)
+                SlidingExpiration = TimeSpan.FromSeconds(5)
             });
 
             return ApiResult<PageInfoCount<InvoiceDTO>>.Success(ResultCode.Success, redislist);
