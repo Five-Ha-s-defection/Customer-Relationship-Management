@@ -106,7 +106,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
                 query = query.WhereIf(dto.DealPrice > 0, x => x.DealPrice == dto.DealPrice);
                 query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
-
+                
 
 
                 //
