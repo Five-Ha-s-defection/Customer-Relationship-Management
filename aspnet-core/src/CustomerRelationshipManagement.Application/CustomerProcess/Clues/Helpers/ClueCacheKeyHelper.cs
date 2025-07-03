@@ -22,6 +22,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues.Helpers
                    $"Type_{dto.type}_" +
                    $"AssignedTo_{(string.IsNullOrWhiteSpace(dto.AssignedTo.ToString()) ? "null" : dto.AssignedTo)}_" +
                    $"CreatedBy_{(dto.CreatedBy.HasValue ? dto.CreatedBy.Value.ToString() : "null")}_" +
+                   $"UserIds_{(dto.UserIds != null && dto.UserIds.Count > 0 ? string.Join("-", dto.UserIds) : "null")}_" +
+                   $"CreatedByIds_{(dto.CreatedByIds != null && dto.CreatedByIds.Count > 0 ? string.Join("-", dto.CreatedByIds) : "null")}_" +
+                   $"ClueSourceId_{(dto.ClueSourceId != Guid.Empty ? dto.ClueSourceId.ToString() : "null")}_" +
+                   $"IndustryId_{(dto.IndustryId != Guid.Empty ? dto.IndustryId.ToString() : "null")}_" +
                    $"Status_{(dto.Status != null && dto.Status.Count > 0 ? string.Join("-", dto.Status) : "null")}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
@@ -30,7 +34,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues.Helpers
                    $"OrderDesc_{dto.OrderDesc}_" +
                    $"Keyword_{(string.IsNullOrWhiteSpace(dto.Keyword) ? "All" : dto.Keyword)}_" +
                    $"Page_{dto.PageIndex}_Size_{dto.PageSize}";
-
         }
 
         /// <summary>
