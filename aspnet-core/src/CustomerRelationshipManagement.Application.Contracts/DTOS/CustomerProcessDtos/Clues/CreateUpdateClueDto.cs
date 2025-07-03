@@ -97,5 +97,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// </summary>
         [Required]
         public DateTime NextContactTime { get; set; }
+
+
+        /// <summary>
+        /// 线索编号
+        /// </summary>
+        [Required]
+        public string ClueCode { get; set; }
     }
 }

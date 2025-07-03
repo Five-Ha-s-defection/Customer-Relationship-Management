@@ -2,6 +2,7 @@
 using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Clues.Helpers;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
@@ -13,6 +14,7 @@ using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,6 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
-using StackExchange.Redis;
 
 
 
@@ -88,6 +89,22 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 var clue = ObjectMapper.Map<CreateUpdateClueDto, Clue>(dto);
                 // 设置UserId为随机 GUID
                 clue.UserId = Guid.NewGuid();
+                // 自动生成客户编号 C-年月日时分-四位纯数字或大写字母数字混合
+                var now = DateTime.Now; // 获取当前时间
+                var random = new Random(); // 创建随机数生成器
+                string randomStr;
+                if (random.Next(2) == 0) // 50%概率生成纯数字
+                {
+                    // 生成1000~9999的四位纯数字
+                    randomStr = random.Next(1000, 10000).ToString("D4");
+                }
+                else // 50%概率生成大写字母和数字混合
+                {
+                    // 生成1000~FFFF的四位十六进制字符串（大写，含字母和数字）
+                    randomStr = random.Next(0x1000, 0x10000).ToString("X4");
+                }
+                // 拼接客户编号，格式如C-202506240038-3B7C或X-202506240038-1540
+                clue.ClueCode = $"X-{now:yyyyMMddHHmm}-{randomStr}";
                 //保存到数据库
                 var list=await repository.InsertAsync(clue);
                 //清除缓存，确保数据一致性
@@ -150,8 +167,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                    Status = clu.Status,
                                    LastFollowTime = clu.LastFollowTime,
                                    NextContactTime = clu.NextContactTime,
+                                   CreatorId = clu.CreatorId,
                                    CreateName = creator.RealName,
                                    CreationTime = clu.CreationTime,
+                                   ClueCode=clu.ClueCode,
                                };
                     // 只在type==1且AssignedTo有值时加UserId过滤条件
                     list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
@@ -183,6 +202,52 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                             TimeField.LastFollow => list.Where(x => x.LastFollowTime >= dto.StartTime && x.LastFollowTime <= dto.EndTime),
                             _ => list
                         };
+                    }
+
+                    // 高级筛选字段处理（负责人、创建人多选，线索来源、行业单选）
+                    if (dto.MatchMode == 0) // 全部满足(AND)
+                    {
+                        if (dto.UserIds != null && dto.UserIds.Count > 0)
+                            list = list.Where(x => dto.UserIds.Contains(x.UserId));
+                        if (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0)
+                            list = list.Where(x => x.CreatorId.HasValue && dto.CreatedByIds.Contains(x.CreatorId.Value));
+                        if (dto.ClueSourceId != Guid.Empty)
+                            list = list.Where(x => x.ClueSourceId == dto.ClueSourceId);
+                        if (dto.IndustryId != Guid.Empty)
+                            list = list.Where(x => x.IndustryId == dto.IndustryId);
+                        if (!string.IsNullOrEmpty(dto.ClueCode))
+                            list = list.Where(x => x.ClueCode.Contains(dto.ClueCode));
+                        if (!string.IsNullOrEmpty(dto.ClueName))
+                            list = list.Where(x => x.ClueName.Contains(dto.ClueName));
+                        if (!string.IsNullOrEmpty(dto.CluePhone))
+                            list = list.Where(x => x.CluePhone.Contains(dto.CluePhone));
+                        if (!string.IsNullOrEmpty(dto.ClueEmail))
+                            list = list.Where(x => x.ClueEmail.Contains(dto.ClueEmail));
+                        if (!string.IsNullOrEmpty(dto.ClueWechat))
+                            list = list.Where(x => x.ClueWechat.Contains(dto.ClueWechat));
+                        if (!string.IsNullOrEmpty(dto.ClueQQ))
+                            list = list.Where(x => x.ClueQQ.Contains(dto.ClueQQ));
+                        if (!string.IsNullOrEmpty(dto.CompanyName))
+                            list = list.Where(x => x.CompanyName.Contains(dto.CompanyName));
+                        if (!string.IsNullOrEmpty(dto.Address))
+                            list = list.Where(x => x.Address.Contains(dto.Address));
+                    }
+                    else // 部分满足(OR)
+                    {
+                        list = list.Where(x =>
+                            (dto.UserIds != null && dto.UserIds.Count > 0 && dto.UserIds.Contains(x.UserId)) ||
+                            (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0 && dto.CreatedByIds.Contains(x.UserId)) ||
+                            (dto.ClueSourceId != Guid.Empty && x.ClueSourceId == dto.ClueSourceId) ||
+                            (dto.IndustryId != Guid.Empty && x.IndustryId == dto.IndustryId) ||
+                            (!string.IsNullOrEmpty(dto.ClueCode) && x.ClueCode.Contains(dto.ClueCode)) ||
+                            (!string.IsNullOrEmpty(dto.ClueName) && x.ClueName.Contains(dto.ClueName)) ||
+                            (!string.IsNullOrEmpty(dto.CluePhone) && x.CluePhone.Contains(dto.CluePhone)) ||
+                            (!string.IsNullOrEmpty(dto.ClueEmail) && x.ClueEmail.Contains(dto.ClueEmail)) ||
+                            (!string.IsNullOrEmpty(dto.ClueWechat) && x.ClueWechat.Contains(dto.ClueWechat)) ||
+                            (!string.IsNullOrEmpty(dto.ClueQQ) && x.ClueQQ.Contains(dto.ClueQQ)) ||
+                            (!string.IsNullOrEmpty(dto.CompanyName) && x.CompanyName.Contains(dto.CompanyName)) ||
+                            (!string.IsNullOrEmpty(dto.Address) && x.Address.Contains(dto.Address))
+                        );
                     }
 
                     // 排序

@@ -39,7 +39,7 @@ public class Program
             {
                 options.AddDefaultPolicy(policy =>//  默认策略
                 {
-                    policy.WithOrigins("http://localhost:3001") // 前端地址
+                    policy.WithOrigins("http://localhost:3000") // 前端地址
                           .AllowAnyHeader()//  允许所有请求头
                           .AllowAnyMethod()//  允许所有方法
                           .AllowCredentials(); // 如果使用 cookie/token 认证

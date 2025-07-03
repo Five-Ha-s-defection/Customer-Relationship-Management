@@ -88,5 +88,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         /// 下次联系时间
         /// </summary>
         public DateTime NextContactTime { get; set; }
+
+        /// <summary>
+        /// 线索编号
+        /// </summary>
+        public string ClueCode { get; set; }
     }
 }
