@@ -18,6 +18,11 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         public Guid CustomerId { get; set; }
 
         /// <summary>
+        /// 客户名称
+        /// </summary>
+        public string CustomerName { get; set; } = string.Empty;
+
+        /// <summary>
         /// 选择商机ID
         /// </summary>
         public Guid BusinessOpportunityId { get; set; }
@@ -26,6 +31,16 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// 负责人ID
         /// </summary>
         public Guid UserId { get; set; }
+
+        /// <summary>
+        /// 负责人名称
+        /// </summary>
+        public string UserName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 创建人名称
+        /// </summary>
+        public string CreateUserName { get; set; } = string.Empty;
 
         /// <summary>
         /// 签订日期
