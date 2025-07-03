@@ -26,7 +26,7 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
         /// </summary>
         public string? ProductBrand { get; set; } 
         /// <summary>
-        //// 供应商
+        /// 供应商
         /// </summary>
         public string? ProductSupplier { get; set; } 
         /// <summary>
