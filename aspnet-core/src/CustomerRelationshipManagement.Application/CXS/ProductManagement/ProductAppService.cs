@@ -1,9 +1,11 @@
 ﻿//using CustomerRelationshipManagement.DTOS.UploadFileDto;
 using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.Export;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Interfaces.IProductAppService;
+using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.ProductCategory.Categorys;
 using CustomerRelationshipManagement.ProductCategory.Products;
 using Microsoft.AspNetCore.Http;
@@ -16,9 +18,9 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
-using Volo.Abp.Domain.Repositories;
-
+using Volo.Abp.Caching;
 using Volo.Abp.Content;
+using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CXS.ProductManagement
 {
@@ -31,14 +33,16 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         private readonly ILogger<ProductAppService> logger;
 
         private readonly IExportAppService exportAppService;
+        private readonly IDistributedCache<PageInfoCount<ProductDtos>> cache;
 
-        public ProductAppService(IRepository<Product, Guid> productRepository, IHttpContextAccessor httpContextAccessor, ILogger<ProductAppService> logger, IRepository<Category, Guid> ctegoryRepository, IExportAppService exportAppService)
+        public ProductAppService(IRepository<Product, Guid> productRepository, IHttpContextAccessor httpContextAccessor, ILogger<ProductAppService> logger, IRepository<Category, Guid> ctegoryRepository, IExportAppService exportAppService, IDistributedCache<PageInfoCount<ProductDtos>> cache)
         {
             this.productRepository = productRepository;
             this.httpContextAccessor = httpContextAccessor;
             this.logger = logger;
             this.ctegoryRepository = ctegoryRepository;
             this.exportAppService = exportAppService;
+            this.cache = cache;
         }
         /// <summary>
         /// 新增产品
@@ -88,12 +92,16 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         /// <exception cref="NotImplementedException"></exception>
         /// 
         [HttpGet]
-        public async Task<ApiResult<IList<ProductDtos>>> GetProduct([FromQuery] SearchProductDto dto)
+        public async Task<ApiResult<PageInfoCount<ProductDtos>>> GetProduct([FromQuery] SearchProductDto dto)
         {
+
             try
             {
+               
+               
                 var query = await productRepository.GetQueryableAsync();
-                //查询条件
+
+                #region 查询条件
                 query = query.WhereIf(!string.IsNullOrEmpty(dto.ProductBrand) || !string.IsNullOrEmpty(dto.ProductCode), x => x.ProductBrand.Contains(dto.ProductBrand) || x.ProductCode.Contains(dto.ProductCode));
 
                 query = query.WhereIf(dto.CategoryId != Guid.Empty, x => x.CategoryId == dto.CategoryId);
@@ -107,15 +115,33 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 query = query.WhereIf(dto.DealPrice > 0, x => x.DealPrice == dto.DealPrice);
                 query = query.WhereIf(dto.SuggestedPrice > 0, x => x.SuggestedPrice == dto.SuggestedPrice);
 
+                #endregion
 
+                //abp分页
+                var querypaging = query.PageResult(dto.PageIndex, dto.PageSize);
 
-                //
-                //分页
-                var querypaging = query.OrderByDescending(x => x.Id).Skip(dto.PageIndex).Take(dto.PageSize);
                 //将数据通过映射转换
-                var productdto = ObjectMapper.Map<IList<Product>, IList<ProductDtos>>(querypaging.ToList());
+                var productdto = ObjectMapper.Map<IList<Product>, IList<ProductDtos>>(querypaging.Queryable.ToList());
+
+                var productinfo=await productRepository.GetQueryableAsync();
+                var categoryinfo = await ctegoryRepository.GetQueryableAsync();
+
+                var pageInfo = new PageInfoCount<ProductDtos>
+                {
+
+                    TotalCount = querypaging.RowCount,
+                    PageCount = (int)Math.Ceiling(querypaging.RowCount * 1.0 / dto.PageSize),
+                    Data = productdto
+                };
+                return ApiResult<PageInfoCount<ProductDtos>>.Success(ResultCode.Success, pageInfo);
+
+
+                //分页
+                //var querypaging = query.OrderByDescending(x => x.Id).Skip(dto.PageIndex).Take(dto.PageSize);
+                ////将数据通过映射转换
+                //var productdto = ObjectMapper.Map<IList<Product>, IList<ProductDtos>>(querypaging.ToList());
                 //返回apiresult
-                return ApiResult<IList<ProductDtos>>.Success(ResultCode.Success, productdto);
+                //return ApiResult<IList<ProductDtos>>.Success(ResultCode.Success, productdto);
 
             }
             catch (Exception ex)
