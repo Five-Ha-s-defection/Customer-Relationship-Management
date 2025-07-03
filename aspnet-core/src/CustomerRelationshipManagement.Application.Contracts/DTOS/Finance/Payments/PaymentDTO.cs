@@ -88,5 +88,32 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Payments
         /// 应收款金额
         /// </summary>
         public decimal? ReceivablePay { get; set; }
+
+        /// <summary>
+        /// 客户名称
+        /// </summary>
+        public string CustomerName { get; set; }
+
+        /// <summary>
+        /// 合同名称
+        /// </summary>
+        public string ContractName { get; set; }
+
+        public string RealName { get; set; }
+
+        /// <summary>
+        /// 创建者真实姓名
+        /// </summary>
+        public string CreatorRealName { get; set; }
+
+        /// <summary>
+        /// 审核人姓名（逗号分隔）
+        /// </summary>
+        public string AuditorNames { get; set; }
+
+        /// <summary>
+        /// 收款方式
+        /// </summary>
+        public string PaymentMethodName { get; set; }
     }
 }

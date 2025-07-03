@@ -26,6 +26,7 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// </summary>
         public Guid UserId { get; set; }
 
+
         /// <summary>
         /// 应收款编号
         /// </summary>

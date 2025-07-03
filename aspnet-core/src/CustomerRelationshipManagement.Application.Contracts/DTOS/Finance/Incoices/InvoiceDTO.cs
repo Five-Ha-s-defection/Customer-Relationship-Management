@@ -37,22 +37,12 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// <summary>
         /// 发票编号
         /// </summary>
-        public string InvoiceNumberCode { get; set; } = string.Empty;
+        public string InvoiceNumberCode { get; set; }
 
         /// <summary>
         /// 开票金额
         /// </summary>
         public decimal Amount { get; set; }
-
-        /// <summary>
-        /// 税额
-        /// </summary>
-        public decimal TaxAmount { get; set; }
-
-        /// <summary>
-        /// 总金额（含税）
-        /// </summary>
-        public decimal TotalAmount { get; set; }
 
         /// <summary>
         /// 开票时间
@@ -96,24 +86,22 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// </summary>
         public string Remark { get; set; } = string.Empty;
 
+
         /// <summary>
-        /// 已有的发票信息ID
+        /// 已有的发票信息
         /// </summary>
-        public Guid InvoiceInformationId { get; set; }
+        public Guid InvoiceInformationId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// 发票抬头
         /// </summary>
-        public string Title { get; set; } = string.Empty;
+        public string Title { get; set; }
 
         /// <summary>
         /// 纳税人识别号
         /// </summary>
-        public string TaxNumber { get; set; } = string.Empty;
+        public string TaxNumber { get; set; }
 
-        /// <summary>
-        /// 开户银行
-        /// </summary>
         public string Bank { get; set; } = string.Empty;
 
         /// <summary>
@@ -130,5 +118,35 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// 开票电话
         /// </summary>
         public string BillingPhone { get; set; } = string.Empty;
+
+
+
+
+        /// <summary>
+        /// 客户名称
+        /// </summary>
+        public string CustomerName { get; set; }
+
+        /// <summary>
+        /// 合同名称
+        /// </summary>
+        public string ContractName { get; set; }
+
+        public string RealName { get; set; }
+
+        /// <summary>
+        /// 创建者真实姓名
+        /// </summary>
+        public string CreatorRealName { get; set; }
+
+        /// <summary>
+        /// 审核人姓名（逗号分隔）
+        /// </summary>
+        public string AuditorNames { get; set; }
+
+        /// <summary>
+        /// 已有发票信息名称
+        /// </summary>
+        public string InoviceTitle { get; set; }
     }
 } 
