@@ -4,9 +4,11 @@ using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
-using CustomerRelationshipManagement.CustomerProcess.ClueSources;
 using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
+using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
+using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
+using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
 using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.CustomerProcess.Prioritys;
 using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
@@ -16,7 +18,9 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunit
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
@@ -39,9 +43,7 @@ using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
-using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
+using CustomerRelationshipManagement.RBACDtos.Users;
 
 namespace CustomerRelationshipManagement;
 
