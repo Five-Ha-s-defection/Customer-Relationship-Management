@@ -273,6 +273,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                 }
                 customer.IsDeleted = true;
                 await repository.UpdateAsync(customer);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
                 return ApiResult<CustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CustomerDto>(customer));
             }
             catch (Exception ex)
@@ -300,6 +302,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                 }
                 var customerDto = ObjectMapper.Map(dto, customer);
                 await repository.UpdateAsync(customerDto);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
                 return ApiResult<CreateUpdateCustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CreateUpdateCustomerDto>(customerDto));
             }
             catch (Exception ex)

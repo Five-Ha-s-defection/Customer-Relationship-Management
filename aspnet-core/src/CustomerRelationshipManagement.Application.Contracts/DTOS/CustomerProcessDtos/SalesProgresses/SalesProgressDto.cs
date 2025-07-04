@@ -7,7 +7,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses
 {
-    public class SalesProgressDto:FullAuditedEntityDto<Guid>
+    public class SalesProgressDto:EntityDto<Guid>
     {
         /// <summary>
         /// 销售进度名称

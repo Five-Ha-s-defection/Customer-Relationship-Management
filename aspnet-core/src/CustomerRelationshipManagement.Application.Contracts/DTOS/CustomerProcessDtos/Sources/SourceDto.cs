@@ -7,7 +7,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources
 {
-    public class SourceDto:FullAuditedEntityDto<Guid>
+    public class SourceDto : EntityDto<Guid>    
     {
         /// <summary>
         /// 线索来源名称

@@ -7,7 +7,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys
 {
-    public class PriorityDto:FullAuditedEntityDto<Guid>
+    public class PriorityDto:EntityDto<Guid>
     {
         /// <summary>
         /// 优先级名称

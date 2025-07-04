@@ -7,7 +7,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes
 {
-    public class CustomerTypeDto:FullAuditedEntityDto<Guid>
+    public class CustomerTypeDto : EntityDto<Guid>
     {
         /// <summary>
         /// 客户类型名称

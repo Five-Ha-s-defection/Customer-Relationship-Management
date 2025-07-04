@@ -7,7 +7,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels
 {
-    public class LevelDto : FullAuditedEntityDto<Guid>
+    public class LevelDto : EntityDto<Guid>
     {
         /// <summary>
         /// 客户级别名称
