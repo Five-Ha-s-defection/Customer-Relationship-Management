@@ -104,8 +104,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// <returns>分页查询结果</returns>
         public async Task<ApiResult<PageInfoCount<ReceivablesDTO>>> GetPageAsync([FromQuery] ReceivablesSearchDto receivablesSearchDto)
         {
-            // 构建缓存键名
             await ClearAbpCacheAsync();
+            // 构建缓存键名
             string cacheKey ="Getreceivables";
 
             // 使用Redis缓存获取或添加数据

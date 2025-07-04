@@ -94,7 +94,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
         /// <summary>
         /// 已有的发票信息
         /// </summary>
-        public Guid InvoiceInformationId { get; set; } = Guid.Empty;
+        public Guid? InvoiceInformationId { get; set; }
 
         /// <summary>
         /// 发票抬头

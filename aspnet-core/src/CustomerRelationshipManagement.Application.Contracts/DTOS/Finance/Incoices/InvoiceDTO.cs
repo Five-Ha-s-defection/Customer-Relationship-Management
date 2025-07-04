@@ -33,6 +33,10 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// 负责人ID
         /// </summary>
         public Guid UserId { get; set; }
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public Guid? CreatorId { get; set; }
 
         /// <summary>
         /// 发票编号
@@ -43,6 +47,11 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// 开票金额
         /// </summary>
         public decimal Amount { get; set; }
+
+        /// <summary>
+        /// 税额
+        /// </summary>
+        public decimal TaxAmount { get; set; }
 
         /// <summary>
         /// 开票时间
@@ -90,7 +99,7 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// <summary>
         /// 已有的发票信息
         /// </summary>
-        public Guid InvoiceInformationId { get; set; } = Guid.Empty;
+        public Guid InvoiceInformationId { get; set; }
 
         /// <summary>
         /// 发票抬头
@@ -148,5 +157,11 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// 已有发票信息名称
         /// </summary>
         public string InoviceTitle { get; set; }
+
+
+        /// <summary>
+        /// 当前审核人
+        /// </summary>
+        public string CurrentAuditorName { get; set; }
     }
 } 
