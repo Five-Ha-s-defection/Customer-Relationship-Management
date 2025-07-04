@@ -7,7 +7,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys
 {
-    public class IndustryDto:FullAuditedEntityDto<Guid>
+    public class IndustryDto : EntityDto<Guid>
     {
         /// <summary>
         /// 行业名称

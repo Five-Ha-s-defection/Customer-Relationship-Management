@@ -3,6 +3,7 @@ using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.CommunicationTypes;
 using CustomerRelationshipManagement.CustomerProcess.ContactCommunications;
 using CustomerRelationshipManagement.CustomerProcess.ContactRelations;
 using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
@@ -10,6 +11,7 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
+using CustomerRelationshipManagement.CustomerProcess.CustomReplys;
 using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.CustomerProcess.Prioritys;
 using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
@@ -27,6 +29,7 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.UserPermissions;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.Record;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -109,6 +112,17 @@ public class CustomerRelationshipManagementDbContext :
     /// 商机表
     /// </summary>
     public DbSet<BusinessOpportunity> BusinessOpportunity { get; set; }
+
+    /// <summary>
+    /// 沟通类型表
+    /// </summary>
+    public DbSet<CommunicationType> CommunicationType { get; set; }
+
+    /// <summary>
+    /// 自定义回复表
+    /// </summary>
+
+    public DbSet<CustomReply> CustomReply { get; set; }
     #endregion
 
     #region 过程管理模块
@@ -196,6 +210,9 @@ public class CustomerRelationshipManagementDbContext :
     public DbSet<UserRoleInfo> UserRoleInfo { get; set; }
 
     #endregion
+
+    //记录表
+    public DbSet<OperationLog> OperationLog { get; set; }
     public CustomerRelationshipManagementDbContext(DbContextOptions<CustomerRelationshipManagementDbContext> options)
         : base(options)
     {
