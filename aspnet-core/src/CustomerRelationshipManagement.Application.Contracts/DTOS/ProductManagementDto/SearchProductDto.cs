@@ -59,5 +59,8 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
         /// 成交价
         /// </summary>
         public decimal? DealPrice { get; set; } = 0;
+
+
+        public string? Keyword { get; set; }
     }
 }
