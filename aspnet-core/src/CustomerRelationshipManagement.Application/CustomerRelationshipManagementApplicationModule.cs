@@ -1,5 +1,7 @@
-﻿using CustomerRelationshipManagement.RBAC.UserInfos;
+﻿using CustomerRelationshipManagement.DTOS.UploadDto;
+using CustomerRelationshipManagement.RBAC.UserInfos;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.Upload;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
@@ -35,5 +37,9 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
         {
             return ConnectionMultiplexer.Connect(redisConfig);
         });
+
+        Configure<FileUploadOptions>(configuration.GetSection("FileUpload"));
+
+
     }
 }

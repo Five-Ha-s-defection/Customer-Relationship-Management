@@ -4,9 +4,6 @@ using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
-using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
-using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
-using CustomerRelationshipManagement.CustomerProcess.ClueSources;
 using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
 using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
@@ -19,7 +16,6 @@ using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
@@ -46,10 +42,6 @@ using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
-using CustomerRelationshipManagement.CustomerProcess.Prioritys;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
-using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
 
 namespace CustomerRelationshipManagement;
 
