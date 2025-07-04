@@ -106,5 +106,10 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// 创建人名称
         /// </summary>
         public string CreateName { get; set; }
+
+        /// <summary>
+        /// 线索编号
+        /// </summary>
+        public string ClueCode { get; set; }
     }
 }
