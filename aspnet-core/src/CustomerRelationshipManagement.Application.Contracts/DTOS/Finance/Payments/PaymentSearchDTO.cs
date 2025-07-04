@@ -24,6 +24,11 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Payments
         /// 负责人
         /// </summary>
         public Guid? UserId { get; set; }
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public Guid? CreatorId { get; set; }
+
 
         /// <summary>
         /// 所属客户
