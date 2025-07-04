@@ -54,10 +54,13 @@ namespace CustomerRelationshipManagement.DTOS.ProductManagementDto
         /// <summary>
         /// 上架未上架
         /// </summary>
-        public bool ProductStatus { get; set; }= false;
+        public bool ProductStatus { get; set; } 
         /// <summary>
         /// 成交价
         /// </summary>
         public decimal? DealPrice { get; set; } = 0;
+
+
+        public string? Keyword { get; set; }
     }
 }

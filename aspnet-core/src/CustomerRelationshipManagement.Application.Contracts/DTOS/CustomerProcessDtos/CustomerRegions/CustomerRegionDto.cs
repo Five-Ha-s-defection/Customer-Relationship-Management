@@ -8,7 +8,7 @@ using Volo.Abp.Domain.Entities;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions
 {
-    public class CustomerRegionDto : FullAuditedEntityDto<Guid>
+    public class CustomerRegionDto : EntityDto<Guid>
     {
          /// <summary>
         /// 客户地区名称
