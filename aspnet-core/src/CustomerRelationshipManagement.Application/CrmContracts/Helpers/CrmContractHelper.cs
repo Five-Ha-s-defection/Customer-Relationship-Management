@@ -40,7 +40,8 @@ namespace CustomerRelationshipManagement.CrmContracts.Helpers
                    $"SignDate_{safeString(dto.SignDate)}_" +
                    $"CommencementDate_{safeString(dto.CommencementDate)}_" +
                    $"ExpirationDate_{safeString(dto.ExpirationDate)}_" +
-                   $"Page_{dto.PageIndex}_Size_{dto.PageSize}";
+                   $"Page_{dto.PageIndex}_Size_{dto.PageSize}_"+
+                   $"ContractProceeds_{dto.ContractProceeds}";
         }
 
         /// <summary>
@@ -65,7 +66,8 @@ namespace CustomerRelationshipManagement.CrmContracts.Helpers
                             $"{dto.CommencementDate}_" +
                             $"{dto.ExpirationDate}_" +
                             $"{dto.PageIndex}_" +
-                            $"{dto.PageSize}";
+                            $"{dto.PageSize}_"+
+                            $"{dto.ContractProceeds}";
 
             using var md5 = MD5.Create();
             var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(rawKey));

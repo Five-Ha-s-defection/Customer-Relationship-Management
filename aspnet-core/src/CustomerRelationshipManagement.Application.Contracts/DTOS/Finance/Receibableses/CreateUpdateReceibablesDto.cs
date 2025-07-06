@@ -12,19 +12,18 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// <summary>
         /// 所属客户
         /// </summary>
-        [Required]
         public Guid CustomerId { get; set; }
 
         /// <summary>
         /// 关联合同
         /// </summary>
-        [Required]
+
         public Guid ContractId { get; set; }
 
         /// <summary>
         /// 负责人
         /// </summary>
-        [Required]
+
         public Guid UserId { get; set; }
 
         /// <summary>
@@ -35,13 +34,13 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// <summary>
         /// 应收款金额
         /// </summary
-        [Required]
+
         public decimal ReceivablePay { get; set; }
 
         /// <summary>
         /// 应收款时间
         /// </summary>
-        [Required]
+
         public DateTime ReceivableDate { get; set; }
 
         /// <summary>
