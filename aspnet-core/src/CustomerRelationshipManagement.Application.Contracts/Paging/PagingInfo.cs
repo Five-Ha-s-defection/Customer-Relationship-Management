@@ -1,8 +1,11 @@
-﻿using System;
+﻿using CustomerRelationshipManagement.Clues;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Caching;
 
 namespace CustomerRelationshipManagement.Paging
 {
@@ -14,20 +17,20 @@ namespace CustomerRelationshipManagement.Paging
         /// <summary>
         /// 页索引
         /// </summary>
+        [DefaultValue("1")]
         public int PageIndex { get; set; }
         /// <summary>
         /// 页大小
         /// </summary>
+        [DefaultValue("10")]
         public int PageSize { get; set; }
-        /// <summary>
-        /// 关键字
-        /// </summary>
-        public string? Keyword { get; set; }
     }
+
     /// <summary>
     ///  分页返回信息
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [CacheName("PageInfo")]
     public class PageInfoCount<T>
     {
         /// <summary>

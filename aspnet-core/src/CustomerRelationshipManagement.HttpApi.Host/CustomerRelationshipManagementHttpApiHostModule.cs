@@ -1,10 +1,8 @@
 ﻿using CustomerRelationshipManagement.EntityFrameworkCore;
-using CustomerRelationshipManagement.MultiTenancy;
-using CustomerRelationshipManagement.Users;
+using CustomerRelationshipManagement.Upload;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,10 +11,10 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc;
@@ -27,8 +25,8 @@ using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite.Bundling;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
 using Volo.Abp.AspNetCore.Serilog;
 using Volo.Abp.Autofac;
+using Volo.Abp.Caching.StackExchangeRedis;
 using Volo.Abp.Modularity;
-using Volo.Abp.Security.Claims;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
@@ -41,22 +39,16 @@ namespace CustomerRelationshipManagement;
     typeof(CustomerRelationshipManagementApplicationModule),
     typeof(CustomerRelationshipManagementEntityFrameworkCoreModule),
     typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
+    typeof(AbpCachingStackExchangeRedisModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
 )]
 public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 {
+
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        PreConfigure<OpenIddictBuilder>(builder =>
-        {
-            //builder.AddValidation(options =>
-            //{
-            //    options.AddAudiences("CustomerRelationshipManagement");
-            //    options.UseLocalServer();
-            //    options.UseAspNetCore();
-            //});
-        });
+
     }
     /// <summary>
     /// 配置服务
@@ -64,18 +56,22 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
     /// <param name="context"></param>
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        //配置antiforgery
+
         Configure<AbpAntiForgeryOptions>(options =>
         {
             options.TokenCookie.Expiration = TimeSpan.FromDays(365);
             options.AutoValidate = false;
-
         });
+        //添加主机环境
+        context.Services.AddTransient<Upload.IHostingEnvironment, HostingEnvironmentAdapter>();
         //配置http上下文
         context.Services.AddHttpContextAccessor();
 
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
+
+
+
 
         ConfigureAuthentication(context);
         ConfigureBundles();
@@ -102,15 +98,15 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
                     {
                         //是否验证发行人
                         ValidateIssuer = true,
-                        ValidIssuer = configuration["JwtConfig:Bearer:Issuer"],//发行人
+                        ValidIssuer = configuration["AuthServer:JwtBearer:Issuer"],//发行人
 
                         //是否验证受众人
                         ValidateAudience = true,
-                        ValidAudience = configuration["JwtConfig:Bearer:Audience"],//受众人
+                        ValidAudience = configuration["AuthServer:JwtBearer:Audience"],//受众人
 
                         //是否验证密钥
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtConfig:Bearer:SecurityKey"])),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["AuthServer:JwtBearer:SecurityKey"])),
 
                         ValidateLifetime = true, //验证生命周期
 
@@ -118,7 +114,28 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
 
                         ClockSkew = TimeSpan.FromSeconds(30)   //平滑过期偏移时间
                     };
+
+                    // ✅ 添加下面的调试代码
+                    option.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            Console.WriteLine("❌ JWT 验证失败：" + context.Exception.Message);
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            Console.WriteLine("✅ JWT 验证成功，用户：" + context.Principal?.Identity?.Name);
+                            return Task.CompletedTask;
+                        },
+                        OnMessageReceived = context =>
+                        {
+                            Console.WriteLine("📥 收到 Token：" + context.Token);
+                            return Task.CompletedTask;
+                        }
+                    };
                 }
+
             );
     }
 
@@ -176,32 +193,48 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
     {
         Configure<AbpAspNetCoreMvcOptions>(options =>
         {
+            // 注册Application程序集中的所有应用服务为控制器
             options.ConventionalControllers.Create(typeof(CustomerRelationshipManagementApplicationModule).Assembly);
         });
     }
 
     private static void ConfigureSwaggerServices(ServiceConfigurationContext context, IConfiguration configuration)
     {
+        context.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "CustomerRelationshipManagement API", Version = "v1" });
 
-        context.Services.AddAbpSwaggerGenWithOAuth(
-           configuration["AuthServer:Authority"]!,
-           new Dictionary<string, string>
-           {
-                    {"CustomerRelationshipManagement", "CustomerRelationshipManagement API"}
-            },
-            options =>
+            // 移除所有分组限制，让所有API都能显示
+            // 不再需要DocInclusionPredicate，所有API都会显示在v1分组中
+
+            //开启权限小锁
+            options.OperationFilter<AddResponseHeadersFilter>();
+            options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
+            options.OperationFilter<SecurityRequirementsOperationFilter>();
+            options.CustomSchemaIds(type => type.FullName);
+
+            //给参数设置默认值
+            //options.SchemaFilter<SchemaFilter>();
+
+            //在header中添加token，传递到后台
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "CustomerRelationshipManagement API", Version = "v1" });
-                options.DocInclusionPredicate((docName, description) => true);
-                options.CustomSchemaIds(type => type.FullName);
-
-
-
-                ////就是这里！！！！！！！！！
-                //var basePath = AppDomain.CurrentDomain.BaseDirectory;
-                //var xmlPath = Path.Combine(basePath, "CustomerRelationshipManagement.Application.xml");//这个就是刚刚配置的xml文件名
-                //options.IncludeXmlComments(xmlPath, true);//默认的第二个参数是false，这个是controller的注释，记得修改
+                Description = "JWT授权(数据将在请求头中进行传递)直接在下面框中输入Bearer {token}(注意两者之间是一个空格) \"",
+                Name = "Authorization",//jwt默认的参数名称
+                In = ParameterLocation.Header,//jwt默认存放Authorization信息的位置(请求头中)
+                BearerFormat = "JWT",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer",
             });
+
+
+            
+       
+            //就是这里！！！！！！！！！
+            var basePath = AppDomain.CurrentDomain.BaseDirectory;
+            var xmlPath = Path.Combine(basePath, "CustomerRelationshipManagement.Application.xml");//这个就是刚刚配置的xml文件名
+            options.IncludeXmlComments(xmlPath, true);//默认的第二个参数是false，这个是controller的注释，记得修改
+        });
     }
 
     private void ConfigureCors(ServiceConfigurationContext context, IConfiguration configuration)
@@ -220,12 +253,18 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();
+
             });
+
         });
     }
 
     public override void OnApplicationInitialization(ApplicationInitializationContext context)
     {
+
+        // 初始化 CSRedis
+        //RedisHelper.Initialization(new CSRedis.CSRedisClient("10.223.3.246:6379"));
+
         var app = context.GetApplicationBuilder();
         var env = context.GetEnvironment();
 
@@ -246,43 +285,31 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         app.UseRouting();
         app.UseCors();
         app.UseAuthentication();
-        //app.UseAbpOpenIddictValidation();
+        /*app.UseAbpOpenIddictValidation();
 
-        //if (MultiTenancyConsts.IsEnabled)
-        //{
-        //    app.UseMultiTenancy();
-        //}
+        if (MultiTenancyConsts.IsEnabled)
+        {
+            app.UseMultiTenancy();
+        }*/
         app.UseUnitOfWork();
         app.UseDynamicClaims();
         app.UseAuthorization();
-
         app.UseSwagger();
-        app.UseAbpSwaggerUI(c =>
+        app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "CustomerRelationshipManagement API");
 
-            var configuration = context.ServiceProvider.GetRequiredService<IConfiguration>();
-            c.OAuthClientId(configuration["AuthServer:SwaggerClientId"]);
-            c.OAuthScopes("CustomerRelationshipManagement");
-
-
             // 模型的默认扩展深度，设置为 -1 完全隐藏模型
             c.DefaultModelsExpandDepth(1);
-
             // API文档仅展开标记
             c.DocExpansion(DocExpansion.List);
             c.DefaultModelRendering(ModelRendering.Example);
             c.DefaultModelExpandDepth(-1);
-
-            //API前缀设置为空
+            // API前缀设置为空
             c.RoutePrefix = string.Empty;
-
-
             // API页面Title
-            c.DocumentTitle = "😍我们的客户管理系统接口管理⭐⭐⭐";
-
+            c.DocumentTitle = "😍接口文档 - 阿星Plus⭐⭐⭐";
         });
-
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();

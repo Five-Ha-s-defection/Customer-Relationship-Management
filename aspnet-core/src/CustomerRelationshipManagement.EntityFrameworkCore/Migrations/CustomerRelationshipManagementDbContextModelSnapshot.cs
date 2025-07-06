@@ -24,7 +24,1171 @@ namespace CustomerRelationshipManagement.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("CustomerRelationshipManagement.Menus.MenuInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys.BusinessOpportunity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("Budget")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("BusinessOpportunityCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BusinessOpportunityName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<DateTime>("ExpectedDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("PriorityId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("SalesProgressId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_BusinessOpportunity", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Cars.CarFrameNumber", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CarFrameNumberName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarFrameNumber");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.ClueSources.ClueSource", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ClueSourceContent")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClueSourceName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ClueSourceStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ClueSource");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Clues.Clue", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClueCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClueEmail")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClueName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CluePhone")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ClueQQ")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("ClueSourceId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ClueWechat")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<Guid>("IndustryId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime>("LastFollowTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<DateTime>("NextContactTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_Clue", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CommunicationTypes.CommunicationType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CommunicationTypeEnglishName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CommunicationTypeName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("CommunicationTypeStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("CustomReplyId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CommunicationType");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.ContactCommunications.ContactCommunication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("AttachmentUrl")
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("BusinessOpportunityId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("ClueId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<Guid?>("ExpectedDateId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<int>("FollowUpStatus")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<DateTime>("NextContactTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_ContactCommunication", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.ContactRelations.ContactRelation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ContactRelationName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContactRelation");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomReplys.CustomReply", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreateTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("CustomReplyEnglishName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CustomReplyName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomReply");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerContacts.CustomerContact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("ContactRelationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("Mobile")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("QQ")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("Salutation")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Wechat")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_CustomerContact", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerLevels.CustomerLevel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CustomerLevelName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerLevel");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerRegions.CustomerRegion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CustomerRegionName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerRegion");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.CustomerTypes.CustomerType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CustomerTypeName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CustomerType");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Customers.Customer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CarFrameNumberId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal?>("CheckAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<Guid>("ClueId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<string>("CustomerAddress")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CustomerCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CustomerEmail")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CustomerExpireTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("CustomerLevelId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CustomerName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("CustomerPhone")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("CustomerRegionId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CustomerRemark")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("CustomerSourceId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CustomerTypeId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_Customer", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Industrys.Industry", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("IndustryName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Industry");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.Prioritys.Priority", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("PriorityName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Priority");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.CustomerProcess.SalesProgresses.SalesProgress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("SalesProgressName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SalesProgress");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.Finance.Invoices.Invoice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.PrimitiveCollection<string>("ApproveComments")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.PrimitiveCollection<string>("ApproveTimes")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.PrimitiveCollection<string>("ApproverIds")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Bank")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BankAccount")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BillingAddress")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BillingPhone")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<Guid>("ContractId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<int>("CurrentStep")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<DateTime>("InvoiceDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("InvoiceImg")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("InvoiceInformationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("InvoiceNumberCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("InvoiceStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InvoiceType")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("TaxAmount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("TaxNumber")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_Invoice", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.Finance.PaymentMethods.PaymentMethod", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("PaymentMethodName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_PaymentMethod", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.Finance.Payments.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.PrimitiveCollection<string>("ApproveComments")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.PrimitiveCollection<string>("ApproveTimes")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.PrimitiveCollection<string>("ApproverIds")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<Guid>("ContractId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<int>("CurrentStep")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<string>("PaymentCode")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<DateTime>("PaymentDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("PaymentMethod")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ReceivableId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_Payment", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.Finance.Receivableses.Receivables", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<Guid>("ContractId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("PaymentId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ReceivableCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("ReceivableDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<decimal>("ReceivablePay")
+                        .HasMaxLength(128)
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_Receivables", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.ProductCategory.Categorys.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("EnglishName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_Category", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.ProductCategory.Products.Product", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<decimal?>("DealPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ProductBrand")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProductCode")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProductDescription")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProductImageUrl")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ProductRemark")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("ProductStatus")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("ProductSupplier")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal?>("SuggestedPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_Product", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.Menus.MenuInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -114,7 +1278,7 @@ namespace CustomerRelationshipManagement.Migrations
                     b.ToTable("App_MenuInfo", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.Permissions.PermissionInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.Permissions.PermissionInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -186,7 +1350,7 @@ namespace CustomerRelationshipManagement.Migrations
                     b.ToTable("App_PermissionInfo", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.RoleMenus.RoleMenuInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.RoleMenus.RoleMenuInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -206,7 +1370,7 @@ namespace CustomerRelationshipManagement.Migrations
                     b.ToTable("App_RoleMenuInfo", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.RolePermissions.RolePermissionInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.RolePermissions.RolePermissionInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -226,7 +1390,7 @@ namespace CustomerRelationshipManagement.Migrations
                     b.ToTable("App_RolePermissionInfo", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.Roles.RoleInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.Roles.RoleInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -293,7 +1457,7 @@ namespace CustomerRelationshipManagement.Migrations
                     b.ToTable("App_RoleInfo", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.UserPermissions.UserPermissionInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.UserPermissions.UserPermissionInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -313,7 +1477,7 @@ namespace CustomerRelationshipManagement.Migrations
                     b.ToTable("App_UserPermissionInfo", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.UserRoles.UserRoleInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.UserRoles.UserRoleInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
@@ -333,10 +1497,14 @@ namespace CustomerRelationshipManagement.Migrations
                     b.ToTable("App_UserRoleInfo", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.Users.UserInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.Users.UserInfo", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("Avatar")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -398,6 +1566,10 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
+                    b.Property<string>("RealName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -406,21 +1578,225 @@ namespace CustomerRelationshipManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("App_UserInfo", (string)null);
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("00000000-0000-0000-0000-000000000000"),
-                            ConcurrencyStamp = "e07622e887f84812aa433729572104a9",
-                            CreationTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "admin@admin.com",
-                            ExtraProperties = "{}",
-                            IsActive = true,
-                            IsDeleted = false,
-                            Password = "123",
-                            PhoneInfo = "12345678901",
-                            UserName = "admin"
-                        });
+            modelBuilder.Entity("CustomerRelationshipManagement.Record.OperationLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("BizId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("BizType")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OperationLog");
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.crmcontracts.CrmContract", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.PrimitiveCollection<string>("ApproveComments")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.PrimitiveCollection<string>("ApproveTimes")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Attachment")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.PrimitiveCollection<string>("AuditorId")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("BusinessOpportunityId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CommencementDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<string>("ContractName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<decimal>("ContractProceeds")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<string>("ContractScanning")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ContractTerms")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<int>("CurrentStep")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Dealer")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<DateTime>("ExpirationDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<int>("PaymentStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SignDate")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_CrmContract", (string)null);
+                });
+
+            modelBuilder.Entity("CustomerRelationshipManagement.crmcontracts.CrmContractandProduct", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("BuyProductNum")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("CreationTime");
+
+                    b.Property<Guid?>("CreatorId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("CreatorId");
+
+                    b.Property<Guid>("CrmContractId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("DeleterId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("DeleterId");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DeletionTime");
+
+                    b.Property<string>("ExtraProperties")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasColumnName("ExtraProperties");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false)
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastModificationTime");
+
+                    b.Property<Guid?>("LastModifierId")
+                        .HasColumnType("char(36)")
+                        .HasColumnName("LastModifierId");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("SellPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<decimal>("SumPrice")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("App_CrmContractandProduct", (string)null);
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
@@ -831,15 +2207,15 @@ namespace CustomerRelationshipManagement.Migrations
                     b.ToTable("AbpSettingDefinitions", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.RoleMenus.RoleMenuInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.RoleMenus.RoleMenuInfo", b =>
                 {
-                    b.HasOne("CustomerRelationshipManagement.Menus.MenuInfo", "Menu")
+                    b.HasOne("CustomerRelationshipManagement.RBAC.Menus.MenuInfo", "Menu")
                         .WithMany("RoleMenus")
                         .HasForeignKey("MenuId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CustomerRelationshipManagement.Roles.RoleInfo", "Role")
+                    b.HasOne("CustomerRelationshipManagement.RBAC.Roles.RoleInfo", "Role")
                         .WithMany("RoleMenus")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -850,15 +2226,15 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.RolePermissions.RolePermissionInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.RolePermissions.RolePermissionInfo", b =>
                 {
-                    b.HasOne("CustomerRelationshipManagement.Permissions.PermissionInfo", "Permission")
+                    b.HasOne("CustomerRelationshipManagement.RBAC.Permissions.PermissionInfo", "Permission")
                         .WithMany()
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CustomerRelationshipManagement.Roles.RoleInfo", "Role")
+                    b.HasOne("CustomerRelationshipManagement.RBAC.Roles.RoleInfo", "Role")
                         .WithMany("RolePermissions")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -869,15 +2245,15 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.UserPermissions.UserPermissionInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.UserPermissions.UserPermissionInfo", b =>
                 {
-                    b.HasOne("CustomerRelationshipManagement.Permissions.PermissionInfo", "Permission")
+                    b.HasOne("CustomerRelationshipManagement.RBAC.Permissions.PermissionInfo", "Permission")
                         .WithMany()
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CustomerRelationshipManagement.Users.UserInfo", "User")
+                    b.HasOne("CustomerRelationshipManagement.RBAC.Users.UserInfo", "User")
                         .WithMany("UserPermissions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -888,15 +2264,15 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.UserRoles.UserRoleInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.UserRoles.UserRoleInfo", b =>
                 {
-                    b.HasOne("CustomerRelationshipManagement.Roles.RoleInfo", "Role")
+                    b.HasOne("CustomerRelationshipManagement.RBAC.Roles.RoleInfo", "Role")
                         .WithMany("UserRoles")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CustomerRelationshipManagement.Users.UserInfo", "User")
+                    b.HasOne("CustomerRelationshipManagement.RBAC.Users.UserInfo", "User")
                         .WithMany("UserRoles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -934,12 +2310,12 @@ namespace CustomerRelationshipManagement.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.Menus.MenuInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.Menus.MenuInfo", b =>
                 {
                     b.Navigation("RoleMenus");
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.Roles.RoleInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.Roles.RoleInfo", b =>
                 {
                     b.Navigation("RoleMenus");
 
@@ -948,7 +2324,7 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Navigation("UserRoles");
                 });
 
-            modelBuilder.Entity("CustomerRelationshipManagement.Users.UserInfo", b =>
+            modelBuilder.Entity("CustomerRelationshipManagement.RBAC.Users.UserInfo", b =>
                 {
                     b.Navigation("UserPermissions");
 

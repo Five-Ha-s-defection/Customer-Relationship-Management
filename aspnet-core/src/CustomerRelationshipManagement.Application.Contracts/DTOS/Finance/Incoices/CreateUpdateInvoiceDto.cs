@@ -1,0 +1,127 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CustomerRelationshipManagement.Finance.Invoices
+{
+    public class CreateUpdateInvoiceDto
+    {
+        /// <summary>
+        /// 所属客户ID
+        /// </summary>
+        [Required]
+        public Guid CustomerId { get; set; }
+
+        /// <summary>
+        /// 关联合同ID
+        /// </summary>
+        [Required]
+        public Guid ContractId { get; set; }
+
+        /// <summary>
+        /// 关联收款ID
+        /// </summary>
+        [Required]
+        public Guid PaymentId { get; set; } = Guid.Empty;
+
+        /// <summary>
+        /// 负责人ID
+        /// </summary>
+        public Guid UserId { get; set; }
+
+        /// <summary>
+        /// 发票编号
+        /// </summary>
+        public string InvoiceNumberCode { get; set; }
+
+
+        /// <summary>
+        /// 开票金额
+        /// </summary>
+        public decimal Amount { get; set; }
+
+        /// <summary>
+        /// 税额
+        /// </summary>
+        public decimal TaxAmount { get; set; }
+
+        /// <summary>
+        /// 开票时间
+        /// </summary>
+        public DateTime InvoiceDate { get; set; }
+
+        /// <summary>
+        /// 开票类型（增值税普通发票、增值税专用发票等）
+        /// </summary>
+        public int InvoiceType { get; set; }
+
+        /// <summary>
+        /// 每一级的审批人 ID
+        /// </summary>
+        public List<Guid> ApproverIds { get; set; } = new();
+        /// <summary>
+        /// 当前审批到第几人（从0开始）
+        /// </summary>
+        public int CurrentStep { get; set; } = 0;
+        /// <summary>
+        /// 审批意见
+        /// </summary>
+        public List<string> ApproveComments { get; set; } = new();
+        /// <summary>
+        /// 审批时间
+        /// </summary>
+        public List<DateTime> ApproveTimes { get; set; } = new();
+
+        /// <summary>
+        /// 开票状态
+        /// </summary>
+        public int InvoiceStatus { get; set; } = 0;// 0:待审核 1:审核通过 2:审核未通过
+
+        /// <summary>
+        /// 发票图片
+        /// </summary>
+        public string InvoiceImg { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 备注
+        /// </summary>
+        public string Remark { get; set; } = string.Empty;
+
+
+        /// <summary>
+        /// 已有的发票信息
+        /// </summary>
+        public Guid? InvoiceInformationId { get; set; }
+
+        /// <summary>
+        /// 发票抬头
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
+        /// 纳税人识别号
+        /// </summary>
+        public string TaxNumber { get; set; }
+
+        public string Bank { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 开户地址
+        /// </summary>
+        public string BillingAddress { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 开户账号
+        /// </summary>
+        public string BankAccount { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 开票电话
+        /// </summary>
+        public string BillingPhone { get; set; } = string.Empty;
+
+    }
+}

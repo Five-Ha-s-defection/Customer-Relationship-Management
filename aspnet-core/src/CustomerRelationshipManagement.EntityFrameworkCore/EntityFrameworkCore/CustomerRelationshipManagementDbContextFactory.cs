@@ -1,8 +1,10 @@
-﻿using System;
-using System.IO;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using System;
+using System.IO;
+using Volo.Abp.Data;
 
 namespace CustomerRelationshipManagement.EntityFrameworkCore;
 
@@ -18,7 +20,6 @@ public class CustomerRelationshipManagementDbContextFactory : IDesignTimeDbConte
 
         var builder = new DbContextOptionsBuilder<CustomerRelationshipManagementDbContext>()
             .UseMySql(configuration.GetConnectionString("Default"),new MySqlServerVersion(new Version(8,0,42)));
-
         return new CustomerRelationshipManagementDbContext(builder.Options);
     }
 
