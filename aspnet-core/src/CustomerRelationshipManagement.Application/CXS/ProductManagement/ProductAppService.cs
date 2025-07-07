@@ -269,6 +269,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 }
                 var productDto = ObjectMapper.Map(updateProduct, product);
                 await productRepository.UpdateAsync(productDto);
+                await ClearAbpCacheAsync();
                 return ApiResult<CreateUpdateProductDtos>.Success(ResultCode.Success, ObjectMapper.Map<Product, CreateUpdateProductDtos>(productDto));
             }
             catch (Exception)
@@ -366,6 +367,35 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 }
             };
             return await exportAppService.ExportToExcelAsync(exportData);
+        }
+
+        /// <summary>
+        /// 修改产品状态
+        /// </summary>
+        /// <param name="id">主键</param>
+        /// <param name="state">状态</param>
+        /// <returns></returns>
+        /// 
+        [HttpPut]
+        public async Task<ApiResult<ProductDtos>> UpdProductState(Guid id, bool state)
+        {
+            try
+            {
+                var updproductState= await productRepository.GetAsync(x => x.Id == id);
+                if(updproductState == null)
+                {
+                    return ApiResult<ProductDtos>.Fail("产品不存在", ResultCode.Fail);
+                }
+                updproductState.ProductStatus = state;
+                await productRepository.UpdateAsync(updproductState);
+                await ClearAbpCacheAsync();
+                return ApiResult<ProductDtos>.Success(ResultCode.Success,ObjectMapper.Map<Product, ProductDtos>(updproductState));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("修改产品状态信息出错！" + ex.Message);
+                throw;
+            }
         }
     }
 

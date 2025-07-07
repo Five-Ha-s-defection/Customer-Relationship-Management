@@ -17,6 +17,6 @@ namespace CustomerRelationshipManagement.Interfaces.IProductAppService
 
         Task<ApiResult<List<CategoryDtos>>> GetCategeryCascadeList();
 
-
+        Task<ApiResult<ProductDtos>> UpdProductState(Guid id, bool state);
     }
 }
