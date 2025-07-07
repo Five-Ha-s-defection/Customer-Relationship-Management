@@ -22,6 +22,12 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// 负责人ID
         /// </summary>
         public Guid? UserId { get; set; }
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public Guid? CreatorId { get; set; }
+
         /// <summary>
         /// 所属客户ID
         /// </summary>

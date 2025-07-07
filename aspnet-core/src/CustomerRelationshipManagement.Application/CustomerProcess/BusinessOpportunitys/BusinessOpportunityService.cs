@@ -17,6 +17,8 @@ using CustomerRelationshipManagement.RBAC.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
-using Newtonsoft.Json;
+using Volo.Abp.ObjectMapping;
 
 namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
 {
@@ -42,11 +44,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
         private readonly IRepository<Product> productrepository;
         private readonly IRepository<Clue> cluerepository;
         private readonly IRepository<UserInfo> userrepository;
-        //private readonly IDistributedCache<PageInfoCount<BusinessOpportunityDto>> cache;
-        // 依赖注入
+        private readonly IConnectionMultiplexer connectionMultiplexer;
         private readonly IDistributedCache cache;
         private readonly ILogger<BusinessOpportunityService> logger;
-        public BusinessOpportunityService(IRepository<BusinessOpportunity> businessopportunityrepository, ILogger<BusinessOpportunityService> logger, IRepository<Customer> customerrepository, IRepository<Priority> priorityrepository, IRepository<SalesProgress> salesprogressrepository, IRepository<Product> productrepository, IRepository<Clue> cluerepository, IRepository<UserInfo> userrepository, IDistributedCache cache)
+        public BusinessOpportunityService(IRepository<BusinessOpportunity> businessopportunityrepository, ILogger<BusinessOpportunityService> logger, IRepository<Customer> customerrepository, IRepository<Priority> priorityrepository, IRepository<SalesProgress> salesprogressrepository, IRepository<Product> productrepository, IRepository<Clue> cluerepository, IRepository<UserInfo> userrepository, IDistributedCache cache, IConnectionMultiplexer connectionMultiplexer)
         {
             this.businessopportunityrepository = businessopportunityrepository;
             this.logger = logger;
@@ -57,6 +58,26 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
             this.cluerepository = cluerepository;
             this.userrepository = userrepository;
             this.cache = cache;
+            this.connectionMultiplexer = connectionMultiplexer;
+        }
+
+
+        /// <summary>
+        /// 清楚关于c:PageInfo,k的所有信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearAbpCacheAsync()
+        {
+            var endpoints = connectionMultiplexer.GetEndPoints();
+            foreach (var endpoint in endpoints)
+            {
+                var server = connectionMultiplexer.GetServer(endpoint);
+                var keys = server.Keys(pattern: "c:PageInfo,k:*");//填写自己的缓存前缀
+                foreach (var key in keys)
+                {
+                    await connectionMultiplexer.GetDatabase().KeyDeleteAsync(key);
+                }
+            }
         }
 
         /// <summary>
@@ -87,6 +108,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
                 // 拼接客户编号，格式如C-202506240038-3B7C或C-202506240038-1540
                 businessopportunity.BusinessOpportunityCode = $"S-{now:yyyyMMddHHmm}-{randomStr}";
                 var list = await businessopportunityrepository.InsertAsync(businessopportunity);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
                 return ApiResult<BusinessOpportunityDto>.Success(ResultCode.Success, ObjectMapper.Map<BusinessOpportunity, BusinessOpportunityDto>(list));
             }
             catch (Exception ex)
@@ -360,11 +383,66 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
                 }
                 bus.IsDeleted = true;
                 await businessopportunityrepository.UpdateAsync(bus);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
                 return ApiResult<BusinessOpportunityDto>.Success(ResultCode.Success, ObjectMapper.Map<BusinessOpportunity, BusinessOpportunityDto>(bus));
             }
             catch (Exception ex)
             {
                 logger.LogError("删除商机信息出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取商机详情信息
+        /// </summary>
+        /// <param name="id">要查询的商机ID</param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ApiResult<BusinessOpportunityDto>> GetBusinessOpportunityById(Guid id)
+        {
+            try
+            {
+                var businessopportunity = await businessopportunityrepository.GetAsync(x => x.Id == id);
+                if (businessopportunity == null)
+                {
+                    return ApiResult<BusinessOpportunityDto>.Fail("商机信息不存在", ResultCode.NotFound);
+                }
+                return ApiResult<BusinessOpportunityDto>.Success(ResultCode.Success, ObjectMapper.Map<BusinessOpportunity, BusinessOpportunityDto>(businessopportunity));
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 修改商机信息
+        /// </summary>
+        /// <param name="id">要修改的商机ID</param>
+        /// <param name="dto">商机信息</param>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task<ApiResult<CreateUpdateBusinessOpportunityDto>> UpdCustomer(Guid id, CreateUpdateBusinessOpportunityDto dto)
+        {
+            try
+            {
+                var businessopportunity = await businessopportunityrepository.GetAsync(x => x.Id == id);
+                if (businessopportunity == null)
+                {
+                    return ApiResult<CreateUpdateBusinessOpportunityDto>.Fail("未找到要修改的商机", ResultCode.NotFound);
+                }
+                var businessopportunityDto = ObjectMapper.Map(dto, businessopportunity);
+                await businessopportunityrepository.UpdateAsync(businessopportunity);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
+                return ApiResult<CreateUpdateBusinessOpportunityDto>.Success(ResultCode.Success, ObjectMapper.Map<BusinessOpportunity, CreateUpdateBusinessOpportunityDto>(businessopportunity));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("修改线索信息出错！" + ex.Message);
                 throw;
             }
         }

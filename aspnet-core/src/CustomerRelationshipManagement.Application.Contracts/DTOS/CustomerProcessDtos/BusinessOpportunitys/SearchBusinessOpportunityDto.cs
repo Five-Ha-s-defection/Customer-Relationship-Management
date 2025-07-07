@@ -14,10 +14,10 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpport
 
         public Guid? AssignedTo { get; set; }        // 负责人
 
-            /// <summary>
-            /// 销售进度（可多选，存销售进度的枚举值或ID）
-            /// </summary>
-            public List<Guid> SalesProgressList { get; set; } = new List<Guid>();
+        /// <summary>
+        /// 销售进度（可多选，存销售进度的枚举值或ID）
+        /// </summary>
+        public List<Guid> SalesProgressList { get; set; } = new List<Guid>();
 
         public DateTime? StartTime { get; set; }     // 时间范围起
         public DateTime? EndTime { get; set; }       // 时间范围止

@@ -1,5 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.CustomerProcess.ContactRelations;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactRelations;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
@@ -63,7 +64,7 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomerCo
         /// 获取联系人关系下拉框数据
         /// </summary>
         /// <returns></returns>
-        Task<ApiResult<List<CustomerRegionDto>>> GetContactRelationList();
+        Task<ApiResult<List<ContactRelationDto>>> GetContactRelationList();
 
         /// <summary>
         /// 获取角色下拉框数据

@@ -7,7 +7,7 @@ using Volo.Abp.Application.Dtos;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars
 {
-    public class CarDto:FullAuditedEntityDto<Guid>
+    public class CarDto : EntityDto<Guid>
     {
         /// <summary>
         /// 车架号名称
