@@ -55,7 +55,7 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         /// <summary>
         /// 开票时间
         /// </summary>
-        public DateTime? InvoiceDate { get; set; }
+        public string? InvoiceDate { get; set; }
 
 
 

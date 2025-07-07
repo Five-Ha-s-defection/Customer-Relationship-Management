@@ -53,7 +53,7 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Payments
         /// <summary>
         /// 收款时间
         /// </summary>
-        public DateTime? PaymentDate { get; set; }
+        public string? PaymentDate { get; set; }
 
         /// <summary>
         /// 收款状态
