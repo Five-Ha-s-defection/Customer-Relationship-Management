@@ -7,6 +7,7 @@ using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Interfaces.ICrmContracts;
 using CustomerRelationshipManagement.Paging;
@@ -43,16 +44,18 @@ namespace CustomerRelationshipManagement.CrmContracts
         private readonly IRepository<Receivables, Guid> receivablesrepository;
         private readonly IRepository<CrmContractandProduct, Guid> crmContractandProductrepository;
         private readonly IRepository<Customer, Guid> customerrepository;
+        private readonly IRepository<Payment, Guid> paymentrepository;
         private readonly IRepository<UserInfo, Guid> userInforepository;
         private readonly IConnectionMultiplexer connectionMultiplexer;
         private readonly IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache;
 
-        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, IRepository<Customer, Guid> customerrepository, IRepository<UserInfo, Guid> userInforepository, IConnectionMultiplexer connectionMultiplexer , IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache)
+        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, IRepository<Customer, Guid> customerrepository,IRepository<Payment,Guid> paymentrepository, IRepository<UserInfo, Guid> userInforepository, IConnectionMultiplexer connectionMultiplexer , IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache)
         {
             this.repository = repository;
             this.receivablesrepository = receivablesrepository;
             this.crmContractandProductrepository = crmContractandProductrepository;
             this.customerrepository = customerrepository;
+            this.paymentrepository = paymentrepository;
             this.userInforepository = userInforepository;
             this.connectionMultiplexer = connectionMultiplexer;
             this.cache = cache;
@@ -183,6 +186,24 @@ namespace CustomerRelationshipManagement.CrmContracts
                 {
                     var CustomerName = (await customerinfo.FirstOrDefaultAsync(a => a.Id == item.CustomerId))?.CustomerName;
                     item.CustomerName = CustomerName ?? "";
+                }
+
+                var receiveinfo = await receivablesrepository.GetQueryableAsync();
+
+                //根据id获取应收款
+                foreach (var item in crmcontractdto)
+                {
+                    var Accountsreceivable = (await receiveinfo.FirstOrDefaultAsync(a => a.ContractId == item.Id))?.ReceivablePay;
+                    item.Accountsreceivable = Accountsreceivable ?? 0;
+                }
+
+                var paymentinfo = await paymentrepository.GetQueryableAsync();
+
+                //根据id获取已收款
+                foreach (var item in crmcontractdto)
+                {
+                    var Paymentreceived = (await paymentinfo.FirstOrDefaultAsync(a => a.ContractId == item.Id))?.Amount;
+                    item.Paymentreceived = Paymentreceived ?? 0;
                 }
 
                 var pageInfo = new PageInfoCount<ShowCrmContractDto>
