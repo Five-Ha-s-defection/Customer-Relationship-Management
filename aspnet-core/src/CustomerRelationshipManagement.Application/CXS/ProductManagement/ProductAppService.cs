@@ -398,6 +398,31 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 throw;
             }
         }
+
+        /// <summary>
+        /// 获取产品列表
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpGet]
+        public async Task<ApiResult<List<CategoryDtosList>>> GetCategoryDtoList()
+        {
+            try
+            {
+                var list = await ctegoryRepository.GetQueryableAsync();
+                var category = list.Select(u => new CategoryDtosList
+                {
+                    Id = u.Id,
+                    CategoryName = u.CategoryName,
+                }).ToList();
+                return ApiResult<List<CategoryDtosList>>.Success(ResultCode.Success, category);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("获取产品列表出错！" + ex.Message);
+                throw;
+            }
+        }
     }
 
 }

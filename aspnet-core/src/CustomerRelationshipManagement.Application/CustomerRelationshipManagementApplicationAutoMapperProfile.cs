@@ -180,6 +180,8 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Category, CreateUpdateCategoryDtos>().ReverseMap();
         //产品分类树形结构显示Dto
         CreateMap<Category, CategoryTreeDtos>().ReverseMap();
+        //产品分类列表显示Dto
+        CreateMap<Category, CategoryDtosList>().ReverseMap();
         #endregion
 
         #region 合同管理
