@@ -3,6 +3,7 @@ using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
 using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers.Helpers;
@@ -17,6 +18,7 @@ using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -46,10 +48,11 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly IRepository<ClueSource> sourceRepository;
         private readonly IRepository<CustomerRegion> regionRepository;
         private readonly IRepository<CustomerType> typeRepository;
+        private readonly IRepository<CustomerContact> contactRepository; 
         private readonly ILogger<CustomerService> logger;
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
         private readonly IConnectionMultiplexer connectionMultiplexer;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository)
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository, IRepository<CustomerContact> contactRepository)
         {
             this.repository = repository;
             this.logger = logger;
@@ -62,6 +65,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             this.regionRepository = regionRepository;
             this.connectionMultiplexer = connectionMultiplexer;
             this.typeRepository = typeRepository;
+            this.contactRepository = contactRepository;
         }
 
         /// <summary>
@@ -143,33 +147,78 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                     var customerlist = await repository.GetQueryableAsync();
                     var cluelist = await clueRepository.GetQueryableAsync();
                     var userlist = await userRepository.GetQueryableAsync();
-                    var list=from cus in customerlist
-                             join clu in cluelist 
-                             on cus.ClueId equals clu.Id
-                             into clueGroup
-                             from clu in clueGroup.DefaultIfEmpty() // 左连接
-                             join user in userlist
-                             on cus.CreatorId equals user.Id
-                             select new CustomerDto
-                             {
-                                 Id=cus.Id,
-                                 UserId = cus.UserId,
-                                 CustomerName =cus.CustomerName,
-                                 CheckAmount=cus.CheckAmount,
-                                 CustomerLevelId = cus.CustomerLevelId,
-                                 CustomerPhone =cus.CustomerPhone,
-                                 CustomerSourceId = cus.CustomerSourceId,
-                                 ClueId=cus.ClueId,
-                                 LastFollowTime = clu != null ? clu.LastFollowTime : null,
-                                 NextContactTime = clu != null ? clu.NextContactTime : null,
-                                 CreationTime = cus.CreationTime,
-                                 CreatorId = user.Id,
-                                 CreateName = user.UserName,
-                                 ClueWechat = clu != null ? clu.ClueWechat : null,         // 新增
-                                 CustomerEmail = cus.CustomerEmail,
-                             };
-                    //区分客户池和客户
-                    list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
+                    var carlist = await carRepository.GetQueryableAsync();
+                    var levelist = await levelRepository.GetQueryableAsync();
+                    var regionlist = await regionRepository.GetQueryableAsync();
+                    var typelist = await typeRepository.GetQueryableAsync();
+                    var sourceList = await sourceRepository.GetQueryableAsync();
+                    // var contactlist = await contactRepository.GetQueryableAsync(); // 联系人相关，已注释
+                    var list = from cus in customerlist
+                               join clu in cluelist on cus.ClueId equals clu.Id into clueGroup
+                               from clu in clueGroup.DefaultIfEmpty()
+                               join user in userlist on cus.UserId equals user.Id into userGroup
+                               from user in userGroup.DefaultIfEmpty()
+                               join car in carlist on cus.CarFrameNumberId equals car.Id into carGroup
+                               from car in carGroup.DefaultIfEmpty()
+                               join level in levelist on cus.CustomerLevelId equals level.Id into levelGroup
+                               from level in levelGroup.DefaultIfEmpty()
+                               join region in regionlist on cus.CustomerRegionId equals region.Id into regionGroup
+                               from region in regionGroup.DefaultIfEmpty()
+                               join type in typelist on cus.CustomerTypeId equals type.Id into typeGroup
+                               from type in typeGroup.DefaultIfEmpty()
+                               join source in sourceList on cus.CustomerSourceId equals source.Id into sourceGroup
+                               from source in sourceGroup.DefaultIfEmpty()
+                               join creator in userlist on cus.CreatorId equals creator.Id into creatorGroup
+                               from creator in creatorGroup.DefaultIfEmpty()
+                                   // join contact in contactlist on cus.Id equals contact.CustomerId into contactGroup
+                                   // from contact in contactGroup.DefaultIfEmpty()
+                               select new CustomerDto
+                               {
+                                   Id = cus.Id,
+                                   UserId = cus.UserId,
+                                   UserName = user != null ? user.UserName : null,
+                                   CustomerName = cus.CustomerName,
+                                   CheckAmount = cus.CheckAmount,
+                                   CustomerPhone = cus.CustomerPhone,
+                                   CustomerSourceId = cus.CustomerSourceId,
+                                   ClueSourceName = source != null ? source.ClueSourceName : null,
+                                   ClueId = cus.ClueId,
+                                   LastFollowTime = clu != null ? clu.LastFollowTime : null,
+                                   NextContactTime = clu != null ? clu.NextContactTime : null,
+                                   CreationTime = cus.CreationTime,
+                                   CreatorId = creator != null ? creator.Id : Guid.Empty,
+                                   CreateName = creator != null ? creator.RealName : null,
+                                   ClueWechat = clu != null ? clu.ClueWechat : null,
+                                   CustomerEmail = cus.CustomerEmail,
+                                   CustomerCode = cus.CustomerCode,
+                                   CustomerExpireTime = cus.CustomerExpireTime,
+                                   CarFrameNumberId = cus.CarFrameNumberId,
+                                   CarFrameNumberName = car != null ? car.CarFrameNumberName : null,
+                                   CustomerRegionId = cus.CustomerRegionId,
+                                   CustomerRegionName = region != null ? region.CustomerRegionName : null,
+                                   CustomerTypeId = cus.CustomerTypeId,
+                                   CustomerTypeName = type != null ? type.CustomerTypeName : null,
+                                   CustomerLevelId = cus.CustomerLevelId,
+                                   CustomerLevelName = level != null ? level.CustomerLevelName : null,
+                                   CustomerAddress = cus.CustomerAddress,
+                                   CustomerRemark = cus.CustomerRemark,
+                                   // ContactName= contact != null ? contact.ContactName : null, // 联系人相关，已注释
+                                   // Mobile= contact != null ? contact.Mobile : null, // 联系人相关，已注释
+                                   // Email= contact != null ? contact.Email : null, // 联系人相关，已注释
+                               };
+                    // type: 0=全部，1=我负责的，2=我创建的
+                    if (dto.type == 1 && dto.AssignedTo.HasValue)
+                    {
+                        list = list.Where(x => x.UserId == dto.AssignedTo);
+                    }
+                    else if (dto.type == 2 && dto.CreatedBy.HasValue)
+                    {
+                        list = list.Where(x => x.CreatorId == dto.CreatedBy);
+                    }
+
+
+                    ////区分客户池和客户
+                    //list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
 
                     //查询条件
                     //根据客户姓名、（联系人）、电话、邮箱、（微信号）模糊查询
@@ -180,10 +229,11 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                                                || x.ClueWechat.Contains(dto.Keyword)
                                                || x.CustomerEmail.Contains(dto.Keyword));
                     }
+
                     // 时间筛选
                     if (dto.StartTime.HasValue && dto.EndTime.HasValue && dto.TimeType.HasValue)
                     {
-                        list= dto.TimeType switch
+                        list = dto.TimeType switch
                         {
                             TimeField.CreateTime => list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime),
                             TimeField.NextContact => list.Where(x => x.NextContactTime >= dto.StartTime && x.NextContactTime <= dto.EndTime),
@@ -191,6 +241,69 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                             _ => list
                         };
                     }
+
+                    // 高级筛选字段处理
+                    if (dto.MatchMode == 0) // 全部满足(AND)
+                    {
+                        if (dto.UserIds != null && dto.UserIds.Count > 0)
+                            list = list.Where(x => dto.UserIds.Contains(x.UserId));
+                        if (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0)
+                            list = list.Where(x => x.CreatorId.HasValue && dto.CreatedByIds.Contains(x.CreatorId.Value));
+                        if (!string.IsNullOrEmpty(dto.CustomerCode))
+                            list = list.Where(x => x.CustomerCode.Contains(dto.CustomerCode));
+                        if (!string.IsNullOrEmpty(dto.CustomerName))
+                            list = list.Where(x => x.CustomerName.Contains(dto.CustomerName));
+                        if (dto.CustomerExpireTime != default)
+                            list = list.Where(x => x.CustomerExpireTime <= dto.CustomerExpireTime);
+                        if (dto.CheckAmount > 0)
+                            list = list.Where(x => x.CheckAmount <= dto.CheckAmount);
+                        if (dto.CarFrameNumberId != Guid.Empty)
+                            list = list.Where(x => x.CarFrameNumberId == dto.CarFrameNumberId);
+                        if (dto.CustomerLevelId != Guid.Empty)
+                            list = list.Where(x => x.CustomerLevelId == dto.CustomerLevelId);
+                        if (!string.IsNullOrEmpty(dto.CustomerPhone))
+                            list = list.Where(x => x.CustomerPhone.Contains(dto.CustomerPhone));
+                        if (!string.IsNullOrEmpty(dto.CustomerEmail))
+                            list = list.Where(x => x.CustomerEmail.Contains(dto.CustomerEmail));
+                        if (dto.CustomerTypeId != Guid.Empty)
+                            list = list.Where(x => x.CustomerTypeId == dto.CustomerTypeId);
+                        if (dto.CustomerSourceId != Guid.Empty)
+                            list = list.Where(x => x.CustomerSourceId == dto.CustomerSourceId);
+                        if (dto.CustomerRegionId != Guid.Empty)
+                            list = list.Where(x => x.CustomerRegionId == dto.CustomerRegionId);
+                        if (!string.IsNullOrEmpty(dto.CustomerAddress))
+                            list = list.Where(x => x.CustomerAddress.Contains(dto.CustomerAddress));
+                        // if (!string.IsNullOrEmpty(dto.ContactName))
+                        //     list = list.Where(x => x.ContactName.Contains(dto.ContactName)); // 联系人相关，已注释
+                        // if (!string.IsNullOrEmpty(dto.Mobile))
+                        //     list = list.Where(x => x.Mobile.Contains(dto.Mobile)); // 联系人相关，已注释
+                        // if (!string.IsNullOrEmpty(dto.Email))
+                        //     list = list.Where(x => x.Email.Contains(dto.Email)); // 联系人相关，已注释
+                    }
+                    else // 部分满足(OR)
+                    {
+                        list = list.Where(x =>
+                            (dto.UserIds != null && dto.UserIds.Count > 0 && dto.UserIds.Contains(x.UserId)) ||
+                            (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0 && dto.CreatedByIds.Contains(x.CreatorId.Value)) ||
+                            (dto.CarFrameNumberId != Guid.Empty && x.CarFrameNumberId == dto.CarFrameNumberId) ||
+                            (dto.CustomerLevelId != Guid.Empty && x.CustomerLevelId == dto.CustomerLevelId) ||
+                            (!string.IsNullOrEmpty(dto.CustomerCode) && x.CustomerCode.Contains(dto.CustomerCode)) ||
+                             (!string.IsNullOrEmpty(dto.CustomerName) && x.CustomerName.Contains(dto.CustomerName)) ||
+                            ((dto.CustomerExpireTime != default) && x.CustomerExpireTime <= dto.CustomerExpireTime) ||
+                            (dto.CheckAmount > 0 && x.CheckAmount <= dto.CheckAmount) ||
+                            (!string.IsNullOrEmpty(dto.CustomerPhone) && x.CustomerPhone.Contains(dto.CustomerPhone)) ||
+                            (!string.IsNullOrEmpty(dto.CustomerEmail) && x.CustomerEmail.Contains(dto.CustomerEmail)) ||
+                            (dto.CustomerTypeId != Guid.Empty && x.CustomerTypeId == dto.CustomerTypeId) ||
+                            (dto.CustomerSourceId != Guid.Empty && x.CustomerSourceId == dto.CustomerSourceId) ||
+                            (dto.CustomerRegionId != Guid.Empty && x.CustomerRegionId == dto.CustomerRegionId) ||
+                            (!string.IsNullOrEmpty(dto.CustomerAddress) && x.CustomerAddress.Contains(dto.CustomerAddress))
+                         // (!string.IsNullOrEmpty(dto.ContactName) && x.ContactName.Contains(dto.ContactName)) || // 联系人相关，已注释
+                         // (!string.IsNullOrEmpty(dto.Mobile) && x.Mobile.Contains(dto.Mobile)) || // 联系人相关，已注释
+                         // (!string.IsNullOrEmpty(dto.Email) && x.Email.Contains(dto.Email)) || // 联系人相关，已注释
+                         );
+                    }
+
+
 
                     // 排序
                     if (dto.OrderBy.HasValue)
@@ -212,6 +325,17 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
 
                     //用ABP框架的分页
                     var res = list.PageResult(dto.PageIndex, dto.PageSize);
+                    //数据为空时不缓存
+                    if (res.RowCount == 0)
+                    {
+                        // 不缓存空数据
+                        return new PageInfoCount<CustomerDto>
+                        {
+                            TotalCount = 0,
+                            PageCount = 0,
+                            Data = new List<CustomerDto>()
+                        };
+                    }
                     //构建分页结果对象
                     return new PageInfoCount<CustomerDto>
                     {
@@ -219,9 +343,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                         PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / dto.PageSize),
                         Data = res.Queryable.ToList()
                     };
-                },()=>new DistributedCacheEntryOptions
+                }, () => new DistributedCacheEntryOptions
                 {
-                    SlidingExpiration = TimeSpan.FromMinutes(5)     //设置缓存过期时间为5分钟
+                    SlidingExpiration = TimeSpan.FromMinutes(1)     //设置缓存过期时间为5分钟
                 });
                 return ApiResult<PageInfoCount<CustomerDto>>.Success(ResultCode.Success, redislist);
             }
