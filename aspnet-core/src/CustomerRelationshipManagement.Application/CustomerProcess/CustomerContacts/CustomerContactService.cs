@@ -176,7 +176,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
                 await repository.UpdateAsync(customerContactDto);
                 //清除缓存，确保数据一致性
                 await ClearAbpCacheAsync();
-                await ClearAbpCacheAsync();
                 return ApiResult<CreateUpdateCustomerContactDto>.Success(ResultCode.Success, ObjectMapper.Map<CustomerContact, CreateUpdateCustomerContactDto>(customerContactDto));
 
             }
