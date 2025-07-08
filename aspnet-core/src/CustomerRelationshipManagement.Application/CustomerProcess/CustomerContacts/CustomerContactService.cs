@@ -284,77 +284,83 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
         {
             try
             {
-                //构建缓存键名
-                string cacheKey = CustomerContactCacheKeyHelper.BuildReadableKey(dto);
+                // 清除对应的缓存
+                await ClearAbpCacheAsync();
+                string cacheKey = $"GetCustomerContact";
                 //使用Redis缓存获取或添加数据
                 var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
                 {
-                    var userlist = await userrepository.GetQueryableAsync();    
-                    var customerlist=await customerRepository.GetQueryableAsync();
+                    var cutomercontactlist = await repository.GetQueryableAsync();
+                    var userlist = await userrepository.GetQueryableAsync();
+                    var customerlist = await customerRepository.GetQueryableAsync();
                     var relationlist = await contactrelationrepository.GetQueryableAsync();
                     var rolelist = await rolerepository.GetQueryableAsync();
                     var contactlist = await repository.GetQueryableAsync();
-                    var list = from contact in contactlist
-                               join customer in customerlist
-                               on contact.CustomerId equals customer.Id
-                               join rela in relationlist
-                               on contact.ContactRelationId equals rela.Id
-                               join role in rolelist
-                               on contact.RoleId equals role.Id
-                               join user in userlist on customer.UserId equals user.Id into userGroup
-                               from user in userGroup.DefaultIfEmpty()
+                    var list = from cc in cutomercontactlist
+                               join customer in customerlist on cc.CustomerId equals customer.Id into ccc
+                               from customer in ccc.DefaultIfEmpty()
+                               join relation in relationlist on cc.ContactRelationId equals relation.Id into ccr
+                               from relation in ccr.DefaultIfEmpty()
+                               join c in userlist on customer.UserId equals c.Id into rc
+                               from c in rc.DefaultIfEmpty()
+                               join rel in relationlist on cc.ContactRelationId equals rel.Id into relc
+                               from rel in relc.DefaultIfEmpty()
+                               join r in rolelist on cc.RoleId equals r.Id into rcc
+                               from r in rcc.DefaultIfEmpty()
+                               join creator in userlist on r.CreatorId equals creator.Id into creatorJoin
+                               from creator in creatorJoin.DefaultIfEmpty()
                                select new CustomerContactDto
                                {
-                                   Id = contact.Id,
-                                   ContactName = contact.ContactName,
-                                   ContactRelationId = contact.ContactRelationId,
-                                   ContactRelationName= rela.ContactRelationName,
-                                   RoleId = contact.RoleId,
-                                   RoleName = role.RoleName,
-                                   Mobile=contact.Mobile,
-                                   Email=contact.Email,
-                                   QQ=contact.QQ,
-                                   Remark=contact.Remark,
-                                   Wechat=contact.Wechat,
-                                   CustomerId= contact.CustomerId,
+                                   Id = cc.Id,
+                                   CustomerId = cc.CustomerId,
                                    CustomerName = customer.CustomerName,
                                    UserId = customer.UserId,
-                                   UserName = user.UserName,
-                                   CreatorId = contact.CreatorId,
-                                   CreateName = user.UserName,
-                                   CreationTime = contact.CreationTime,
+                                   UserName = c.UserName,
+                                   ContactName = cc.ContactName,
+                                   ContactRelationId = cc.ContactRelationId,
+                                   ContactRelationName = rel.ContactRelationName,
+                                   RoleId = cc.RoleId,
+                                   RoleName = r.RoleName,
+                                   Salutation = cc.Salutation,
+                                   Position = cc.Position,
+                                   Mobile = cc.Mobile,
+                                   QQ = cc.QQ,
+                                   Email = cc.Email,
+                                   Wechat = cc.Wechat,
+                                   Remark = cc.Remark,
+                                   CreateName = c.UserName,
+                                   CreateTime = cc.CreationTime
                                };
-                    // type: 0=全部，1=我负责的，2=我创建的
-                    // 查看范围过滤
-                    if (dto.type == 1 && dto.AssignedTo.HasValue) // 我负责的
-                    {
-                        list = list.Where(x => x.UserId == dto.AssignedTo.Value);
-                    }
-                    else if (dto.type == 2 && dto.AssignedTo.HasValue) // 我创建的
-                    {
-                        list = list.Where(x => x.CreatorId == dto.AssignedTo.Value);
-                    }
-                    //查询条件
-                    if (!string.IsNullOrEmpty(dto.Keyword))
-                    {
-                        list = list.Where(x => x.ContactName.Contains(dto.Keyword)
-                                               || x.Mobile.Contains(dto.Keyword)
-                                               || x.Email.Contains(dto.Keyword)
-                                               || x.Wechat.Contains(dto.Keyword));
-                    }
-                    // 时间区间筛选（创建时间）
-                    if (dto.StartTime.HasValue && dto.EndTime.HasValue)
-                    {
-                        list = list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime);
-                    }
-                    else if (dto.StartTime.HasValue)
-                    {
-                        list = list.Where(x => x.CreationTime >= dto.StartTime);
-                    }
-                    else if (dto.EndTime.HasValue)
-                    {
-                        list = list.Where(x => x.CreationTime <= dto.EndTime);
-                    }
+                    // 这里可以加上你的where条件，对p.xxx和r.xxx都可以筛选
+                    list = list.WhereIf(!string.IsNullOrEmpty(dto.ContactName), x => x.ContactName.Contains(dto.ContactName))
+                        .WhereIf(dto.UserId.HasValue, x => x.UserId == dto.UserId)
+                        .WhereIf(dto.StartTime.HasValue, x => x.CreateTime >= dto.StartTime.Value)
+                        .WhereIf(dto.EndTime.HasValue, x => x.CreateTime <= dto.EndTime.Value.AddDays(1))
+                        .WhereIf(dto.UserId.HasValue, x => x.UserId == dto.UserId.Value)
+                        .WhereIf(dto.CustomerId.HasValue, x => x.CustomerId == dto.CustomerId.Value)
+                        .WhereIf(dto.ContactRelationId.HasValue, x => x.ContactRelationId == dto.ContactRelationId.Value)
+                        .WhereIf(dto.RoleId.HasValue, x => x.RoleId == dto.RoleId.Value)
+                        .WhereIf(dto.CreatorId.HasValue, x => x.CreatorId == dto.CreatorId.Value)
+                        .WhereIf(dto.Salutation.HasValue, x => x.Salutation == dto.Salutation.Value)
+                        .WhereIf(!string.IsNullOrEmpty(dto.Position), x => x.Position.Contains(dto.Position))
+                        .WhereIf(!string.IsNullOrEmpty(dto.Mobile), x => x.Mobile.Contains(dto.Mobile))
+                        .WhereIf(!string.IsNullOrEmpty(dto.QQ), x => x.QQ.Contains(dto.QQ))
+                        .WhereIf(!string.IsNullOrEmpty(dto.Email), x => x.Email.Contains(dto.Email))
+                        .WhereIf(!string.IsNullOrEmpty(dto.Wechat), x => x.Wechat.Contains(dto.Wechat))
+                        .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.ContactName.Contains(dto.Keyword)|| x.Mobile.Contains(dto.Keyword)|| x.Email.Contains(dto.Keyword)|| x.Wechat.Contains(dto.Keyword));
+                    //// 时间区间筛选（创建时间）
+                    //if (dto.StartTime.HasValue && dto.EndTime.HasValue)
+                    //{
+                    //    list = list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime);
+                    //}
+                    //else if (dto.StartTime.HasValue)
+                    //{
+                    //    list = list.Where(x => x.CreationTime >= dto.StartTime);
+                    //}
+                    //else if (dto.EndTime.HasValue)
+                    //{
+                    //    list = list.Where(x => x.CreationTime <= dto.EndTime);
+                    //}
                    
                     
                     //用ABP框架的分页

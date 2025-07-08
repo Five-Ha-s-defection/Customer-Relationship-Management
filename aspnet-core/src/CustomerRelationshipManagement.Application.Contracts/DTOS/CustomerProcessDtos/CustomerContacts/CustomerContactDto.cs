@@ -100,5 +100,10 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContac
         /// </summary>  
         public string CreateName { get; set; }
 
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreateTime { get; set; }
+
     }
 }
