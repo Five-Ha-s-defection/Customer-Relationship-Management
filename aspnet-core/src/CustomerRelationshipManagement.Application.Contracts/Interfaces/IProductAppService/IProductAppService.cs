@@ -15,7 +15,7 @@ namespace CustomerRelationshipManagement.Interfaces.IProductAppService
     public interface IProductAppService : IApplicationService
     {
 
-        Task<ApiResult<List<CategoryDtos>>> GetCategeryCascadeList();
+        Task<ApiResult<List<CategoryTreeDtos>>> GetCategeryCascadeList();
 
         Task<ApiResult<ProductDtos>> UpdProductState(Guid id, bool state);
     }

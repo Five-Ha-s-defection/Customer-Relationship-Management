@@ -194,6 +194,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 return ApiResult<PageInfoCount<ProductDtos>>.Success(ResultCode.Success, redislist);
 
 
+
                 ////abp分页
                 //var querypaging = query.PageResult(dto.PageIndex, dto.PageSize);
 
@@ -284,17 +285,17 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResult<List<CategoryDtos>>> GetCategeryCascadeList()
+        public async Task<ApiResult<List<CategoryTreeDtos>>> GetCategeryCascadeList()
         {
             try
             {
                 var allCategories = await ctegoryRepository.GetListAsync();
                 //递归构建树
-                List<CategoryDtos> BuildTree(Guid parentId)
+                List<CategoryTreeDtos> BuildTree(Guid parentId)
                 {
                     return allCategories
                         .Where(c => c.ParentId == parentId)
-                        .Select(x => new CategoryDtos
+                        .Select(x => new CategoryTreeDtos
                         {
                             Id = x.Id,
                             CategoryName = x.CategoryName,
@@ -307,7 +308,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 }
                 //假设根节点ParentId为Guid.Empty
                 var tree = BuildTree(Guid.Empty);
-                return ApiResult<List<CategoryDtos>>.Success(ResultCode.Success, tree);
+                return ApiResult<List<CategoryTreeDtos>>.Success(ResultCode.Success, tree);
             }
             catch (Exception)
             {
@@ -332,7 +333,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                            {
                                Id = a.Id,
                                CategoryId = a.CategoryId,
-                               CategoryName = b.CategoryName, // 这里做了判空
+                               CategoryName = b != null ? b.CategoryName : "", // 这里做了判空
                                ParentId = a.ParentId,
                                ProductImageUrl = a.ProductImageUrl,
                                ProductBrand = a.ProductBrand,
