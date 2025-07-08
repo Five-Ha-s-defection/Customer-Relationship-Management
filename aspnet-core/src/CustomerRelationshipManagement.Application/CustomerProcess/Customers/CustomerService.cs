@@ -18,7 +18,6 @@ using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;

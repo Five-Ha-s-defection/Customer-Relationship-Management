@@ -306,15 +306,18 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
                                from rel in relc.DefaultIfEmpty()
                                join r in rolelist on cc.RoleId equals r.Id into rcc
                                from r in rcc.DefaultIfEmpty()
-                               join creator in userlist on r.CreatorId equals creator.Id into creatorJoin
+                               join creator in userlist on cc.CreatorId equals creator.Id into creatorJoin
                                from creator in creatorJoin.DefaultIfEmpty()
                                select new CustomerContactDto
                                {
                                    Id = cc.Id,
+                                   CreatorId = cc.CreatorId,
+                                   CreatorName = creator.UserName,
+                                   CreationTime = cc.CreationTime,
                                    CustomerId = cc.CustomerId,
                                    CustomerName = customer.CustomerName,
                                    UserId = customer.UserId,
-                                   UserName = c.UserName,
+                                   RealName = c.RealName,
                                    ContactName = cc.ContactName,
                                    ContactRelationId = cc.ContactRelationId,
                                    ContactRelationName = rel.ContactRelationName,
@@ -327,8 +330,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
                                    Email = cc.Email,
                                    Wechat = cc.Wechat,
                                    Remark = cc.Remark,
+                                   IsPrimary = cc.IsPrimary,
                                    CreateName = c.UserName,
-                                   CreateTime = cc.CreationTime
                                };
                     // 这里可以加上你的where条件，对p.xxx和r.xxx都可以筛选
                     list = list.WhereIf(!string.IsNullOrEmpty(dto.ContactName), x => x.ContactName.Contains(dto.ContactName))
@@ -347,19 +350,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
                         .WhereIf(!string.IsNullOrEmpty(dto.Email), x => x.Email.Contains(dto.Email))
                         .WhereIf(!string.IsNullOrEmpty(dto.Wechat), x => x.Wechat.Contains(dto.Wechat))
                         .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.ContactName.Contains(dto.Keyword)|| x.Mobile.Contains(dto.Keyword)|| x.Email.Contains(dto.Keyword)|| x.Wechat.Contains(dto.Keyword));
-                    //// 时间区间筛选（创建时间）
-                    //if (dto.StartTime.HasValue && dto.EndTime.HasValue)
-                    //{
-                    //    list = list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime);
-                    //}
-                    //else if (dto.StartTime.HasValue)
-                    //{
-                    //    list = list.Where(x => x.CreationTime >= dto.StartTime);
-                    //}
-                    //else if (dto.EndTime.HasValue)
-                    //{
-                    //    list = list.Where(x => x.CreationTime <= dto.EndTime);
-                    //}
                    
                     
                     //用ABP框架的分页
@@ -374,13 +364,38 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
                     return pageInfo;
                 }, () => new DistributedCacheEntryOptions
                 {
-                    SlidingExpiration = TimeSpan.FromSeconds(5)     //设置缓存过期时间为5分钟
+                    SlidingExpiration = TimeSpan.FromMinutes(5)     //设置缓存过期时间为5分钟
                 });
 
                 return ApiResult<PageInfoCount<CustomerContactDto>>.Success(ResultCode.Success, redislist);
             }
             catch (Exception)
             {
+                throw;
+            }
+        }
+        /// <summary>
+        /// 修改客户联系人是否为主要联系人
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="isPrimary"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<CreateUpdateCustomerContactDto>> UpdateIsPrimaryCustomerContact(Guid id,bool isPrimary)
+        {
+            try
+            {
+                var updCustomerContact = await repository.GetAsync(x => x.Id == id);
+                if (updCustomerContact == null)
+                {
+                    return ApiResult<CreateUpdateCustomerContactDto>.Fail("客户联系人不存在", ResultCode.Fail);
+                }
+                updCustomerContact.IsPrimary = isPrimary;
+                await repository.UpdateAsync(updCustomerContact);
+                return ApiResult<CreateUpdateCustomerContactDto>.Success(ResultCode.Success, ObjectMapper.Map<CustomerContact, CreateUpdateCustomerContactDto>(updCustomerContact));
+            }
+            catch (Exception)
+            {
+
                 throw;
             }
         }
