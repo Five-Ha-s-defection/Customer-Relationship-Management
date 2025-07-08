@@ -4,11 +4,16 @@ using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.CommunicationTypes;
+using CustomerRelationshipManagement.CustomerProcess.ContactCommunications;
+using CustomerRelationshipManagement.CustomerProcess.ContactRelations;
 using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
 using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
+using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
+using CustomerRelationshipManagement.CustomerProcess.CustomReplys;
 using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.CustomerProcess.Prioritys;
 using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
@@ -17,10 +22,15 @@ using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CommunicationTypes;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactCommunications;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactRelations;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomReplys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
@@ -43,16 +53,8 @@ using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
-using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactRelations;
-using CustomerRelationshipManagement.CustomerProcess.ContactRelations;
-using CustomerRelationshipManagement.CustomerProcess.ContactCommunications;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactCommunications;
-using CustomerRelationshipManagement.CustomerProcess.CommunicationTypes;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CommunicationTypes;
-using CustomerRelationshipManagement.CustomerProcess.CustomReplys;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomReplys;
+using CustomerRelationshipManagement.Record;
+using CustomerRelationshipManagement.RecordDto;
 
 namespace CustomerRelationshipManagement;
 
@@ -191,5 +193,8 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<UpdateCrmContractDto, CrmContract>().ReverseMap();
         CreateMap<CrmContractandProduct, UpdateCrmcontractandProductDto>().ReverseMap();
         #endregion
+
+        //操作日志
+        CreateMap<OperationLog, OperationLogDto>().ReverseMap();
     }
 }

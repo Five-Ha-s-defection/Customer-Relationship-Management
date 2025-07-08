@@ -1,4 +1,6 @@
 ﻿using CustomerRelationshipManagement.Clues;
+using CustomerRelationshipManagement.ContactCommunications;
+using CustomerRelationshipManagement.Paging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactCommunications
 {
-    public class SearchContactCommunicationDto
+    public class SearchContactCommunicationDto: PagingInfo
     {
         /// <summary>
         /// 显示类型 0 显示所有 1 显示我负责的
@@ -33,5 +35,10 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactCommuni
         /// 搜索关键字（联系内容）
         /// </summary>
         public string? Keyword { get; set; }
+
+        /// <summary>
+        /// 联系对象类型（0=全部，1=客户，2=客户池，3=商机，4=线索，5=线索池）
+        /// </summary>
+        public ContactTargetType ContactTargetType { get; set; } = ContactTargetType.All;
     }
 }

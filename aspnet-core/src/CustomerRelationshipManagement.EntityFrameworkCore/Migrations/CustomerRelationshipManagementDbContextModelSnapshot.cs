@@ -314,6 +314,9 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasColumnType("char(36)")
                         .HasColumnName("CreatorId");
 
+                    b.Property<Guid>("CustomReplyId")
+                        .HasColumnType("char(36)");
+
                     b.Property<Guid?>("CustomerId")
                         .HasColumnType("char(36)");
 
@@ -341,6 +344,9 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false)
                         .HasColumnName("IsDeleted");
+
+                    b.Property<bool>("IsServe")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("datetime(6)")
@@ -446,6 +452,9 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("IsDeleted");
 
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("LastModificationTime");
@@ -550,6 +559,9 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("varchar(40)")
                         .HasColumnName("ConcurrencyStamp");
+
+                    b.Property<Guid>("ContactId")
+                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime(6)")
