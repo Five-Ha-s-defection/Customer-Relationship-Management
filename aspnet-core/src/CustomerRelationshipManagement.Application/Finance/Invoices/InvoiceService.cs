@@ -173,7 +173,6 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                         .ToList();
                 }
 
-
                 // 先ToList，后处理AuditorNames
                 var userList = userinfo.ToList();
                 foreach (var item in resultList)
