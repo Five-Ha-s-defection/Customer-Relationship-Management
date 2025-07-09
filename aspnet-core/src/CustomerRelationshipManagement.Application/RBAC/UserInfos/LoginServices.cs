@@ -99,7 +99,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 //返回数据
                 return ApiResult<LoginResultDto>.Success(ResultCode.Success, new LoginResultDto
                 {
-                       Token=token,
+                       AccessToken=token,
                       User=profile,
                       ExpireTime=expireTime,
                 });

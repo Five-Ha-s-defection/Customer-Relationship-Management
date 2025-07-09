@@ -63,5 +63,11 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContac
         /// </summary>
         public string Remark { get; set; } = string.Empty;
 
+        //=========================================================================
+        /// <summary>
+        /// 是否主联系人
+        /// </summary>
+        public bool IsPrimary { get; set; }
+
     }
 }

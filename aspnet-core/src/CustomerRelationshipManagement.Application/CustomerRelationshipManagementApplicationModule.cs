@@ -1,10 +1,14 @@
-﻿using CustomerRelationshipManagement.DTOS.UploadDto;
+﻿using CustomerRelationshipManagement.DTOS.SparkAi;
+using CustomerRelationshipManagement.DTOS.UploadDto;
+using CustomerRelationshipManagement.RBAC.RefreshToken;
 using CustomerRelationshipManagement.RBAC.UserInfos;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.Upload;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
+using System;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
@@ -30,15 +34,20 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
 
         context.Services.AddScoped<IJwtHelper, JwtHelper>();
 
+        context.Services.AddScoped<IRefreshTokenStore,RedisRefreshTokenStore>();
+
         var configuration = context.Services.GetConfiguration();
 
-        var redisConfig = configuration["Redis:Configuration"];
+        var redisConfig = configuration.GetValue<string>("Redis:Configuration");
         context.Services.AddSingleton<IConnectionMultiplexer>(sp =>
         {
             return ConnectionMultiplexer.Connect(redisConfig);
         });
 
         Configure<FileUploadOptions>(configuration.GetSection("FileUpload"));
+
+        // 绑定 SparkAI 配置
+        context.Services.Configure<SparkAiOptions>(configuration.GetSection("SparkAI"));
 
 
     }
