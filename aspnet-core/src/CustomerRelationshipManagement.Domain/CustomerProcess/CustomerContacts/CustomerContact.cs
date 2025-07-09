@@ -66,7 +66,13 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }        
+        public string Remark { get; set; }
+
+        //=========================================================================
+        /// <summary>
+        /// 是否主联系人
+        /// </summary>
+        public bool IsPrimary { get; set; }
 
     }
 }

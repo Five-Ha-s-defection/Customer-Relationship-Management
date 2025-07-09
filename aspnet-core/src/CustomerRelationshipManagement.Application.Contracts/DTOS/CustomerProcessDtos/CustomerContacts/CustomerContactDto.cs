@@ -29,7 +29,7 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContac
         /// <summary>
         /// 客户负责人名称
         /// </summary>
-        public string UserName { get; set; }
+        public string RealName { get; set; }
 
         /// <summary>
         /// 联系人姓名
@@ -94,11 +94,26 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContac
         /// </summary>
         public string Remark { get; set; }
 
+        /// <summary>
+        /// 是否主要联系人
+        /// </summary>
+        public bool IsPrimary { get; set; }
+
         //======================================================================================
         /// <summary>  
         /// 创建人姓名（createId外键 连接 用户表Id）  
         /// </summary>  
         public string CreateName { get; set; }
+
+        /// <summary>
+        /// 创建时间
+        /// </summary>
+        public DateTime CreateTime { get; set; }
+
+        /// <summary>
+        /// 创建人姓名
+        /// </summary>
+        public string CreatorName { get; set;}
 
     }
 }

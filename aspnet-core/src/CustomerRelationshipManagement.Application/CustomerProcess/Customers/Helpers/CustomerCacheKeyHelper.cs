@@ -20,6 +20,13 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers.Helpers
             return $"CustomerRedis_" +
                    $"Type_{dto.type}_" +
                    $"AssignedTo_{(string.IsNullOrWhiteSpace(dto.AssignedTo.ToString()) ? "null" : dto.AssignedTo)}_" +
+                   $"UserIds_{(dto.UserIds != null && dto.UserIds.Count > 0 ? string.Join("-", dto.UserIds) : "null")}_" +
+                   $"CreatedByIds_{(dto.CreatedByIds != null && dto.CreatedByIds.Count > 0 ? string.Join("-", dto.CreatedByIds) : "null")}_" +
+                   $"CarFrameNumberId{(dto.CarFrameNumberId != Guid.Empty ? dto.CarFrameNumberId.ToString() : "null")}_" +
+                   $"CustomerLevelId{(dto.CustomerLevelId != Guid.Empty ? dto.CustomerLevelId.ToString() : "null")}_" +
+                   $"CustomerTypeId{(dto.CustomerTypeId != Guid.Empty ? dto.CustomerTypeId.ToString() : "null")}_" +
+                   $"CustomerSourceId{(dto.CustomerSourceId != Guid.Empty ? dto.CustomerSourceId.ToString() : "null")}_" +
+                   $"CustomerRegionId{(dto.CustomerRegionId != Guid.Empty ? dto.CustomerRegionId.ToString() : "null")}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"TimeType_{dto.TimeType?.ToString() ?? "null"}_" +

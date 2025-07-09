@@ -52,5 +52,16 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactCommuni
         /// 评论
         /// </summary>
         public string? Comments { get; set; }
+
+        //===================新增字段=====================================
+        /// <summary>
+        /// 自定义回复（外键）
+        /// </summary>
+        public Guid? CustomReplyId { get; set; }
+
+        /// <summary>
+        /// 保存为模版
+        /// </summary>
+        public bool IsServe { get; set; } = false;
     }
 }

@@ -89,14 +89,13 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// 备注
         /// </summary>
         [Required]
-        [StringLength(200)]
         public string CustomerRemark { get; set; } = string.Empty;
 
         /// <summary>
         /// 线索Id（外键）
         /// </summary>
         [Required]
-        public Guid ClueId { get; set; }
+        public Guid? ClueId { get; set; }= Guid.Empty;
 
         /// <summary>
         /// 客户编号（类似C-202506240038-3B7C形式）

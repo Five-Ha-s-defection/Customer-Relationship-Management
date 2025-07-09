@@ -66,6 +66,8 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         context.Services.AddTransient<Upload.IHostingEnvironment, HostingEnvironmentAdapter>();
         //配置http上下文
         context.Services.AddHttpContextAccessor();
+        // 注册 HttpClient（如果你还没加）
+        context.Services.AddHttpClient();
 
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();

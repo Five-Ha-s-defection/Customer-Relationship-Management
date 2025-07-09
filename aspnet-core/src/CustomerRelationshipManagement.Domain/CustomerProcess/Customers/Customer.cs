@@ -87,6 +87,11 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         /// 客户编号（类似C-202506240038-3B7C形式）
         /// </summary>
         public string CustomerCode { get; set; }
+
+        /// <summary>
+        /// 联系人Id（外键）
+        /// </summary>
+        public Guid ContactId { get; set; }
     }
 
 }

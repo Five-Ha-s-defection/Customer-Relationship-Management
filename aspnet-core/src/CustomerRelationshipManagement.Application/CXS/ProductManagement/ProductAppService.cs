@@ -194,6 +194,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 return ApiResult<PageInfoCount<ProductDtos>>.Success(ResultCode.Success, redislist);
 
 
+
                 ////abp分页
                 //var querypaging = query.PageResult(dto.PageIndex, dto.PageSize);
 
@@ -269,6 +270,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 }
                 var productDto = ObjectMapper.Map(updateProduct, product);
                 await productRepository.UpdateAsync(productDto);
+                await ClearAbpCacheAsync();
                 return ApiResult<CreateUpdateProductDtos>.Success(ResultCode.Success, ObjectMapper.Map<Product, CreateUpdateProductDtos>(productDto));
             }
             catch (Exception)
@@ -283,17 +285,17 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResult<List<CategoryDtos>>> GetCategeryCascadeList()
+        public async Task<ApiResult<List<CategoryTreeDtos>>> GetCategeryCascadeList()
         {
             try
             {
                 var allCategories = await ctegoryRepository.GetListAsync();
                 //递归构建树
-                List<CategoryDtos> BuildTree(Guid parentId)
+                List<CategoryTreeDtos> BuildTree(Guid parentId)
                 {
                     return allCategories
                         .Where(c => c.ParentId == parentId)
-                        .Select(x => new CategoryDtos
+                        .Select(x => new CategoryTreeDtos
                         {
                             Id = x.Id,
                             CategoryName = x.CategoryName,
@@ -306,7 +308,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 }
                 //假设根节点ParentId为Guid.Empty
                 var tree = BuildTree(Guid.Empty);
-                return ApiResult<List<CategoryDtos>>.Success(ResultCode.Success, tree);
+                return ApiResult<List<CategoryTreeDtos>>.Success(ResultCode.Success, tree);
             }
             catch (Exception)
             {
@@ -331,7 +333,7 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                            {
                                Id = a.Id,
                                CategoryId = a.CategoryId,
-                               CategoryName = b.CategoryName, // 这里做了判空
+                               CategoryName = b != null ? b.CategoryName : "", // 这里做了判空
                                ParentId = a.ParentId,
                                ProductImageUrl = a.ProductImageUrl,
                                ProductBrand = a.ProductBrand,
@@ -366,6 +368,60 @@ namespace CustomerRelationshipManagement.CXS.ProductManagement
                 }
             };
             return await exportAppService.ExportToExcelAsync(exportData);
+        }
+
+        /// <summary>
+        /// 修改产品状态
+        /// </summary>
+        /// <param name="id">主键</param>
+        /// <param name="state">状态</param>
+        /// <returns></returns>
+        /// 
+        [HttpPut]
+        public async Task<ApiResult<ProductDtos>> UpdProductState(Guid id, bool state)
+        {
+            try
+            {
+                var updproductState= await productRepository.GetAsync(x => x.Id == id);
+                if(updproductState == null)
+                {
+                    return ApiResult<ProductDtos>.Fail("产品不存在", ResultCode.Fail);
+                }
+                updproductState.ProductStatus = state;
+                await productRepository.UpdateAsync(updproductState);
+                await ClearAbpCacheAsync();
+                return ApiResult<ProductDtos>.Success(ResultCode.Success,ObjectMapper.Map<Product, ProductDtos>(updproductState));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("修改产品状态信息出错！" + ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 获取产品列表
+        /// </summary>
+        /// <returns></returns>
+        /// 
+        [HttpGet]
+        public async Task<ApiResult<List<CategoryDtosList>>> GetCategoryDtoList()
+        {
+            try
+            {
+                var list = await ctegoryRepository.GetQueryableAsync();
+                var category = list.Select(u => new CategoryDtosList
+                {
+                    Id = u.Id,
+                    CategoryName = u.CategoryName,
+                }).ToList();
+                return ApiResult<List<CategoryDtosList>>.Success(ResultCode.Success, category);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("获取产品列表出错！" + ex.Message);
+                throw;
+            }
         }
     }
 

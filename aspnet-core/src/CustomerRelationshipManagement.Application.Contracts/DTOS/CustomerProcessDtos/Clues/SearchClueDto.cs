@@ -75,7 +75,7 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// <summary>
         /// 线索来源（单选）
         /// </summary>
-        public Guid ClueSourceId { get; set; }
+        public Guid? ClueSourceId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// 邮箱
@@ -100,7 +100,7 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// <summary>
         /// 行业（单选）
         /// </summary>
-        public Guid IndustryId { get; set; }
+        public Guid? IndustryId { get; set; } = Guid.Empty;
 
         /// <summary>
         /// 地址
@@ -109,7 +109,7 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
 
         /// <summary>
         /// 匹配模式：0=全部满足(AND)，1=部分满足(OR)（单选）
-        /// </summary>
+        /// </summary> 
         public int MatchMode { get; set; } = 0;
     }
 }
