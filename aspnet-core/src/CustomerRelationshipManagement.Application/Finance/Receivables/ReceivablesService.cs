@@ -1,13 +1,20 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
+using CustomerRelationshipManagement.DTOS.Export;
+using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Export;
+using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Helper;
 using CustomerRelationshipManagement.Interfaces.IFinance.Receivableses;
 using CustomerRelationshipManagement.Paging;
+using CustomerRelationshipManagement.ProductCategory.Categorys;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.Record;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
@@ -19,7 +26,9 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Uow;
 
 namespace CustomerRelationshipManagement.Finance.Receivableses
 {
@@ -41,6 +50,11 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
 
         private readonly IConnectionMultiplexer connectionMultiplexer;
 
+        private readonly IRepository<OperationLog, Guid> operationLogrepository;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
+
+        private readonly IExportAppService exportAppService;
+
         /// <summary>
         /// Redis缓存服务接口
         /// </summary>
@@ -53,7 +67,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// </summary>
         /// <param name="repository">应收款数据仓储</param>
         /// <param name="redisCacheService">Redis缓存服务</param>
-        public ReceivablesService(IRepository<Receivables, Guid> repository, IDistributedCache<PageInfoCount<ReceivablesDTO>> cache, IDistributedCache<ReceivablesDTO> cacheById, IRepository<Payment, Guid> paymentrepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables, IConnectionMultiplexer connectionMultiplexer)
+        public ReceivablesService(IRepository<Receivables, Guid> repository, IDistributedCache<PageInfoCount<ReceivablesDTO>> cache, IDistributedCache<ReceivablesDTO> cacheById, IRepository<Payment, Guid> paymentrepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables, IConnectionMultiplexer connectionMultiplexer, IRepository<OperationLog, Guid> operationLogrepository, IUnitOfWorkManager unitOfWorkManager, IExportAppService exportAppService)
         {
             this.repository = repository;
             _cache = cache;
@@ -63,6 +77,9 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
             this.customerrepository = customerrepository;
             this.crmcontractreceivables = crmcontractreceivables;
             this.connectionMultiplexer = connectionMultiplexer;
+            this.operationLogrepository = operationLogrepository;
+            _unitOfWorkManager = unitOfWorkManager;
+            this.exportAppService = exportAppService;
         }
 
         /// <summary>
@@ -72,27 +89,40 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// <returns>操作结果，包含创建的应收款信息</returns>
         public async Task<ApiResult<ReceivablesDTO>> InsertAsync(CreateUpdateReceibablesDto createUpdateReceibablesDto)
         {
-            // 将DTO映射为实体对象
-            var receivables = ObjectMapper.Map<CreateUpdateReceibablesDto, Receivables>(createUpdateReceibablesDto);
-
-            // 如果用户没有提供编号，则自动生成；如果提供了，则使用用户提供的
-            if (string.IsNullOrEmpty(receivables.ReceivableCode))
+            using (var uow = _unitOfWorkManager.Begin())
             {
-                // 自动生成应收款编号：时间-随机四位数字
-                var random = new Random();
-                var randomNumber = random.Next(1000, 10000); // 生成1000-9999之间的随机数
-                var currentTime = DateTime.Now.ToString("yyyyMMdd"); // 格式：20241201
-                receivables.ReceivableCode = $"M{currentTime}-{randomNumber}"; // 格式：M20241201-1234
-            }
-            else
-            {
-                receivables.ReceivableCode = $"M{receivables.ReceivableCode}";
-            }
-            // 插入数据到数据库
-            receivables =await repository.InsertAsync(receivables);
+                // 将DTO映射为实体对象
+                var receivables = ObjectMapper.Map<CreateUpdateReceibablesDto, Receivables>(createUpdateReceibablesDto);
 
-            // 返回成功结果，包含创建的应收款信息
-            return  ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
+                // 如果用户没有提供编号，则自动生成；如果提供了，则使用用户提供的
+                if (string.IsNullOrEmpty(receivables.ReceivableCode))
+                {
+                    // 自动生成应收款编号：时间-随机四位数字
+                    var random = new Random();
+                    var randomNumber = random.Next(1000, 10000); // 生成1000-9999之间的随机数
+                    var currentTime = DateTime.Now.ToString("yyyyMMdd"); // 格式：20241201
+                    receivables.ReceivableCode = $"M{currentTime}-{randomNumber}"; // 格式：M20241201-1234
+                }
+                else
+                {
+                    receivables.ReceivableCode = $"M{receivables.ReceivableCode}";
+                }
+                // 插入数据到数据库
+                receivables = await repository.InsertAsync(receivables);
+                var record = new OperationLog
+                {
+                    BizType = "receivables",
+                    BizId = receivables.Id,
+                    Action = "添加了应收款",
+                    CreationTime = DateTime.Now,
+                };
+                await operationLogrepository.InsertAsync(record);
+
+                await uow.CompleteAsync(); // 提交事务
+
+                // 返回成功结果，包含创建的应收款信息
+                return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
+            }
         }
 
 
@@ -104,8 +134,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// <returns>分页查询结果</returns>
         public async Task<ApiResult<PageInfoCount<ReceivablesDTO>>> GetPageAsync([FromQuery] ReceivablesSearchDto receivablesSearchDto)
         {
-            // 构建缓存键名
             await ClearAbpCacheAsync();
+            // 构建缓存键名
             string cacheKey ="Getreceivables";
 
             // 使用Redis缓存获取或添加数据
@@ -158,7 +188,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                     .WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId.Value)
                     .WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId.Value)
                     .WhereIf(receivablesSearchDto.CreatorId.HasValue, x => x.CreatorId == receivablesSearchDto.CreatorId.Value)
-                    .WhereIf(receivablesSearchDto.ReceivableDate.HasValue, x =>x.ReceivableDate >= receivablesSearchDto.ReceivableDate.Value &&x.ReceivableDate < receivablesSearchDto.ReceivableDate.Value.AddDays(1))
+                    .WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableDate), a => a.ReceivableDate >= DateTime.Parse(receivablesSearchDto.ReceivableDate) && a.ReceivableDate < DateTime.Parse(receivablesSearchDto.ReceivableDate).AddDays(1))
                     .WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableCode), x => x.ReceivableCode.Contains(receivablesSearchDto.ReceivableCode));
 
                 // 使用ABP框架的分页方法进行分页查询
@@ -217,24 +247,37 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// <returns></returns>
         public async Task<ApiResult<ReceivablesDTO>> UpdateAsync(Guid id, CreateUpdateReceibablesDto createUpdateReceibablesDto)
         {
-            // 1. 获取数据库中最新的、带有正确ConcurrencyStamp的实体
-            var receivables = await repository.GetAsync(id);
-            if (receivables == null)
+            using (var uow = _unitOfWorkManager.Begin())
             {
-                return ApiResult<ReceivablesDTO>.Fail("未找到该数据", ResultCode.NotFound);
+                // 1. 获取数据库中最新的、带有正确ConcurrencyStamp的实体
+                var receivables = await repository.GetAsync(id);
+                if (receivables == null)
+                {
+                    return ApiResult<ReceivablesDTO>.Fail("未找到该数据", ResultCode.NotFound);
+                }
+
+                // 2. 将传入的DTO中的属性值，更新到从数据库查出的实体上
+                ObjectMapper.Map(createUpdateReceibablesDto, receivables);
+
+                // 3. 更新实体，此时Id和ConcurrencyStamp都是正确的
+                await repository.UpdateAsync(receivables);
+                var record = new OperationLog
+                {
+                    BizType = "receivables",
+                    BizId = receivables.Id,
+                    Action = "修改了应收款",
+                    CreationTime = DateTime.Now,
+                };
+                await operationLogrepository.InsertAsync(record);
+
+                // 4. 清除相关缓存
+                await ClearAbpCacheAsync();
+
+                await uow.CompleteAsync(); // 提交事务
+
+                // 5. 返回更新后的数据
+                return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
             }
-            
-            // 2. 将传入的DTO中的属性值，更新到从数据库查出的实体上
-            ObjectMapper.Map(createUpdateReceibablesDto, receivables);
-
-            // 3. 更新实体，此时Id和ConcurrencyStamp都是正确的
-            await repository.UpdateAsync(receivables);
-
-            // 4. 清除相关缓存
-            await ClearAbpCacheAsync();
-
-            // 5. 返回更新后的数据
-            return ApiResult<ReceivablesDTO>.Success(ResultCode.Success, ObjectMapper.Map<Receivables, ReceivablesDTO>(receivables));
         }
         /// <summary>
         /// 批量删除应收款信息
@@ -291,7 +334,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// 导出应收款信息
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> GetExportReceivablesAsyncExcel()
+        public async Task<IRemoteStreamContent> GetExportAsyncExcel()
         {
             // 从数据库查询所有产品
             // 获取查询对象
@@ -328,36 +371,27 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                             CreationTime = r.CreationTime,
                             CreatorRealName = creator.UserName,
                         };
-            var data = query.ToList();
-
-            var headers = new List<string>
+            var exportData = new ExportDataDto<ReceivablesDTO>
             {
-                "应收款编号",
-                "应收款金额",
-                "应收款时间",
-                "所属客户",
-                "关联合同",
-                "负责人"
+                FileName = "应收款",
+                Items = query.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    { "Id", "应收款ID" },
+                    { "ReceivableCode", "应收款编号" },
+                    { "ReceivablePay", "应收款金额" },
+                    { "ReceivableDate", "应收款时间" },
+                    { "CustomerId", "所属客户ID" },
+                    { "CustomerName", "客户名称" },
+                    { "ContractId", "关联合同ID" },
+                    { "ContractName", "合同名称" },
+                    { "UserId", "负责人ID" },
+                    { "RealName", "负责人名称" },
+                    { "CreationTime", "创建时间" },
+                    { "CreatorRealName", "创建人名称" },
+                }
             };
-            // 定义每列对应的属性选择器（可自定义格式）
-            var selectors = new List<Func<ReceivablesDTO, object>>
-            {
-                p => p.ReceivableCode,
-                p => p.ReceivablePay,
-                p => p.ReceivableDate.ToString("yyyy-MM-dd"),
-                p => p.CustomerName,
-                p => p.ContractName,
-                p => p.RealName
-            };
-
-            // 调用通用导出方法，生成Excel字节流
-            var fileBytes = ExcelExportHelper.ExportToExcel(data, headers, selectors, "应收款信息");
-
-            // 返回文件流，浏览器会自动下载
-            return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            {
-                FileDownloadName = "应收款信息.xlsx"
-            };
+            return await exportAppService.ExportToExcelAsync(exportData);
         }
 
         /// <summary>

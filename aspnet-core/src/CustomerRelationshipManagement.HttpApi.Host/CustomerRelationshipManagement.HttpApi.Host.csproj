@@ -48,6 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\upload\file\" />
     <Folder Include="wwwroot\editors\" />
   </ItemGroup>
 

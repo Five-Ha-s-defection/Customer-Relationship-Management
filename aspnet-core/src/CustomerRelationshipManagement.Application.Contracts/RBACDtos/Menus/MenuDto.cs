@@ -40,7 +40,7 @@ namespace CustomerRelationshipManagement.RBACDtos.Menus
         /// <summary>
         /// 是否可见
         /// </summary>
-        public bool Hidden { get; set; } = true;
+        public bool IsVisible { get; set; } = true;
         /// <summary>
         ///  排序（前端的侧边栏进行排序）
         /// </summary>

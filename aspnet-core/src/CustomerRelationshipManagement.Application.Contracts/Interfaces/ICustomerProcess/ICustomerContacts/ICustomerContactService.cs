@@ -72,6 +72,14 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomerCo
         /// <returns></returns>
         Task<ApiResult<List<RoleDto>>> GetRoleDtoList();
 
+        /// <summary>
+        /// 修改联系人是否为主要联系人
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="isPrimary"></param>
+        /// <returns></returns>
+        Task<ApiResult<CreateUpdateCustomerContactDto>> UpdateIsPrimaryCustomerContact(Guid id, bool isPrimary);
+
 
     }
 }

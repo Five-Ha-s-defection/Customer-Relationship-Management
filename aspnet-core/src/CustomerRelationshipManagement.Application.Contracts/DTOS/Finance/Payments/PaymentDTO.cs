@@ -115,5 +115,10 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Payments
         /// 收款方式
         /// </summary>
         public string PaymentMethodName { get; set; }
+
+        /// <summary>
+        /// 当前审核人
+        /// </summary>
+        public string CurrentAuditorName { get; set;}
     }
 }
