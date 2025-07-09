@@ -258,12 +258,13 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
         }
 
         /// <summary>
-        /// 无查询条件、无分页，显示所有联系沟通列表（可根据线索id筛选）
+        /// 无查询条件、无分页，显示所有联系沟通列表（可根据线索id/客户id/商机id筛选）
         /// </summary>
-        /// <param name="clueId">可选，线索id</param>
+        /// <param name="id">线索id/客户id/商机id</param>
+        /// <param name="targetType">目标类型：1-线索，2-客户，3-商机</param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResult<List<ContactCommunicationDto>>> GetAllContactCommunications(Guid? clueId = null)
+        public async Task<ApiResult<List<ContactCommunicationDto>>> GetAllContactCommunications(Guid id, int targetType)
         {
             try
             {
@@ -311,10 +312,23 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
                                UserId = cus != null ? cus.UserId : Guid.Empty,
                                UserName = user != null ? user.UserName : null,
                            };
-                if (clueId.HasValue && clueId.Value != Guid.Empty)
+
+                // 根据目标类型筛选数据
+                switch (targetType)
                 {
-                    list = list.Where(x => x.ClueId == clueId.Value);
+                    case 1: // 线索
+                        list = list.Where(x => x.ClueId == id);
+                        break;
+                    case 2: // 客户
+                        list = list.Where(x => x.CustomerId == id);
+                        break;
+                    case 3: // 商机
+                        list = list.Where(x => x.BusinessOpportunityId == id);
+                        break;
+                    default:
+                        break;
                 }
+                
                 var result = list.ToList();
                 return ApiResult<List<ContactCommunicationDto>>.Success(ResultCode.Success, result);
             }
@@ -324,6 +338,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
                 throw;
             }
         }
+
 
         /// <summary>
         /// 获取联系沟通详情信息
