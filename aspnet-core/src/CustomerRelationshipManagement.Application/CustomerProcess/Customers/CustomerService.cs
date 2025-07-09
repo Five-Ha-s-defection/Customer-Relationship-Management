@@ -18,12 +18,14 @@ using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
@@ -51,7 +53,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly ILogger<CustomerService> logger;
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
         private readonly IConnectionMultiplexer connectionMultiplexer;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository, IRepository<CustomerContact> contactRepository)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository, IRepository<CustomerContact> contactRepository, IHttpContextAccessor httpContextAccessor)
         {
             this.repository = repository;
             this.logger = logger;
@@ -65,6 +68,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             this.connectionMultiplexer = connectionMultiplexer;
             this.typeRepository = typeRepository;
             this.contactRepository = contactRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -635,6 +639,50 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             {
                 logger.LogError("获取客户级别下拉框数据出错！" + ex.Message);
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// 上传图片（附文本使用）
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<EditorUploadResult> UploadImageForEditAsync(IFormFile file)
+        {
+            var result = new EditorUploadResult();
+            try
+            {
+                var str = Guid.NewGuid().ToString();
+                var folder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "editors");
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+                var fileName = str + "_" + file.FileName;
+                var savePath = Path.Combine(folder, fileName);
+
+                using (var fs = new FileStream(savePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(fs);
+                    await fs.FlushAsync();
+                }
+
+                // 通过 IHttpContextAccessor 获取请求信息
+                var request = _httpContextAccessor.HttpContext?.Request;
+                var scheme = request?.Scheme ?? "http";
+                var host = request?.Host.Value ?? "localhost";
+                var url = $"{scheme}://{host}/editors/{fileName}";
+
+                result.errno = 0;
+                result.data = new { url = url };
+                return result;
+            }
+            catch (Exception ex)
+            {
+                result.errno = 1;
+                result.data = new { message = ex.Message };
+                return result;
             }
         }
     }
