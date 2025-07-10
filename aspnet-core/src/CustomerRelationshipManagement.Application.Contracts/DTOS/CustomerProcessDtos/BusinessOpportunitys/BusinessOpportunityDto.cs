@@ -34,7 +34,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpport
         /// 客户负责人名称
         /// </summary>
         public string UserName { get; set; }
-        
+
+        /// <summary>
+        /// 客户名称
+        /// </summary>
+        public string CustomerName { get; set; }
+
 
         /// <summary>
         /// 优先级
@@ -82,6 +87,11 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpport
         /// 产品Id
         /// </summary>
         public Guid ProductId { get; set; }
+
+        /// <summary>
+        /// 门幅
+        /// </summary>
+        public string ProductBrand { get; set; }
 
         //======================================================================================
         /// <summary>  

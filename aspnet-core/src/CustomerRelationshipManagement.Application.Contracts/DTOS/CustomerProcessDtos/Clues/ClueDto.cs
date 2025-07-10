@@ -111,5 +111,14 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// 线索编号
         /// </summary>
         public string ClueCode { get; set; }
+
+        //=============================区分线索和线索池==================================================================
+        /// <summary>
+        /// 线索分配/领取状态
+        /// 0 未领取/未分配
+        /// 1 已领取/已分配
+        /// 2 已放弃
+        /// </summary>
+        public int CluePoolStatus { get; set; } = 0;
     }
 }
