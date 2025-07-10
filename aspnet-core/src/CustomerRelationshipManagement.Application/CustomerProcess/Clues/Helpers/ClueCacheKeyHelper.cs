@@ -27,6 +27,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues.Helpers
                    $"ClueSourceId_{(dto.ClueSourceId != Guid.Empty ? dto.ClueSourceId.ToString() : "null")}_" +
                    $"IndustryId_{(dto.IndustryId != Guid.Empty ? dto.IndustryId.ToString() : "null")}_" +
                    $"Status_{(dto.Status != null && dto.Status.Count > 0 ? string.Join("-", dto.Status) : "null")}_" +
+                   $"CluePoolStatus_{(dto.CluePoolStatus != null ? dto.CluePoolStatus : "null")}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"TimeType_{dto.TimeType?.ToString() ?? "null"}_" +

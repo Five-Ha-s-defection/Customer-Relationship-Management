@@ -77,6 +77,23 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// </summary>
         public IList<Guid> AuditorId { get; set; } = new List<Guid>();
 
+
+
+
+        /// <summary>
+        /// 审核人姓名（逗号分隔）
+        /// </summary>
+        public string AuditorNames { get; set; }
+
+        /// <summary>
+        /// 当前审核人
+        /// </summary>
+        public string CurrentAuditorName { get; set;}
+
+
+
+
+
         /// <summary>
         /// 合同扫描件(图片)
         /// </summary>
@@ -104,19 +121,26 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// 审批时间
         /// </summary>
         public List<DateTime> ApproveTimes { get; set; } = new();
+
         /// <summary>
         /// 收款状态
+        /// </summary>
+        public int PaymentInfoStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
+        /// <summary>
+        /// 合同收款状态
         /// </summary>
         public int PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
 
         /// <summary>
-        /// 应收款
+        /// 应收款信息
         /// </summary>
-        public decimal Accountsreceivable { get; set; } = 0;
+        public decimal Accountsreceivable { get; set;}
 
         /// <summary>
-        /// 已收款
+        /// 收款信息
         /// </summary>
-        public decimal Paymentreceived { get; set; } = 0;
+        public decimal Paymentreceived { get; set;}
+
+
     }
 }

@@ -44,7 +44,7 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// <summary>
         /// 所属客户id
         /// </summary>
-        public Guid? CustomerId {  get; set; } = Guid.Empty;
+        public Guid? CustomerId {  get; set; } 
 
         /// <summary>
         /// 合同名称
@@ -75,5 +75,13 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// 合同金额
         /// </summary>
         public decimal? ContractProceeds {  get; set; } = 0;
+
+        /// <summary>
+        /// 收款状态
+        /// </summary>
+        public int PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
+
+
+
     }
 }

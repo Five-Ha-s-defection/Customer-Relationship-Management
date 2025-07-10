@@ -1,9 +1,11 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
+using CustomerRelationshipManagement.DTOS.Export;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
+using CustomerRelationshipManagement.Export;
 using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
@@ -23,6 +25,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Uow;
 
@@ -39,12 +42,14 @@ namespace CustomerRelationshipManagement.Finance.Invoices
 
         private readonly IConnectionMultiplexer connectionMultiplexer;
 
+        private readonly IExportAppService exportAppService;
+
         private readonly IDistributedCache<PageInfoCount<InvoiceDTO>> cache;
 
         private readonly IRepository<OperationLog, Guid> operationLogrepository;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public InvoiceService(IRepository<Invoice, Guid> repository, IDistributedCache<PageInfoCount<InvoiceDTO>> cache, IRepository<CrmContract, Guid> crmcontractreceivables, IRepository<UserInfo, Guid> userinforeceivables, IRepository<Customer, Guid> customerrepository, IConnectionMultiplexer connectionMultiplexer, IUnitOfWorkManager unitOfWorkManager, IRepository<OperationLog, Guid> operationLogrepository, IRepository<Payment, Guid> paymentreceivables)
+        public InvoiceService(IRepository<Invoice, Guid> repository, IDistributedCache<PageInfoCount<InvoiceDTO>> cache, IRepository<CrmContract, Guid> crmcontractreceivables, IRepository<UserInfo, Guid> userinforeceivables, IRepository<Customer, Guid> customerrepository, IConnectionMultiplexer connectionMultiplexer, IUnitOfWorkManager unitOfWorkManager, IRepository<OperationLog, Guid> operationLogrepository, IRepository<Payment, Guid> paymentreceivables, IExportAppService exportAppService)
         {
             this.repository = repository;
             this.cache = cache;
@@ -55,6 +60,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
             _unitOfWorkManager = unitOfWorkManager;
             this.operationLogrepository = operationLogrepository;
             this.paymentreceivables = paymentreceivables;
+            this.exportAppService = exportAppService;
         }
         /// <summary>
         /// 新增发票
@@ -97,7 +103,6 @@ namespace CustomerRelationshipManagement.Finance.Invoices
         /// <returns></returns>
         public async Task<ApiResult<PageInfoCount<InvoiceDTO>>> GetInvoiceListAsync(InvoiceSearchDto invoiceSearchDto)
         {
-            await ClearAbpCacheAsync();
             var cacheKey = $"InvoiceList";
             var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
             {
@@ -221,12 +226,96 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                 return pageInfo;
             }, () => new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromMinutes(5)
+                SlidingExpiration = TimeSpan.FromSeconds(5)
             });
 
             return ApiResult<PageInfoCount<InvoiceDTO>>.Success(ResultCode.Success, redislist);
         }
 
+        /// <summary>
+        /// 导出发票信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IRemoteStreamContent> GetExportAsyncExcel()
+        {
+            var invoice = await repository.GetQueryableAsync();
+            var userinfo = await userinforeceivables.GetQueryableAsync();
+            var customer = await customerrepository.GetQueryableAsync();
+            var crmcontract = await crmcontractreceivables.GetQueryableAsync();// 联合查询
+            var payment = await paymentreceivables.GetQueryableAsync();
+            var query = from i in invoice
+                        join c in userinfo on i.UserId equals c.Id into rc
+                        from c in rc.DefaultIfEmpty()// left join，如果要inner join去掉DefaultIfEmpty
+                        join d in customer on i.CustomerId equals d.Id into id
+                        from d in id.DefaultIfEmpty()
+                        join e in crmcontract on i.ContractId equals e.Id into re
+                        from e in re.DefaultIfEmpty()
+                        join p in payment on i.PaymentId equals p.Id into ip
+                        from p in ip.DefaultIfEmpty()
+                        join creator in userinfo on i.CreatorId equals creator.Id into creatorJoin
+                        from creator in creatorJoin.DefaultIfEmpty()
+                        join io in invoice on i.InvoiceInformationId equals io.Id into ie
+                        from io in ie.DefaultIfEmpty()
+                        select new InvoiceDTO
+                        {
+                            Id = i.Id,
+                            CustomerId = i.CustomerId,
+                            ContractId = i.ContractId,
+                            PaymentId = i.PaymentId,
+                            PaymentAmount = p.Amount,
+                            UserId = i.UserId,
+                            CreatorId = i.CreatorId,
+                            RealName = c.RealName,
+                            InvoiceNumberCode = i.InvoiceNumberCode,
+                            Amount = i.Amount,
+                            TaxAmount = i.TaxAmount,
+                            InvoiceDate = i.InvoiceDate,
+                            InvoiceType = i.InvoiceType,
+                            ApproverIds = i.ApproverIds,
+                            CurrentStep = i.CurrentStep,
+                            ApproveComments = i.ApproveComments,
+                            ApproveTimes = i.ApproveTimes,
+                            InvoiceStatus = i.InvoiceStatus,
+                            CustomerName = d.CustomerName,
+                            ContractName = e.ContractName,
+                            CreatorRealName = creator.RealName,
+                            Title = i.Title,
+                            TaxNumber = i.TaxNumber,
+                            Bank = i.Bank,
+                            BillingAddress = i.BillingAddress,
+                            BankAccount = i.BankAccount,
+                            BillingPhone = i.BillingPhone,
+                            InvoiceImg = i.InvoiceImg,
+                            Remark = i.Remark,
+                            InvoiceInformationId = i.InvoiceInformationId,
+                            InoviceTitle = io.Title,
+                            CurrentAuditorName = "",
+                        };
+            var exportData = new ExportDataDto<InvoiceDTO>
+            {
+                FileName = "发票",
+                Items = query.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+        {
+            { "Id", "发票ID" },
+            { "InvoiceNumberCode", "发票编号" },
+            { "InvoiceStatus", "发票审核状态" },
+            { "Amount", "开票金额" },
+            { "InvoiceDate", "开票时间" },
+            { "InvoiceType", "开票类型" },
+            { "CustomerId", "所属客户ID" },
+            { "CustomerName", "客户名称" },
+            { "ContractId", "关联合同ID" },
+            { "ContractName", "合同名称" },
+            { "UserId", "负责人ID" },
+            { "RealName", "负责人名称" },
+            { "CreationTime", "创建时间" },
+            { "AuditorNames", "审核人" },
+            { "CreatorRealName", "创建人名称" },
+        }
+            };
+            return await exportAppService.ExportToExcelAsync(exportData);
+        }
 
 
         public async Task<ApiResult> Approve(Guid id, Guid approverId, bool isPass, string comment)
