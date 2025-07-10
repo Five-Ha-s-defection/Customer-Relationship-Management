@@ -93,5 +93,13 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         /// 线索编号
         /// </summary>
         public string ClueCode { get; set; }
+
+        /// <summary>
+        /// 线索分配/领取状态
+        /// 0 未领取/未分配
+        /// 1 已领取/已分配
+        /// 2 已放弃
+        /// </summary>
+        public int CluePoolStatus { get; set; } = 0;
     }
 }

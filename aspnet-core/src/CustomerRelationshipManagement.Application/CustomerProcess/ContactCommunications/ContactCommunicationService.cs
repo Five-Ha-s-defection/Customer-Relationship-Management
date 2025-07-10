@@ -168,6 +168,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
                                    CustomReplyId=communicationtype.CustomReplyId,
                                    CustomReplyName=reply.CustomReplyName,
                                    IsServe=communication.IsServe,
+                                   UserId=user.Id,
+                                   UserName=user.UserName
                                };
                     // 联系对象类型筛选
                     switch (dto.ContactTargetType)
