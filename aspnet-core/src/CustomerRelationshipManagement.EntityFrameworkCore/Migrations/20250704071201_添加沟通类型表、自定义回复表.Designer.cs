@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CustomerRelationshipManagement.Migrations
 {
     [DbContext(typeof(CustomerRelationshipManagementDbContext))]
-    partial class CustomerRelationshipManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250704071201_添加沟通类型表、自定义回复表")]
+    partial class 添加沟通类型表自定义回复表
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -269,8 +272,8 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<DateTime>("CreateTime")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid>("CustomReplyId")
-                        .HasColumnType("char(36)");
+                    b.Property<int>("CustomReplyId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -284,9 +287,6 @@ namespace CustomerRelationshipManagement.Migrations
 
                     b.Property<string>("AttachmentUrl")
                         .HasColumnType("longtext");
-
-                    b.Property<Guid?>("BusinessOpportunityId")
-                        .HasColumnType("char(36)");
 
                     b.Property<Guid?>("ClueId")
                         .HasColumnType("char(36)");
@@ -313,9 +313,6 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<Guid?>("CreatorId")
                         .HasColumnType("char(36)")
                         .HasColumnName("CreatorId");
-
-                    b.Property<Guid>("CustomReplyId")
-                        .HasColumnType("char(36)");
 
                     b.Property<Guid?>("CustomerId")
                         .HasColumnType("char(36)");
@@ -344,9 +341,6 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(false)
                         .HasColumnName("IsDeleted");
-
-                    b.Property<bool>("IsServe")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("datetime(6)")
@@ -452,9 +446,6 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("IsDeleted");
 
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<DateTime?>("LastModificationTime")
                         .HasColumnType("datetime(6)")
                         .HasColumnName("LastModificationTime");
@@ -559,9 +550,6 @@ namespace CustomerRelationshipManagement.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("varchar(40)")
                         .HasColumnName("ConcurrencyStamp");
-
-                    b.Property<Guid>("ContactId")
-                        .HasColumnType("char(36)");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime(6)")
@@ -1590,47 +1578,6 @@ namespace CustomerRelationshipManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("App_UserInfo", (string)null);
-                });
-
-            modelBuilder.Entity("CustomerRelationshipManagement.Record.OperationLog", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Action")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("BizId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("BizType")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
-                        .HasColumnName("ConcurrencyStamp");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasColumnName("CreationTime");
-
-                    b.Property<Guid?>("CreatorId")
-                        .HasColumnType("char(36)")
-                        .HasColumnName("CreatorId");
-
-                    b.Property<string>("ExtraProperties")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("ExtraProperties");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OperationLog");
                 });
 
             modelBuilder.Entity("CustomerRelationshipManagement.crmcontracts.CrmContract", b =>
