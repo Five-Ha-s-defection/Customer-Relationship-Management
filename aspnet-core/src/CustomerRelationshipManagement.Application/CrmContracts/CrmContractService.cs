@@ -4,19 +4,25 @@ using CustomerRelationshipManagement.CrmContracts.Helpers;
 using CustomerRelationshipManagement.CustomerProcess.Clues.Helpers;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
+using CustomerRelationshipManagement.DTOS.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Interfaces.ICrmContracts;
 using CustomerRelationshipManagement.Paging;
+using CustomerRelationshipManagement.ProductCategory.Products;
 using CustomerRelationshipManagement.RBAC.Users;
+using CustomerRelationshipManagement.Record;
 using MathNet.Numerics.Distributions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using NPOI.POIFS.Properties;
 using Org.BouncyCastle.Tls.Crypto.Impl;
 using StackExchange.Redis;
 using System;
@@ -30,6 +36,7 @@ using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectMapping;
+using Volo.Abp.Uow;
 
 namespace CustomerRelationshipManagement.CrmContracts
 {
@@ -40,14 +47,19 @@ namespace CustomerRelationshipManagement.CrmContracts
     public class CrmContractService : ApplicationService, ICrmContractService
     {
         private readonly IRepository<CrmContract, Guid> repository;
+        private readonly IRepository<Product, Guid> productrepository;
         private readonly IRepository<Receivables, Guid> receivablesrepository;
         private readonly IRepository<CrmContractandProduct, Guid> crmContractandProductrepository;
         private readonly IRepository<Customer, Guid> customerrepository;
+        private readonly IRepository<Payment, Guid> paymentrepository;
         private readonly IRepository<UserInfo, Guid> userInforepository;
+        private readonly IRepository<OperationLog, Guid> operationLogrepository;
         private readonly IConnectionMultiplexer connectionMultiplexer;
         private readonly IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache;
 
-        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, IRepository<Customer, Guid> customerrepository, IRepository<UserInfo, Guid> userInforepository, IConnectionMultiplexer connectionMultiplexer , IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache)
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
+
+        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, IRepository<Customer, Guid> customerrepository, IRepository<UserInfo, Guid> userInforepository, IConnectionMultiplexer connectionMultiplexer, IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache, IRepository<Product, Guid> productrepository, IRepository<Payment, Guid> paymentrepository, IRepository<OperationLog, Guid> operationLogrepository, IUnitOfWorkManager unitOfWorkManager)
         {
             this.repository = repository;
             this.receivablesrepository = receivablesrepository;
@@ -56,6 +68,10 @@ namespace CustomerRelationshipManagement.CrmContracts
             this.userInforepository = userInforepository;
             this.connectionMultiplexer = connectionMultiplexer;
             this.cache = cache;
+            this.productrepository = productrepository;
+            this.paymentrepository = paymentrepository;
+            this.operationLogrepository = operationLogrepository;
+            _unitOfWorkManager = unitOfWorkManager;
         }
 
         /// <summary>
@@ -73,6 +89,7 @@ namespace CustomerRelationshipManagement.CrmContracts
             {
                 //对合同表预查询
                 var query = await repository.GetQueryableAsync();
+                var userinfo = await userInforepository.GetQueryableAsync();
 
                 #region 查询条件
 
@@ -108,6 +125,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                 {
                     //查询条件(1.合同名称模糊查询)
                     query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName), a => a.ContractName.Contains(pageCrmContractDto.ContractName));
+                    query = query.WhereIf(pageCrmContractDto.CustomerId != null, a => a.CustomerId.Equals(pageCrmContractDto.CustomerId));
                 }
 
                 if (pageCrmContractDto.CheckType == 1)
@@ -119,7 +137,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                     //创建人查询
                     query = query.WhereIf(pageCrmContractDto.CreateUserIds.Count() != 0, a => pageCrmContractDto.CreateUserIds.Contains((Guid)a.CreatorId));
                     //所属客户查询
-                    query = query.WhereIf(pageCrmContractDto.CustomerId != null , a => a.UserId.Equals(pageCrmContractDto.CustomerId));
+                    query = query.WhereIf(pageCrmContractDto.CustomerId != null , a => a.CustomerId.Equals(pageCrmContractDto.CustomerId));
                     //签订日期
                     query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.SignDate), a => a.SignDate >= DateTime.Parse(pageCrmContractDto.SignDate) && a.SignDate < DateTime.Parse(pageCrmContractDto.SignDate).AddDays(1));
                     //生效日期
@@ -141,7 +159,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                     //创建人查询
                     query = query.WhereIf(pageCrmContractDto.CreateUserIds.Count() != 0, a => pageCrmContractDto.CreateUserIds.Contains((Guid)a.CreatorId));
                     //所属客户查询
-                    query = query.WhereIf(pageCrmContractDto.CustomerId != null, a => a.UserId.Equals(pageCrmContractDto.CustomerId));
+                    query = query.WhereIf(pageCrmContractDto.CustomerId != null, a => a.CustomerId.Equals(pageCrmContractDto.CustomerId));
                     //签订日期
                     query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.SignDate), a => a.SignDate >= DateTime.Parse(pageCrmContractDto.SignDate) && a.SignDate < DateTime.Parse(pageCrmContractDto.SignDate).AddDays(1));
                     //生效日期
@@ -164,6 +182,8 @@ namespace CustomerRelationshipManagement.CrmContracts
 
                 var customerinfo = await customerrepository.GetQueryableAsync();
                 var Userinfo = await userInforepository.GetQueryableAsync();
+
+
                 //根据负责人id获取负责人姓名
                 foreach (var item in crmcontractdto)
                 {
@@ -181,8 +201,58 @@ namespace CustomerRelationshipManagement.CrmContracts
                 //根据所属客户id获取所属客户的名称
                 foreach (var item in crmcontractdto)
                 {
+
                     var CustomerName = (await customerinfo.FirstOrDefaultAsync(a => a.Id == item.CustomerId))?.CustomerName;
                     item.CustomerName = CustomerName ?? "";
+                }
+                var receiveinfo = await receivablesrepository.GetQueryableAsync();
+
+                //根据id获取应收款
+                foreach (var item in crmcontractdto)
+                {
+                    var Accountsreceivable = (await receiveinfo.FirstOrDefaultAsync(a => a.ContractId == item.Id))?.ReceivablePay;
+                    item.Accountsreceivable = Accountsreceivable ?? 0;
+                }
+
+                var paymentinfo = await paymentrepository.GetQueryableAsync();
+
+                //根据id获取已收款
+                foreach (var item in crmcontractdto)
+                {
+                    var PaymentInfoStatus = (await paymentinfo.FirstOrDefaultAsync(a => a.ContractId == item.Id))?.PaymentStatus;
+                    item.PaymentInfoStatus = PaymentInfoStatus ?? 0;
+                    decimal? Paymentreceived = null;
+                    if(item.PaymentInfoStatus == 2)
+                    {
+                        Paymentreceived = (await paymentinfo.FirstOrDefaultAsync(a => a.ContractId == item.Id))?.Amount;
+                    }
+                    item.Paymentreceived = Paymentreceived ?? 0;
+                }
+                //根据创建人ids获取审核人姓名
+                foreach (var item in crmcontractdto)
+                {
+                    item.AuditorNames = string.Join(",", Userinfo.Where(u => item.AuditorId.Contains(u.Id)).Select(u => u.RealName));
+                    if (item.AuditorId != null && item.AuditorId.Count > 0)
+                    {
+                        item.AuditorNames = string.Join(",", Userinfo.Where(u => item.AuditorId.Contains(u.Id)).Select(u => u.RealName));
+                        // 只显示当前审核人
+                        if (item.CurrentStep >= 0 && item.CurrentStep < item.AuditorId.Count)
+                        {
+                            //通过索引从审批人 ID 列表中获取当前步骤的审批人 ID
+                            var currentAuditorId = item.AuditorId[item.CurrentStep];
+                            var currentAuditor = Userinfo.FirstOrDefault(u => u.Id == currentAuditorId);
+                            item.CurrentAuditorName = currentAuditor?.RealName ?? "";
+                        }
+                        else
+                        {
+                            item.CurrentAuditorName = "";
+                        }
+                    }
+                    else
+                    {
+                        item.AuditorNames = string.Empty;
+                        item.CurrentAuditorName = "";
+                    }
                 }
 
                 var pageInfo = new PageInfoCount<ShowCrmContractDto>
@@ -200,6 +270,77 @@ namespace CustomerRelationshipManagement.CrmContracts
 
             //返回apiresult
             return ApiResult<PageInfoCount<ShowCrmContractDto>>.Success(ResultCode.Success, redislist);
+        }
+        /// <summary>
+        /// 合同审核
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="approverId"></param>
+        /// <param name="isPass"></param>
+        /// <param name="comment"></param>
+        /// <returns></returns>
+        public async Task<ApiResult> Approve(Guid id, Guid approverId, bool isPass, string? comment)
+        {
+            using (var uow = _unitOfWorkManager.Begin())
+            {
+                // 获取合同记录
+                var crmcontract = await repository.GetAsync(id);
+                if (crmcontract == null)
+                    return ApiResult.Fail("未找到该收款记录", ResultCode.NotFound);
+
+                // 判断审批是否已结束（2=全部通过，3=拒绝）
+                if (crmcontract.PaymentStatus == 2 || crmcontract.PaymentStatus == 3)
+                    return ApiResult.Fail("审批已结束", ResultCode.NotFound);
+
+                // 判断是否有审批人或审批流程是否已结束
+                if (crmcontract.AuditorId.Count == 0 || crmcontract.CurrentStep >= crmcontract.AuditorId.Count)
+                    return ApiResult.Fail("无审批人或审批流程已结束", ResultCode.NotFound);
+
+                // 获取当前应审批人
+                var currentApprover = crmcontract.AuditorId[crmcontract.CurrentStep];
+                if (currentApprover != approverId)
+                    return ApiResult.Fail("当前不是你的审批环节", ResultCode.NotFound);
+
+                // 记录审批意见和时间
+                crmcontract.ApproveComments.Add(comment);
+                crmcontract.ApproveTimes.Add(DateTime.Now);
+
+                if (isPass == false)
+                {
+                    // 审批拒绝
+                    crmcontract.PaymentStatus = 3;
+                }
+                else
+                {
+                    // 审批通过，进入下一个审批环节
+                    crmcontract.CurrentStep++;
+                    if (crmcontract.CurrentStep >= crmcontract.AuditorId.Count)
+                    {
+                        // 所有审批人已通过
+                        crmcontract.PaymentStatus = 2;
+                    }
+                    else
+                    {
+                        // 仍处于审核中
+                        crmcontract.PaymentStatus = 1;
+                    }
+                }
+
+                // 更新收款记录
+                await repository.UpdateAsync(crmcontract);
+
+                var record = new OperationLog
+                {
+                    BizType = "crmcontract",
+                    BizId = crmcontract.Id,
+                    Action = "审核合同",
+                    CreationTime = DateTime.Now,
+                };
+                await operationLogrepository.InsertAsync(record);
+
+                await uow.CompleteAsync(); // 提交事务
+                return ApiResult.Success(ResultCode.Success);
+            }
         }
 
         /// <summary>
@@ -251,6 +392,15 @@ namespace CustomerRelationshipManagement.CrmContracts
 
                     //执行插入应收款表的操作
                     var receivablesresult = await receivablesrepository.InsertAsync(receivables);
+
+                    var record = new OperationLog
+                    {
+                        BizType = "crmcontract",
+                        BizId = crmcontract.Id,
+                        Action = "添加了合同",
+                        CreationTime = DateTime.Now,
+                    };
+                    await operationLogrepository.InsertAsync(record);
 
                     //提交事务
                     scope.Complete();
@@ -344,6 +494,15 @@ namespace CustomerRelationshipManagement.CrmContracts
                     //插入新记录
                     await crmContractandProductrepository.InsertManyAsync(newcrmContractandProducts);
 
+                    var record = new OperationLog
+                    {
+                        BizType = "crmcontract",
+                        BizId = crmcontract.Id,
+                        Action = "修改了合同",
+                        CreationTime = DateTime.Now,
+                    };
+                    await operationLogrepository.InsertAsync(record);
+
                     scope.Complete();
 
                     await ClearAbpCacheAsync();
@@ -401,6 +560,35 @@ namespace CustomerRelationshipManagement.CrmContracts
             }
         }
 
+        /// <summary>
+        /// 根据Id查询产品信息
+        /// </summary>
+        /// <param name="CrmContractId"></param>
+        /// <returns></returns>
+        public async Task<ApiResult<List<ContractProductDto>>> GetLogs(Guid? CrmContractId)
+        {
+            var crmContracts = await repository.GetQueryableAsync();
+            var product = await productrepository.GetQueryableAsync();
+            var crmContractandProduct = await crmContractandProductrepository.GetQueryableAsync();
+
+            var query = from o in crmContractandProduct
+                        join p in crmContracts on o.CrmContractId equals p.Id into creatorJoin
+                        from p in creatorJoin.DefaultIfEmpty()
+                        join pc in product on o.ProductId equals pc.Id into crmpc
+                        from pc in crmpc.DefaultIfEmpty()
+                        select new ContractProductDto
+                        {
+                            CrmContractId = o.CrmContractId,
+                            ProductBrand = pc.ProductBrand,
+                            ProductCode = pc.ProductCode,
+                            BuyProductNum = o.BuyProductNum,
+                            SellPrice = o.SellPrice,
+                            SumPrice = o.SumPrice,
+                            ProductImageUrl = pc.ProductImageUrl,
+                        };
+            query = query.Where(x => x.CrmContractId == CrmContractId);
+            return ApiResult<List<ContractProductDto>>.Success(ResultCode.Success, query.ToList());
+        }
         /// <summary>
         /// 清除关于c:PageInfo,k的所有信息
         /// </summary>
