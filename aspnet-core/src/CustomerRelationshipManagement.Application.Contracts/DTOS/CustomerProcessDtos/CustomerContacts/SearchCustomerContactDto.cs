@@ -10,32 +10,70 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContac
 {
     public class SearchCustomerContactDto:PagingInfo
     {
-        /// <summary>
-        /// 显示类型 0 显示所有 1 显示我负责的
-        /// </summary>
-        public int type { get; set; } = 0;
-
-        public Guid? AssignedTo { get; set; }        // 负责人
 
         public DateTime? StartTime { get; set; }     // 时间范围起
         public DateTime? EndTime { get; set; }       // 时间范围止
 
         /// <summary>
-        /// 时间筛选类型：CreateTime | NextContact | LastFollow（创建、下次联系、最近跟进）
+        /// 负责人
         /// </summary>
-        public TimeField? TimeType { get; set; }
+        public Guid? UserId { get; set; }
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public Guid? CreatorId { get; set; }
+        /// <summary>
+        /// 所属客户ID（外键）
+        /// </summary>
+        public Guid? CustomerId { get; set; }
 
         /// <summary>
-        /// 排序字段：CreateTime | NextContact | LastFollow（创建、下次联系、最近跟进）
+        /// 联系人姓名
         /// </summary>
-        public TimeField? OrderBy { get; set; }
+        public string? ContactName { get; set; }
 
         /// <summary>
-        /// 是否倒序
+        /// 联系人关系（外键）
         /// </summary>
-        public bool OrderDesc { get; set; } = true;
+        public Guid? ContactRelationId { get; set; }
 
-        public string? Keyword { get; set; }
+        /// <summary>
+        /// 角色（外键）
+        /// </summary>
+        public Guid? RoleId { get; set; }
+
+        /// <summary>
+        /// 尊称（先生/女士）
+        /// </summary>
+        public bool? Salutation { get; set; }
+
+        /// <summary>
+        /// 职位
+        /// </summary>
+        public string? Position { get; set; }
+
+        /// <summary>
+        /// 手机
+        /// </summary>
+        public string? Mobile { get; set; }
+
+        /// <summary>
+        /// QQ
+        /// </summary>
+        public string? QQ { get; set; }
+
+        /// <summary>
+        /// 邮箱
+        /// </summary>
+        public string? Email { get; set; }
+
+        /// <summary>
+        /// 微信号
+        /// </summary>
+        public string? Wechat { get; set; }
+
+
+        public string? Keyword { get; set;}
 
     }
 }

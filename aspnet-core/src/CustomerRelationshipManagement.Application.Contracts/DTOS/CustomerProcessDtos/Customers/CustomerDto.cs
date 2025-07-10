@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// </summary>
         public Guid UserId { get; set; }
 
+        //========================================================================================
+        /// <summary>
+        /// 负责人姓名
+        /// </summary>
+        public string UserName { get; set; }
+
         /// <summary>
         /// 客户名称
         /// </summary>
@@ -30,6 +37,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// </summary>
         public Guid CarFrameNumberId { get; set; }
 
+        //=========================================================================================
+        /// <summary>
+        /// 车架号名称
+        /// </summary>
+        public string CarFrameNumberName { get; set; }
+
         /// <summary>
         /// 到期时间
         /// </summary>
@@ -39,6 +52,12 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// 客户级别（外键）
         /// </summary>
         public Guid CustomerLevelId { get; set; }
+
+        //===========================================================================================
+        /// <summary>
+        /// 客户级别名称
+        /// </summary>
+        public string CustomerLevelName { get; set; }
 
         /// <summary>
         /// 联系电话
@@ -55,15 +74,33 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// </summary>
         public Guid CustomerTypeId { get; set; }
 
+        //===========================================================================================
+        /// <summary>
+        /// 客户类型名称
+        /// </summary>
+        public string CustomerTypeName { get; set; }
+
         /// <summary>
         ///  客户来源（外键）
         /// </summary>
         public Guid CustomerSourceId { get; set; }
 
+        //===========================================================================================
+        /// <summary>
+        /// 线索来源名称
+        /// </summary>
+        public string ClueSourceName { get; set; }
+
         /// <summary>
         /// 客户地区（外键）
         /// </summary>
         public Guid CustomerRegionId { get; set; }
+
+        //===========================================================================================
+        /// <summary>
+        /// 客户地区名称
+        /// </summary>
+        public string CustomerRegionName { get; set; }
 
         /// <summary>
         /// 客户地址
@@ -104,6 +141,27 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// <summary>  
         /// 创建人姓名（createId外键 连接 用户表Id）  
         /// </summary>  
-        public string CreateName { get; set; } 
+        public string CreateName { get; set; }
+
+        //========================================================================================
+        ///// <summary>
+        ///// 所属客户ID（外键）
+        ///// </summary>
+        //public Guid CustomerId { get; set; }
+
+        ///// <summary>
+        ///// 联系人姓名
+        ///// </summary>
+        //public string ContactName { get; set; }
+
+        ///// <summary>
+        ///// 手机
+        ///// </summary>
+        //public string Mobile { get; set; }
+
+        ///// <summary>
+        ///// 邮箱
+        ///// </summary>
+        //public string Email { get; set; }
     }
 }
