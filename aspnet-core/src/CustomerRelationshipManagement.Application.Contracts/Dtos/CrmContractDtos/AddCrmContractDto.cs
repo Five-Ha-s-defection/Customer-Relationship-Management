@@ -19,92 +19,92 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// <summary>
         /// 所属客户ID
         /// </summary>
-        [Required]
-        public Guid CustomerId { get; set; }
+
+        public Guid? CustomerId { get; set; } = new Guid();
 
         /// <summary>
         /// 选择商机ID
         /// </summary>
-        public Guid BusinessOpportunityId { get; set; }
+        public Guid? BusinessOpportunityId { get; set; } = new Guid();
 
         /// <summary>
         /// 负责人ID
         /// </summary>
-        [Required]
-        public Guid UserId { get; set; }
+
+        public Guid? UserId { get; set; } = new Guid();
 
         /// <summary>
         /// 签订日期
         /// </summary>
-        [Required]
-        public DateTime SignDate { get; set; }
+
+        public DateTime? SignDate { get; set; } = DateTime.Now;
 
         /// <summary>
         /// 合同名称
         /// </summary>
-        [Required]
-        public string ContractName { get; set; } 
+
+        public string? ContractName { get; set; } = string.Empty;
 
         /// <summary>
         /// 生效日期
         /// </summary>
-        public DateTime CommencementDate { get; set; }
+        public DateTime? CommencementDate { get; set; } = DateTime.Now;
 
         /// <summary>
         /// 截止日期
         /// </summary>
-        [Required]
-        public DateTime ExpirationDate { get; set; }
+
+        public DateTime? ExpirationDate { get; set; } = DateTime.Now;
 
         /// <summary>
         /// 经销商
         /// </summary>
-        [Required]
-        public string Dealer { get; set; }
+
+        public string? Dealer { get; set; } = string.Empty;
 
         /// <summary>
         /// 合同条款
         /// </summary>
-        [Required]
-        public string ContractTerms { get; set; }
+
+        public string? ContractTerms { get; set; } = string.Empty;
 
         /// <summary>
         /// 审核人ID
         /// </summary>
-        [Required]
-        public IList<Guid> AuditorIds { get; set; }
+
+        public IList<Guid>? AuditorIds { get; set; } = new List<Guid>();
 
         /// <summary>
         /// 合同扫描件(图片)
         /// </summary>
-        public string ContractScanning { get; set; }
+        public string? ContractScanning { get; set; } = string.Empty;
 
         /// <summary>
         /// 上传附件
         /// </summary>
-        public string Attachment { get; set; }
+        public string? Attachment { get; set; } = string.Empty;
 
         /// <summary>
         /// 合同收款
         /// </summary>
-        public decimal ContractProceeds { get; set; }
+        public decimal? ContractProceeds { get; set; } = 0;
 
         /// <summary>
         /// 当前审批到第几人（从0开始）
         /// </summary>
-        public int CurrentStep { get; set; } = 0;
+        public int? CurrentStep { get; set; } = 0;
         /// <summary>
         /// 审批意见
         /// </summary>
-        public List<string> ApproveComments { get; set; } = new();
+        public List<string>? ApproveComments { get; set; } = new List<string>();
         /// <summary>
         /// 审批时间
         /// </summary>
-        public List<DateTime> ApproveTimes { get; set; } = new();
+        public List<DateTime>? ApproveTimes { get; set; } = new List<DateTime>();
         /// <summary>
         /// 收款状态
         /// </summary>
-        public int PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
+        public int? PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
 
         #endregion
 
@@ -114,8 +114,8 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// <summary>
         /// 产品信息
         /// </summary>
-        [Required]
-        public IList<AddCrmcontractandProductDto> AddCrmcontractandProductDto { get; set; } = new List<AddCrmcontractandProductDto>();
+
+        public IList<AddCrmcontractandProductDto>? AddCrmcontractandProductDto { get; set; } = new List<AddCrmcontractandProductDto>();
 
         #endregion
 
@@ -124,8 +124,8 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// <summary>
         /// 添加应收款表信息
         /// </summary>
-        [Required]
-        public CreateUpdateReceibablesDto CreateUpdateReceibablesDto { get; set; } = new CreateUpdateReceibablesDto();
+
+        public CreateUpdateReceibablesDto? CreateUpdateReceibablesDto { get; set; } = new CreateUpdateReceibablesDto();
 
         #endregion
     }
