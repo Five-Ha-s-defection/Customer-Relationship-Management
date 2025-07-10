@@ -4,11 +4,16 @@ using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys;
 using CustomerRelationshipManagement.CustomerProcess.Cars;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.CommunicationTypes;
+using CustomerRelationshipManagement.CustomerProcess.ContactCommunications;
+using CustomerRelationshipManagement.CustomerProcess.ContactRelations;
 using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
 using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
+using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
+using CustomerRelationshipManagement.CustomerProcess.CustomReplys;
 using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.CustomerProcess.Prioritys;
 using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
@@ -17,10 +22,15 @@ using CustomerRelationshipManagement.DTOS.CategoryMangamentDto;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CommunicationTypes;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactCommunications;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactRelations;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomReplys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
@@ -30,7 +40,6 @@ using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
-//using CustomerRelationshipManagement.DTOS.ProductManagementDto;
 using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
@@ -44,6 +53,8 @@ using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
+using CustomerRelationshipManagement.Record;
+using CustomerRelationshipManagement.RecordDto;
 
 namespace CustomerRelationshipManagement;
 
@@ -55,9 +66,10 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
 
+        #region 客户管理
         //线索表
         CreateMap<Clue, ClueDto>().ReverseMap();
-        CreateMap<Clue,CreateUpdateClueDto>().ReverseMap();
+        CreateMap<Clue, CreateUpdateClueDto>().ReverseMap();
 
         //客户表
         CreateMap<Customer, CustomerDto>().ReverseMap();
@@ -80,7 +92,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<Industry, CreateUpdateIndustryDto>().ReverseMap();
 
         //客户区域表
-        CreateMap<CustomerRegion,RegionDto>().ReverseMap();
+        CreateMap<CustomerRegion, RegionDto>().ReverseMap();
         CreateMap<CustomerRegion, CreateUpdateRegionDto>().ReverseMap();
 
         //客户类型表
@@ -103,12 +115,26 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         CreateMap<SalesProgress, SalesProgressDto>().ReverseMap();
         CreateMap<SalesProgress, CreateUpdateSalesProgressDto>().ReverseMap();
 
-        //应收款表
-        CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
-        CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
+        //联系人表
+        CreateMap<CustomerContact, CustomerContactDto>().ReverseMap();
+        CreateMap<CustomerContact, CreateUpdateCustomerContactDto>().ReverseMap();
 
-      
+        //联系人关系表
+        CreateMap<ContactRelation, ContactRelationDto>().ReverseMap();
+        CreateMap<ContactRelation, CreateUpdateContactRelationsDto>().ReverseMap();
 
+        //联系沟通表
+        CreateMap<ContactCommunication, ContactCommunicationDto>().ReverseMap();
+        CreateMap<ContactCommunication, CreateUpdateContactCommunicationDto>().ReverseMap();
+
+        //沟通类型表
+        CreateMap<CommunicationType, CommunicationTypeDto>().ReverseMap();
+        CreateMap<CommunicationType, CreateUpdateCommunicationTypeDto>().ReverseMap();
+
+        //自定义回复表
+        CreateMap<CustomReply, CustomReplyDto>().ReverseMap();
+        CreateMap<CustomReply, CreateUpdateCustomReplyDto>().ReverseMap();
+        #endregion
 
         #region RBAC
         //用户信息映射
@@ -126,45 +152,49 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //菜单信息映射
         CreateMap<MenuInfo, MenuDto>().ReverseMap();
         CreateMap<CreateOrUpdateMenuDto, MenuInfo>().ReverseMap();
-
-
-
+        //用户信息映射
+        CreateMap<UserInfo, UserInfoDto>().ReverseMap();
+        CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
         #endregion
 
+        # region 账务管理
+        //收款表
         CreateMap<Payment, PaymentDTO>().ReverseMap();
         CreateMap<CreateUpdatePaymentDTO, Payment>().ReverseMap();
+
+        //应收款表
+        CreateMap<Receivables, ReceivablesDTO>().ReverseMap();
+        CreateMap<CreateUpdateReceibablesDto, Receivables>().ReverseMap();
 
         //发票表
         CreateMap<Invoice, InvoiceDTO>().ReverseMap();
         CreateMap<CreateUpdateInvoiceDto, Invoice>().ReverseMap();
+        #endregion
 
-        //用户信息映射
-        CreateMap<UserInfo, UserInfoDto>().ReverseMap();
-        CreateMap<UserInfo, CreateOrUpdateUserInfoDto>().ReverseMap();
-        
+        #region 产品管理
         //产品管理显示Dto
         CreateMap<Product, ProductDtos>().ReverseMap();
         //产品管理添加修改Dto
-        CreateMap<Product,CreateUpdateProductDtos>().ReverseMap();
+        CreateMap<Product, CreateUpdateProductDtos>().ReverseMap();
         //产品分类显示Dto
         CreateMap<Category, CategoryDtos>().ReverseMap();
         //产品分类添加修改Dto
         CreateMap<Category, CreateUpdateCategoryDtos>().ReverseMap();
+        //产品分类树形结构显示Dto
+        CreateMap<Category, CategoryTreeDtos>().ReverseMap();
+        //产品分类列表显示Dto
+        CreateMap<Category, CategoryDtosList>().ReverseMap();
+        #endregion
 
+        #region 合同管理
         //合同表
         CreateMap<AddCrmContractDto, CrmContract>().ReverseMap();
         CreateMap<CrmContract, ShowCrmContractDto>().ReverseMap();
         CreateMap<UpdateCrmContractDto, CrmContract>().ReverseMap();
-        CreateMap<CrmContractandProduct,UpdateCrmcontractandProductDto>().ReverseMap();
+        CreateMap<CrmContractandProduct, UpdateCrmcontractandProductDto>().ReverseMap();
+        #endregion
 
-
-        //联系人
-        CreateMap<CustomerContactDto,CustomerContact>().ReverseMap();
-        CreateMap<CreateUpdateCustomerContactDto, CustomerContact>().ReverseMap();
-        CreateMap<SearchCustomerContactDto, CustomerContact>().ReverseMap();
-
-        //联系人关系
-        CreateMap<CustomerRegionDto, CustomerRegion >().ReverseMap();
-
+        //操作日志
+        CreateMap<OperationLog, OperationLogDto>().ReverseMap();
     }
 }

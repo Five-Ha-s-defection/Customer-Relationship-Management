@@ -20,5 +20,14 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         /// </summary>
         [DefaultValue("123")]
         public string Password { get; set; }= string.Empty;
+        /// <summary>
+        /// 验证码ID
+        /// </summary>
+        public string captchaKey { get; set; }= string.Empty;
+
+        /// <summary>
+        /// 验证码
+        /// </summary>
+        public string captchaCode { get; set; }= string.Empty;
     }
 }
