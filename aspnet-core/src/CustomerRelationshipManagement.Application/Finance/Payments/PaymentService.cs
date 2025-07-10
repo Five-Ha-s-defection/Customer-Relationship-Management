@@ -88,7 +88,18 @@ namespace CustomerRelationshipManagement.Finance.Payments
                     payment.PaymentCode = $"R{payment.PaymentCode}";
                 }
                 await repository.InsertAsync(payment);
-                
+
+                //更新应收
+                if (payment.ReceivableId != Guid.Empty)
+                {
+                    var receivables = await receivablesRepository.GetAsync(payment.ReceivableId);
+                    if (receivables != null)
+                    {
+                        receivables.PaymentId = payment.Id;
+                        await receivablesRepository.UpdateAsync(receivables);
+                    }
+                }
+
                 var record = new OperationLog
                 {
                     BizType = "payment",
@@ -99,19 +110,6 @@ namespace CustomerRelationshipManagement.Finance.Payments
                 await operationLogrepository.InsertAsync(record);
                 // 清除对应的缓存
                 await ClearAbpCacheAsync();
-
-                //更新应收
-                if (createUpdatePaymentDTO.ReceivableId != Guid.Empty)
-                {
-                    var receivables = await receivablesRepository.GetAsync(createUpdatePaymentDTO.ReceivableId);
-                    if(receivables != null)
-                    {
-                        receivables.PaymentId = payment.Id;
-                        await receivablesRepository.UpdateAsync(receivables);
-                        // 清除对应的缓存
-                        await ClearAbpCacheAsync();
-                    }
-                }
 
                 await uow.CompleteAsync(); // 提交事务
 
@@ -221,8 +219,6 @@ namespace CustomerRelationshipManagement.Finance.Payments
         /// <returns></returns>
         public async Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO searchDTO)
         {
-            // 清除对应的缓存
-            await ClearAbpCacheAsync();
             string cacheKey = $"GetPayment";
             var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
             {
@@ -284,7 +280,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
                     .WhereIf(searchDTO.StartTime.HasValue, x => x.PaymentDate >= searchDTO.StartTime.Value)
                     .WhereIf(searchDTO.EndTime.HasValue, x => x.PaymentDate <= searchDTO.EndTime.Value.AddDays(1))
                     .WhereIf(searchDTO.UserId.HasValue, x => x.UserId == searchDTO.UserId.Value)
-                    .WhereIf(searchDTO.CustomerId.HasValue, x => x.CustomerId == searchDTO.CustomerId.Value)
+                    .WhereIf(searchDTO.CustomerId.HasValue && searchDTO.CustomerId != Guid.Empty,x => x.CustomerId == searchDTO.CustomerId.Value)
                     .WhereIf(searchDTO.ContractId.HasValue, x => x.ContractId == searchDTO.ContractId.Value)
                     .WhereIf(searchDTO.CreatorId.HasValue, x => x.CreatorId == searchDTO.CreatorId.Value)
                    .WhereIf(!string.IsNullOrEmpty(searchDTO.PaymentDate), a => a.PaymentDate >= DateTime.Parse(searchDTO.PaymentDate) && a.PaymentDate < DateTime.Parse(searchDTO.PaymentDate).AddDays(1))
@@ -349,7 +345,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
 
             }, () => new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromMinutes(10)
+                SlidingExpiration = TimeSpan.FromSeconds(5)
             });
             return ApiResult<PageInfoCount<PaymentDTO>>.Success(ResultCode.Success, redislist);
 

@@ -103,7 +103,6 @@ namespace CustomerRelationshipManagement.Finance.Invoices
         /// <returns></returns>
         public async Task<ApiResult<PageInfoCount<InvoiceDTO>>> GetInvoiceListAsync(InvoiceSearchDto invoiceSearchDto)
         {
-            await ClearAbpCacheAsync();
             var cacheKey = $"InvoiceList";
             var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
             {
@@ -227,7 +226,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                 return pageInfo;
             }, () => new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromMinutes(5)
+                SlidingExpiration = TimeSpan.FromSeconds(5)
             });
 
             return ApiResult<PageInfoCount<InvoiceDTO>>.Success(ResultCode.Success, redislist);
