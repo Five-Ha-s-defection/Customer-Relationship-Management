@@ -9,7 +9,6 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers.Helpers;
 using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
@@ -235,9 +234,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                     {
                         list = list.Where(x => x.CreatorId == dto.CreatedBy);
                     }
-
-
-
 
                     //查询条件
                     //根据客户姓名、（联系人）、电话、邮箱、（微信号）模糊查询
@@ -775,6 +771,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             // 映射为 DTO 并返回给前端
             var resultDto = ObjectMapper.Map<Customer, CreateUpdateCustomerDto>(updatedClue);
 
+            //清除缓存，确保数据一致性
+            await ClearAbpCacheAsync();
             return ApiResult<CreateUpdateCustomerDto>.Success(ResultCode.Success, resultDto);
         }
 
