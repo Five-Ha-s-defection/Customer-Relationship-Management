@@ -9,6 +9,7 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers.Helpers;
 using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
@@ -16,10 +17,13 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
 using CustomerRelationshipManagement.Paging;
+using CustomerRelationshipManagement.RBAC.Roles;
+using CustomerRelationshipManagement.RBAC.UserRoles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -29,9 +33,11 @@ using System.IO;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
+using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Users;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Customers
 {
@@ -54,7 +60,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly IDistributedCache<PageInfoCount<CustomerDto>> cache;
         private readonly IConnectionMultiplexer connectionMultiplexer;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository, IRepository<CustomerContact> contactRepository, IHttpContextAccessor httpContextAccessor)
+        private readonly ICurrentUser _currentUser;
+        private readonly IRepository<RoleInfo> roleRepository;
+        private readonly IRepository<UserRoleInfo> userRoleRepository;
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository, IRepository<CustomerContact> contactRepository, IHttpContextAccessor httpContextAccessor, ICurrentUser currentUser, IRepository<RoleInfo> roleRepository, IRepository<UserRoleInfo> userRoleRepository)
         {
             this.repository = repository;
             this.logger = logger;
@@ -69,6 +78,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             this.typeRepository = typeRepository;
             this.contactRepository = contactRepository;
             _httpContextAccessor = httpContextAccessor;
+            _currentUser = currentUser;
+            this.roleRepository = roleRepository;
+            this.userRoleRepository = userRoleRepository;
         }
 
         /// <summary>
@@ -173,13 +185,18 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                                from source in sourceGroup.DefaultIfEmpty()
                                join creator in userlist on cus.CreatorId equals creator.Id into creatorGroup
                                from creator in creatorGroup.DefaultIfEmpty()
-                                   // join contact in contactlist on cus.Id equals contact.CustomerId into contactGroup
-                                   // from contact in contactGroup.DefaultIfEmpty()
+                               where (
+                                 dto.CustomerPoolStatus == null ||
+                                 (dto.CustomerPoolStatus == 1 && cus.CustomerPoolStatus == 1) ||
+                                 ((dto.CustomerPoolStatus == 0 || dto.CustomerPoolStatus == 2) && (cus.CustomerPoolStatus == 0 || cus.CustomerPoolStatus == 2))
+                             )
+                               // join contact in contactlist on cus.Id equals contact.CustomerId into contactGroup
+                               // from contact in contactGroup.DefaultIfEmpty()
                                select new CustomerDto
                                {
                                    Id = cus.Id,
                                    UserId = cus.UserId,
-                                   UserName = user != null ? user.UserName : null,
+                                   RealName = user != null ? user.RealName : null,
                                    CustomerName = cus.CustomerName,
                                    CheckAmount = cus.CheckAmount,
                                    CustomerPhone = cus.CustomerPhone,
@@ -220,8 +237,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                     }
 
 
-                    ////区分客户池和客户
-                    //list = list.WhereIf(dto.type == 1 && dto.AssignedTo.HasValue, x => x.UserId == dto.AssignedTo);
+
 
                     //查询条件
                     //根据客户姓名、（联系人）、电话、邮箱、（微信号）模糊查询
@@ -305,7 +321,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                          // (!string.IsNullOrEmpty(dto.Email) && x.Email.Contains(dto.Email)) || // 联系人相关，已注释
                          );
                     }
-
 
 
                     // 排序
@@ -683,6 +698,144 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                 result.errno = 1;
                 result.data = new { message = ex.Message };
                 return result;
+            }
+        }
+
+        /// <summary>
+        /// 处理客户的分配、领取、放弃操作，并返回更新后的线索详情
+        /// </summary>
+        /// <param name="dto">包含操作类型、客户ID和目标用户ID（可选）的请求参数</param>
+        /// <returns>返回更新后的 CustomerDto 对象</returns>
+        [HttpPut]
+        public async Task<ApiResult<CreateUpdateCustomerDto>> HandleCustomerActionAsync(CustomerActionDto dto)
+        {
+            // 根据线索 ID 查询线索实体
+            var customer = await repository.FirstOrDefaultAsync(x => x.Id == dto.CustomerId);
+            if (customer == null)
+            {
+                throw new BusinessException("Customer.NotFound", "未找到对应的客户");
+            }
+
+            // 获取当前登录用户的 ID
+            // _currentUser 由 ABP 框架自动提供，代表当前已登录用户的信息，常用于应用服务中判断用户身份、ID、租户等。
+            var currentUserId = _currentUser.Id;
+            if (!currentUserId.HasValue)
+            {
+                throw new BusinessException("User.NotLoggedIn", "当前用户未登录");
+            }
+
+            // 根据操作类型处理不同的逻辑
+            switch (dto.ActionType.ToLower())
+            {
+                case "assign":  // 分配线索给其他人
+                    if (!dto.TargetUserId.HasValue || dto.TargetUserId == currentUserId) // 校验目标用户
+                        throw new BusinessException("Customer.InvalidTargetUser", "目标用户无效，不能是自己");
+
+                    customer.UserId = dto.TargetUserId.Value;   // 设置为目标用户
+                    customer.CustomerPoolStatus = 1;          // 标记为已分配
+                    break;
+
+                case "receive":  // 当前用户领取线索
+                    if (customer.CustomerPoolStatus == 1) // 仅公海线索可领取
+                        throw new BusinessException("Customer.InvalidStatus", "仅可领取公海客户");
+
+                    customer.UserId = currentUserId.Value;      // 设置为当前用户
+                    customer.CustomerPoolStatus = 1;          // 标记为已领取
+                    break;
+
+                case "abandon":  // 放弃线索
+                    if (customer.CustomerPoolStatus != 1) // 仅已分配线索可放弃
+                        throw new BusinessException("Customer.InvalidStatus", "仅可放弃已分配客户");
+
+                    if (customer.UserId != currentUserId) // 校验是否为本人负责
+                        throw new BusinessException("Clue.PermissionDenied", "只能放弃自己负责的客户");
+
+                    if (string.IsNullOrEmpty(dto.AbandonReason)) // 校验放弃原因是否为空
+                        throw new BusinessException("Customer.MissingAbandonReason", "放弃客户时必须提供原因");
+
+                    customer.UserId = Guid.Empty;               // 去除负责人
+                    customer.CustomerPoolStatus = 2;          // 标记为已放弃
+                    customer.AbandonReason = dto.AbandonReason;  // 设置放弃原因
+                    break;
+
+                default:
+                    throw new BusinessException("Customer.InvalidAction", "不支持的操作类型");
+            }
+
+            // 更新线索数据到数据库
+            await repository.UpdateAsync(customer);
+
+            // 再次查询，含导航属性（例如：User、ClueSource、Industry 等）
+            // WithDetailsAsync() 是 ABP 框架中 IRepository 提供的一个扩展方法。它返回的是一个 IQueryable<Clue>，并且会自动 Include 线索实体的关联导航属性，比如 User（负责人）、ClueSource（线索来源）、Industry（行业）等。
+            // 自己理解：准备查询，包含关联的其他表
+            var query = await repository.WithDetailsAsync(); // 需要实体配置 WithDetails()
+            // 正式查询
+            var updatedClue = await query.FirstOrDefaultAsync(x => x.Id == customer.Id);
+
+            // 映射为 DTO 并返回给前端
+            var resultDto = ObjectMapper.Map<Customer, CreateUpdateCustomerDto>(updatedClue);
+
+            return ApiResult<CreateUpdateCustomerDto>.Success(ResultCode.Success, resultDto);
+        }
+
+        /// <summary>
+        /// 显示用户列表（用来分配线索）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        [HttpGet]
+        public async Task<ApiResult<PageInfoCount<DTOS.CustomerProcessDtos.Customers.GetUserRoleDto>>> ShowUserListAsync([FromQuery] DTOS.CustomerProcessDtos.Customers.SearchUserDto dto)
+        {
+            try
+            {
+                var userQuery = await userRepository.GetQueryableAsync();
+                var roleQuery = await roleRepository.GetQueryableAsync();
+                var userRoleQuery = await userRoleRepository.GetQueryableAsync();
+
+                var query = from user in userQuery
+                            join ur in userRoleQuery on user.Id equals ur.UserId into urGroup
+                            from ur in urGroup.DefaultIfEmpty()
+                            join role in roleQuery on ur.RoleId equals role.Id into roleGroup
+                            from role in roleGroup.DefaultIfEmpty()
+                            select new DTOS.CustomerProcessDtos.Customers.GetUserRoleDto
+                            {
+                                UserRoleId = ur.Id,
+                                UserId = user.Id,
+                                RealName = user.RealName,
+                                Email = user.Email,
+                                PhoneInfo = user.PhoneInfo,
+                                RoleId = role != null ? role.Id : Guid.Empty,
+                                RoleName = role != null ? role.RoleName : "--"
+                            };
+
+                // 关键词搜索（按姓名或手机号）
+                if (!string.IsNullOrWhiteSpace(dto.Keyword))
+                {
+                    query = query.Where(x =>
+                        x.RealName.Contains(dto.Keyword) ||
+                        x.PhoneInfo.Contains(dto.Keyword));
+                }
+
+                // 排序（按创建时间，假如你有时间字段，可以加上）
+                query = query.OrderByDescending(x => x.RealName); // 示例按名字排序
+
+                // 分页处理
+                var totalCount = query.Count();
+                var pagedList = query.Skip((dto.PageIndex - 1) * dto.PageSize).Take(dto.PageSize).ToList();
+
+                var pageInfo = new PageInfoCount<DTOS.CustomerProcessDtos.Customers.GetUserRoleDto>
+                {
+                    TotalCount = totalCount,
+                    PageCount = (int)Math.Ceiling(totalCount * 1.0 / dto.PageSize),
+                    Data = pagedList
+                };
+
+                return ApiResult<PageInfoCount<DTOS.CustomerProcessDtos.Customers.GetUserRoleDto>>.Success(ResultCode.Success, pageInfo);
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException("用户列表获取失败：" + ex.Message);
             }
         }
     }

@@ -166,7 +166,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                {
                                    Id = clu.Id,
                                    UserId = clu.UserId,
-                                   UserName=user.UserName,
+                                   RealName=user.RealName,
                                    ClueName = clu.ClueName,
                                    CluePhone = clu.CluePhone,
                                    ClueSourceId = clu.ClueSourceId,
@@ -187,11 +187,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                    CreationTime = clu.CreationTime,
                                    ClueCode=clu.ClueCode,
                                };
-                    //// 根据 CluePoolStatus 查询
-                    //if (dto.CluePoolStatus != null)
-                    //{
-                    //    list = list.Where(x => x.CluePoolStatus == dto.CluePoolStatus);
-                    //}
+             
                     // type: 0=全部，1=我负责的，2=我创建的
                     if (dto.type == 1 && dto.AssignedTo.HasValue)
                     {
@@ -523,8 +519,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             switch (dto.ActionType.ToLower())
             {
                 case "assign":  // 分配线索给其他人
-                    if (clue.CluePoolStatus ==1 ) // 仅公海线索可分配
-                        throw new BusinessException("Clue.InvalidStatus", "仅可分配公海线索");
 
                     if (!dto.TargetUserId.HasValue || dto.TargetUserId == currentUserId) // 校验目标用户
                         throw new BusinessException("Clue.InvalidTargetUser", "目标用户无效，不能是自己");
@@ -548,8 +542,12 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                     if (clue.UserId != currentUserId) // 校验是否为本人负责
                         throw new BusinessException("Clue.PermissionDenied", "只能放弃自己负责的线索");
 
+                    if (string.IsNullOrEmpty(dto.AbandonReason)) // 校验放弃原因是否为空
+                        throw new BusinessException("Clue.MissingAbandonReason", "放弃线索时必须提供原因");
+
                     clue.UserId = Guid.Empty;               // 去除负责人
                     clue.CluePoolStatus = 2;          // 标记为已放弃
+                    clue.AbandonReason = dto.AbandonReason;  // 设置放弃原因
                     break;
 
                 default:

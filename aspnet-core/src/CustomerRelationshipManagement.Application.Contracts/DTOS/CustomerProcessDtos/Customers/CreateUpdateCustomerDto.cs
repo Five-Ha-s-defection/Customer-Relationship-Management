@@ -87,5 +87,19 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// 客户编号（类似C-202506240038-3B7C形式）
         /// </summary>
         public string CustomerCode { get; set; }
+
+        //=============================区分客户和客户池==================================================================
+        /// <summary>
+        /// 客户分配/领取状态
+        /// 0 未领取/未分配
+        /// 1 已领取/已分配
+        /// 2 已放弃
+        /// </summary>
+        public int CustomerPoolStatus { get; set; } = 0;
+
+        /// <summary>
+        /// 放弃原因
+        /// </summary>
+        public string? AbandonReason { get; set; } = string.Empty;
     }
 }
