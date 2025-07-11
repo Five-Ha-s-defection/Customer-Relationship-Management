@@ -1,6 +1,4 @@
 using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Application.Contracts.RBAC.Menus;
-using CustomerRelationshipManagement.RBAC.Menus;
 using CustomerRelationshipManagement.RBACDtos.Menus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +9,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
-namespace CustomerRelationshipManagement.Application.RBAC.Menus
+namespace CustomerRelationshipManagement.RBAC.Menus
 {
     /// <summary>
     /// 菜单应用服务，实现菜单的增删改查功能

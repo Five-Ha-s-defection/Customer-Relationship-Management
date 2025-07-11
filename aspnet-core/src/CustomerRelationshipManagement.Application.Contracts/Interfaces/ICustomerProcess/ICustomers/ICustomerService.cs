@@ -1,10 +1,9 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Regions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBACDtos.Users;

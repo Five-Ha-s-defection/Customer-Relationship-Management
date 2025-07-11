@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ISourceServices
+namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ISources
 {
     public interface ISourceService:IApplicationService
     {
