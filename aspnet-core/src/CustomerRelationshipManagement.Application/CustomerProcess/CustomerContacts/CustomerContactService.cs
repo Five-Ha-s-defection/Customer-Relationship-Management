@@ -17,6 +17,7 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using NPOI.SS.Formula.Functions;
@@ -302,25 +303,26 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
                                from relation in ccr.DefaultIfEmpty()
                                join c in userlist on customer.UserId equals c.Id into rc
                                from c in rc.DefaultIfEmpty()
-                               join rel in relationlist on cc.ContactRelationId equals rel.Id into relc
-                               from rel in relc.DefaultIfEmpty()
                                join r in rolelist on cc.RoleId equals r.Id into rcc
                                from r in rcc.DefaultIfEmpty()
                                join creator in userlist on cc.CreatorId equals creator.Id into creatorJoin
                                from creator in creatorJoin.DefaultIfEmpty()
+                               // 通过Customer表中的UserId获取UserInfo表中的负责人姓名
+                               join userInfo in userlist on customer.UserId equals userInfo.Id into userInfoJoin
+                               from userInfo in userInfoJoin.DefaultIfEmpty()
                                select new CustomerContactDto
                                {
                                    Id = cc.Id,
                                    CreatorId = cc.CreatorId,
-                                   CreatorName = creator.UserName,
+                                   CreatorName = c.RealName,
                                    CreationTime = cc.CreationTime,
                                    CustomerId = cc.CustomerId,
                                    CustomerName = customer.CustomerName,
                                    UserId = customer.UserId,
-                                   RealName = c.RealName,
+                                   UserName = userInfo.RealName, // 通过UserId获取的负责人名称
                                    ContactName = cc.ContactName,
                                    ContactRelationId = cc.ContactRelationId,
-                                   ContactRelationName = rel.ContactRelationName,
+                                   ContactRelationName = relation.ContactRelationName,
                                    RoleId = cc.RoleId,
                                    RoleName = r.RoleName,
                                    Salutation = cc.Salutation,
@@ -331,13 +333,12 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
                                    Wechat = cc.Wechat,
                                    Remark = cc.Remark,
                                    IsPrimary = cc.IsPrimary,
-                                   CreateName = c.UserName,
                                };
                     // 这里可以加上你的where条件，对p.xxx和r.xxx都可以筛选
                     list = list.WhereIf(!string.IsNullOrEmpty(dto.ContactName), x => x.ContactName.Contains(dto.ContactName))
                         .WhereIf(dto.UserId.HasValue, x => x.UserId == dto.UserId)
-                        .WhereIf(dto.StartTime.HasValue, x => x.CreateTime >= dto.StartTime.Value)
-                        .WhereIf(dto.EndTime.HasValue, x => x.CreateTime <= dto.EndTime.Value.AddDays(1))
+                        .WhereIf(dto.StartTime.HasValue, x => x.CreationTime >= dto.StartTime.Value)
+                        .WhereIf(dto.EndTime.HasValue, x => x.CreationTime <= dto.EndTime.Value.AddDays(1))
                         .WhereIf(dto.UserId.HasValue, x => x.UserId == dto.UserId.Value)
                         .WhereIf(dto.CustomerId.HasValue, x => x.CustomerId == dto.CustomerId.Value)
                         .WhereIf(dto.ContactRelationId.HasValue, x => x.ContactRelationId == dto.ContactRelationId.Value)
@@ -350,8 +351,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.CustomerContacts
                         .WhereIf(!string.IsNullOrEmpty(dto.Email), x => x.Email.Contains(dto.Email))
                         .WhereIf(!string.IsNullOrEmpty(dto.Wechat), x => x.Wechat.Contains(dto.Wechat))
                         .WhereIf(!string.IsNullOrEmpty(dto.Keyword), x => x.ContactName.Contains(dto.Keyword)|| x.Mobile.Contains(dto.Keyword)|| x.Email.Contains(dto.Keyword)|| x.Wechat.Contains(dto.Keyword));
-                   
-                    
+
                     //用ABP框架的分页
                     var res = list.PageResult(dto.PageIndex, dto.PageSize);
                     //构建分页结果对象
