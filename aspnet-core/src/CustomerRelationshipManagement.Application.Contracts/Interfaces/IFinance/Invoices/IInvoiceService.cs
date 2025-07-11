@@ -1,7 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
-using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Paging;
 using Microsoft.AspNetCore.Mvc;
 using System;

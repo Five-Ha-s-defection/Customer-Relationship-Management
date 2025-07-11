@@ -1,7 +1,7 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.RecordDto;
 using CustomerRelationshipManagement.Interfaces.Record;
 using CustomerRelationshipManagement.RBAC.Users;
-using CustomerRelationshipManagement.RecordDto;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
