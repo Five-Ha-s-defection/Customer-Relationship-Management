@@ -79,9 +79,15 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// <summary>
         /// 收款状态
         /// </summary>
-        public int PaymentStatus { get; set; } = 0; // 0-待审核，1-审核中，2-已通过，3-已拒绝
+        public int? PaymentStatus { get; set; } // 0-待审核，1-审核中，2-已通过，3-已拒绝
 
-
-
+        /// <summary>
+        /// 负责人
+        /// </summary>
+        public Guid? UserId { get; set; }
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        public Guid? CreatorId { get; set; }
     }
 }

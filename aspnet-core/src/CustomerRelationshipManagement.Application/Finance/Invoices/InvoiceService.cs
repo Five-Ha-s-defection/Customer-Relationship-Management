@@ -103,7 +103,9 @@ namespace CustomerRelationshipManagement.Finance.Invoices
         /// <returns></returns>
         public async Task<ApiResult<PageInfoCount<InvoiceDTO>>> GetInvoiceListAsync(InvoiceSearchDto invoiceSearchDto)
         {
-            var cacheKey = $"InvoiceList";
+            string cacheKey = $"InvoiceList:{invoiceSearchDto.InvoiceNumberCode}:{invoiceSearchDto.InvoiceStatus}:{invoiceSearchDto.InvoiceType}:{invoiceSearchDto.StartTime}:{invoiceSearchDto.EndTime}:{invoiceSearchDto.UserId}:{invoiceSearchDto.CreatorId}:{invoiceSearchDto.CustomerId}:{invoiceSearchDto.ContractId}:{invoiceSearchDto.InvoiceDate}:{invoiceSearchDto.CurrentStep}:{string.Join(",", invoiceSearchDto.ApproverIds)}:{string.Join(",", invoiceSearchDto.ApproveComments)}:{string.Join(",", invoiceSearchDto.ApproveTimes)}:{invoiceSearchDto.PageIndex}:{invoiceSearchDto.PageSize}";
+
+
             var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
             {
                 var invoice = await repository.GetQueryableAsync();
@@ -226,7 +228,7 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                 return pageInfo;
             }, () => new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromSeconds(5)
+                SlidingExpiration = TimeSpan.FromMinutes(10)
             });
 
             return ApiResult<PageInfoCount<InvoiceDTO>>.Success(ResultCode.Success, redislist);
@@ -375,8 +377,11 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                     CreationTime = DateTime.Now,
                 };
                 await operationLogrepository.InsertAsync(record);
-                await ClearAbpCacheAsync();
+               
                 await uow.CompleteAsync(); // 提交事务
+
+                await ClearAbpCacheAsync();
+
                 return ApiResult.Success(ResultCode.Success);
             }
         }
