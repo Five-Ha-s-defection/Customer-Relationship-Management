@@ -24,11 +24,6 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         public Guid ProductId { get; set; } = new Guid();
 
         /// <summary>
-        /// 产品编号
-        /// </summary>
-        public string ProductCode { get; set; } = string.Empty;
-
-        /// <summary>
         /// 购买数量
         /// </summary>
         public int BuyProductNum { get; set; } = 0;
