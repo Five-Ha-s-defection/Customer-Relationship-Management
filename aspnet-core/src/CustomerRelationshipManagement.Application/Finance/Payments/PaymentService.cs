@@ -3,6 +3,7 @@ using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.Export;
+using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.Export;
@@ -209,6 +210,8 @@ namespace CustomerRelationshipManagement.Finance.Payments
                 await operationLogrepository.InsertAsync(record);
 
                 await uow.CompleteAsync(); // 提交事务
+
+                await ClearAbpCacheAsync();
                 return ApiResult.Success(ResultCode.Success);
             }
         }
@@ -219,7 +222,8 @@ namespace CustomerRelationshipManagement.Finance.Payments
         /// <returns></returns>
         public async Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO searchDTO)
         {
-            string cacheKey = $"GetPayment";
+            string cacheKey = $"GetPayment:{searchDTO.PaymentCode}:{searchDTO.PaymentStatus}:{searchDTO.StartTime}:{searchDTO.EndTime}:{searchDTO.UserId}:{searchDTO.CreatorId}:{searchDTO.CustomerId}:{searchDTO.ContractId}:{searchDTO.PaymentMethod}:{string.Join(",", searchDTO.ApproverIds)}:{string.Join(",", searchDTO.ApproveComments)}:{string.Join(",", searchDTO.ApproveTimes)}:{searchDTO.CurrentStep}:{searchDTO.PageIndex}:{searchDTO.PageSize}";
+
             var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
             {
                 var payments = await repository.GetQueryableAsync();
@@ -345,7 +349,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
 
             }, () => new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromSeconds(5)
+                SlidingExpiration = TimeSpan.FromMinutes(10)
             });
             return ApiResult<PageInfoCount<PaymentDTO>>.Success(ResultCode.Success, redislist);
 

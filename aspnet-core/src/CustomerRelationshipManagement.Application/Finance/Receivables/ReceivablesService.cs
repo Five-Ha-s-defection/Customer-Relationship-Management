@@ -135,7 +135,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         public async Task<ApiResult<PageInfoCount<ReceivablesDTO>>> GetPageAsync([FromQuery] ReceivablesSearchDto receivablesSearchDto)
         {
             // 构建缓存键名
-            string cacheKey ="Getreceivables";
+            string cacheKey = $"Getreceivables:{receivablesSearchDto.ReceivableCode}:{receivablesSearchDto.StartTime}:{receivablesSearchDto.EndTime}:{receivablesSearchDto.UserId}:{receivablesSearchDto.CreatorId}:{receivablesSearchDto.CustomerId}:{receivablesSearchDto.ContractId}:{receivablesSearchDto.ReceivableDate}:{receivablesSearchDto.PageIndex}:{receivablesSearchDto.PageSize}";
+
 
             // 使用Redis缓存获取或添加数据
             var redislist = await _cache.GetOrAddAsync(cacheKey, async () =>
@@ -173,7 +174,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                                 UserId = r.UserId,
                                 RealName = c != null ? c.RealName : string.Empty,
                                 PaymentId = r.PaymentId,
-                                Amount = p != null && p.PaymentStatus==2 ? p.Amount : 0m,
+                                Amount = p != null && p.PaymentStatus == 2 ? p.Amount : 0m,
                                 CreatorId = r.CreatorId,
                                 CreatorRealName = creator.UserName,
                                 PaymentStatus = p != null ? p.PaymentStatus : 0,
@@ -187,7 +188,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                     .WhereIf(receivablesSearchDto.UserId.HasValue, x => x.UserId == receivablesSearchDto.UserId.Value)
                     .WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId.Value)
                     .WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId.Value)
-                   .WhereIf(receivablesSearchDto.CreatorId.HasValue && receivablesSearchDto.CreatorId != Guid.Empty,x => x.CreatorId == receivablesSearchDto.CreatorId.Value)
+                   .WhereIf(receivablesSearchDto.CreatorId.HasValue && receivablesSearchDto.CreatorId != Guid.Empty, x => x.CreatorId == receivablesSearchDto.CreatorId.Value)
                     .WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableDate), a => a.ReceivableDate >= DateTime.Parse(receivablesSearchDto.ReceivableDate) && a.ReceivableDate < DateTime.Parse(receivablesSearchDto.ReceivableDate).AddDays(1))
                     .WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableCode), x => x.ReceivableCode.Contains(receivablesSearchDto.ReceivableCode));
 
@@ -204,7 +205,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                 return pageInfo;
             }, () => new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromSeconds(5)
+                SlidingExpiration = TimeSpan.FromMinutes(10)
             }); // 设置缓存过期时间为10分钟
             
             // 返回成功结果

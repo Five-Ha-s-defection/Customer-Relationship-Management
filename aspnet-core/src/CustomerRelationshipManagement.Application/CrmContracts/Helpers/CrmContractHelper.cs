@@ -30,6 +30,7 @@ namespace CustomerRelationshipManagement.CrmContracts.Helpers
             // 并根据 SearchTimeType 标记哪个时间类型在生效。
             return $"ContractRedis_" +
                    $"ContractName_{safeString(dto.ContractName)}_" +
+                   $"PaymentStatus_{dto.PaymentStatus?.ToString() ?? "null"}_" +
                    $"CheckType_{dto.CheckType}_" +
                    $"SearchTimeType_{dto.SearchTimeType}_" + // 标记当前时间查询类型
                    $"BeginTime_{(string.IsNullOrWhiteSpace(dto.BeginTime) ? "null" : dto.BeginTime)}_" +
@@ -37,6 +38,8 @@ namespace CustomerRelationshipManagement.CrmContracts.Helpers
                    $"UserIds_{safeGuidList(dto.UserIds)}_" +
                    $"CreateUserIds_{safeGuidList(dto.CreateUserIds)}_" +
                    $"CustomerId_{safeGuid(dto.CustomerId)}_" +
+                   $"CreatorId_{safeGuid(dto.CreatorId)}_" +
+                   $"UserId_{safeGuid(dto.UserId)}_" +
                    $"SignDate_{safeString(dto.SignDate)}_" +
                    $"CommencementDate_{safeString(dto.CommencementDate)}_" +
                    $"ExpirationDate_{safeString(dto.ExpirationDate)}_" +

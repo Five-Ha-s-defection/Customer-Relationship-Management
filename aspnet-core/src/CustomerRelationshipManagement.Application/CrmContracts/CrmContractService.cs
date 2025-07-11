@@ -83,7 +83,7 @@ namespace CustomerRelationshipManagement.CrmContracts
         public async Task<ApiResult<PageInfoCount<ShowCrmContractDto>>> ShowCrmContractList([FromQuery] PageCrmContractDto pageCrmContractDto)
         {
             //构建缓存键名
-            string cacheKey = CrmContractHelper.BuildReadableKey(pageCrmContractDto);
+            string cacheKey = $"GetCrmContract:{pageCrmContractDto.SearchTimeType}:{pageCrmContractDto.BeginTime}:{pageCrmContractDto.EndTime}:{pageCrmContractDto.CheckType}:{string.Join(",", pageCrmContractDto.UserIds)}:{string.Join(",", pageCrmContractDto.CreateUserIds)}:{pageCrmContractDto.CustomerId}:{pageCrmContractDto.ContractName}:{pageCrmContractDto.SignDate}:{pageCrmContractDto.CommencementDate}:{pageCrmContractDto.ExpirationDate}:{pageCrmContractDto.Dealer}:{pageCrmContractDto.ContractProceeds}:{pageCrmContractDto.PaymentStatus}:{pageCrmContractDto.UserId}:{pageCrmContractDto.CreatorId}:{pageCrmContractDto.PageIndex}:{pageCrmContractDto.PageSize}";
             //使用Redis缓存获取或添加数据
             var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
             {
@@ -126,6 +126,12 @@ namespace CustomerRelationshipManagement.CrmContracts
                     //查询条件(1.合同名称模糊查询)
                     query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName), a => a.ContractName.Contains(pageCrmContractDto.ContractName));
                     query = query.WhereIf(pageCrmContractDto.CustomerId != null, a => a.CustomerId.Equals(pageCrmContractDto.CustomerId));
+                    //付款状态
+                    query = query.WhereIf(pageCrmContractDto.PaymentStatus != null, x => x.PaymentStatus == pageCrmContractDto.PaymentStatus);
+                    query = query.WhereIf(pageCrmContractDto.UserId.HasValue, x => x.UserId == pageCrmContractDto.UserId.Value);
+                    query = query.WhereIf(pageCrmContractDto.CreatorId.HasValue, x => x.CreatorId == pageCrmContractDto.CreatorId.Value);
+
+
                 }
 
                 if (pageCrmContractDto.CheckType == 1)
@@ -148,6 +154,7 @@ namespace CustomerRelationshipManagement.CrmContracts
                     query = query.WhereIf(!string.IsNullOrEmpty(pageCrmContractDto.ContractName), a => a.ContractName.Equals(pageCrmContractDto.ContractName));
                     //合同金额
                     query = query.WhereIf(pageCrmContractDto.ContractProceeds!=null, a => a.ContractProceeds.Equals((decimal)(pageCrmContractDto.ContractProceeds)));
+                    
                 }
 
                 if (pageCrmContractDto.CheckType == 2)
@@ -339,6 +346,8 @@ namespace CustomerRelationshipManagement.CrmContracts
                 await operationLogrepository.InsertAsync(record);
 
                 await uow.CompleteAsync(); // 提交事务
+
+                await ClearAbpCacheAsync();
                 return ApiResult.Success(ResultCode.Success);
             }
         }
@@ -389,6 +398,18 @@ namespace CustomerRelationshipManagement.CrmContracts
                     receivables.CustomerId = crmcontractresult.CustomerId;
                     receivables.ContractId = crmcontractresult.Id;
                     receivables.UserId = crmcontractresult.UserId;
+                    if (string.IsNullOrEmpty(receivables.ReceivableCode))
+                    {
+                        // 自动生成应收款编号：时间-随机四位数字
+                        var random = new Random();
+                        var randomNumber = random.Next(1000, 10000); // 生成1000-9999之间的随机数
+                        var currentTime = DateTime.Now.ToString("yyyyMMdd"); // 格式：20241201
+                        receivables.ReceivableCode = $"M{currentTime}-{randomNumber}"; // 格式：M20241201-1234
+                    }
+                    else
+                    {
+                        receivables.ReceivableCode = $"M{receivables.ReceivableCode}";
+                    }
 
                     //执行插入应收款表的操作
                     var receivablesresult = await receivablesrepository.InsertAsync(receivables);
