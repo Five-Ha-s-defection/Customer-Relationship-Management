@@ -66,5 +66,18 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
         /// </summary>
         /// <returns></returns>
         Task<ApiResult<List<IndustryDto>>> GetIndustrySelectList();
+
+        /// <summary>
+        /// 处理线索分配、领取、放弃操作
+        /// </summary>
+        Task<ApiResult<CreateUpdateClueDto>> HandleClueActionAsync(ClueActionDto dto);
+
+        /// <summary>
+        /// 显示用户列表（用来分配线索）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        Task<ApiResult<PageInfoCount<GetUserRoleDto>>> ShowUserListAsync([FromQuery] SearchUserDto dto);
     }
 }
