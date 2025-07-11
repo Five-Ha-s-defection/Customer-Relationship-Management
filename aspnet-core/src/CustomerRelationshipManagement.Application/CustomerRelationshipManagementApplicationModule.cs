@@ -1,14 +1,12 @@
-﻿using CustomerRelationshipManagement.DTOS.SparkAi;
+﻿using CustomerRelationshipManagement.ChatGLMAi;
 using CustomerRelationshipManagement.DTOS.UploadDto;
 using CustomerRelationshipManagement.RBAC.RefreshToken;
 using CustomerRelationshipManagement.RBAC.UserInfos;
 using CustomerRelationshipManagement.RBAC.Users;
-using CustomerRelationshipManagement.Upload;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
-using System;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 using Volo.Abp.SettingManagement;
@@ -35,6 +33,7 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
         context.Services.AddScoped<IJwtHelper, JwtHelper>();
 
         context.Services.AddScoped<IRefreshTokenStore,RedisRefreshTokenStore>();
+        context.Services.AddTransient<IChatGLMService, ChatGLMService>(); // 注入 AI 服务
 
         var configuration = context.Services.GetConfiguration();
 
@@ -46,8 +45,8 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
 
         Configure<FileUploadOptions>(configuration.GetSection("FileUpload"));
 
-        // 绑定 SparkAI 配置
-        context.Services.Configure<SparkAiOptions>(configuration.GetSection("SparkAI"));
+        // 绑定chatglm 模型配置
+        var apiKey = configuration.GetValue<string>("ChatGLM:ApiKey");
 
 
     }

@@ -12,7 +12,6 @@ using CustomerRelationshipManagement.CustomerProcess.CustomerLevels;
 using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
-using CustomerRelationshipManagement.CustomerProcess.CustomerTypes;
 using CustomerRelationshipManagement.CustomerProcess.CustomReplys;
 using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.CustomerProcess.Prioritys;
@@ -26,20 +25,20 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CommunicationTypes
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactCommunications;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactRelations;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomReplys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Regions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.DTOS.RecordDto;
 using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
@@ -54,7 +53,6 @@ using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
 using CustomerRelationshipManagement.Record;
-using CustomerRelationshipManagement.RecordDto;
 
 namespace CustomerRelationshipManagement;
 

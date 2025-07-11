@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions
+namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Regions
 {
     public class CreateUpdateRegionDto
     {

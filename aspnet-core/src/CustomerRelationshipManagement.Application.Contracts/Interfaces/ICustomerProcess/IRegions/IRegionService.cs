@@ -1,5 +1,5 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Regions;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
