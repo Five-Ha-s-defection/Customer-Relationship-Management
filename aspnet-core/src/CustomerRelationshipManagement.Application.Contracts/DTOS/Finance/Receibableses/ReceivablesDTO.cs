@@ -79,6 +79,11 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// </summary>
         public string CreatorRealName { get; set; }
 
+        /// <summary>
+        /// 付款状态
+        /// </summary>
+        public int PaymentStatus { get; set;}
+
 
     }
 }

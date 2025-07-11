@@ -14,91 +14,85 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         /// <summary>
         /// 线索负责人
         /// </summary>
-        [Required]
-        public Guid UserId { get; set; }
+        public Guid? UserId { get; set; }
 
         /// <summary>
         /// 姓名
         /// </summary>
-        [Required]
-        [StringLength(50)]
         public string ClueName { get; set; }
 
         /// <summary>
         /// 电话
         /// </summary>
-        [Required]
-        [StringLength(11)]
         public string CluePhone { get; set; }
 
         /// <summary>
         /// 线索来源
         /// </summary>
-        [Required]
-        public Guid ClueSourceId { get; set; }
-
+        public Guid? ClueSourceId { get; set; } 
         /// <summary>
         /// 邮箱
         /// </summary>
-        [Required]
-        [StringLength(50)]
-        public string ClueEmail { get; set; }
+        public string? ClueEmail { get; set; }
 
         /// <summary>
         /// 微信号
         /// </summary>
-        [Required,StringLength(50)]
-        public string ClueWechat { get; set; }
+        public string? ClueWechat { get; set; }
 
         /// <summary>
         /// QQ
         /// </summary>
-        [Required,StringLength(50)]
-        public string ClueQQ { get; set; }
+        public string? ClueQQ { get; set; }
 
         /// <summary>
         /// 公司名称
         /// </summary>
-        [Required,StringLength(50)]
-        public string CompanyName { get; set; }
+        public string? CompanyName { get; set; }
 
         /// <summary>
         /// 行业
         /// </summary>
-        [Required]
-        public Guid IndustryId { get; set; }
+        public Guid? IndustryId { get; set; }
 
         /// <summary>
         /// 地址
         /// </summary>
-        [Required,StringLength(50)]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         /// <summary>
         /// 备注（富文本）
         /// </summary>
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
 
         /// <summary>
         /// 线索状态（枚举）
         /// </summary>
-        [Required]
-        public ClueStatus Status { get; set; }
+        public ClueStatus Status { get; set; } = ClueStatus.未跟进;
 
         /// <summary>
         /// 最后跟进时间
         /// </summary>
-        public DateTime LastFollowTime { get; set; }
+        public DateTime? LastFollowTime { get; set; }
 
         /// <summary>
         /// 下次联系时间
         /// </summary>
-        public DateTime NextContactTime { get; set; }
+        public DateTime? NextContactTime { get; set; }
 
 
         /// <summary>
         /// 线索编号
         /// </summary>
         public string? ClueCode { get; set; }
+
+        //=============================区分线索和线索池==================================================================
+        /// <summary>
+        /// 线索分配/领取状态
+        /// 0 未领取/未分配
+        /// 1 已领取/已分配
+        /// 2 已放弃
+        /// </summary>
+        public int CluePoolStatus { get; set; } = 0;
     }
 }

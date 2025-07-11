@@ -9,7 +9,8 @@ public enum ResultCode
     Fail = 400,// 失败
     NotFound = 404,// 未找到
     Unauthorized = 401,// 未授权
-    InternalServerError = 500// 服务器内部错误
+    InternalServerError = 500,// 服务器内部错误
+    CaptchaError = 402,// 验证码错误
 }   
 public class ApiResult
 {

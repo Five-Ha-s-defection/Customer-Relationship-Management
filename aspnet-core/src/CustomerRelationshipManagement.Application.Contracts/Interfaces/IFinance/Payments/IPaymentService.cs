@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Volo.Abp.Content;
 
 namespace CustomerRelationshipManagement.Interfaces.IFinance.Payments
 {
@@ -18,6 +19,8 @@ namespace CustomerRelationshipManagement.Interfaces.IFinance.Payments
         Task<ApiResult> Approve(Guid paymentId, Guid approverId, bool isPass, string? comment);
 
         Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO paymentSearchDTO);
+
+        Task<IRemoteStreamContent> GetExportAsyncExcel();
 
         Task<ApiResult<PaymentDTO>> UpdatePayment(Guid id, CreateUpdatePaymentDTO createUpdatePaymentDTO);
 

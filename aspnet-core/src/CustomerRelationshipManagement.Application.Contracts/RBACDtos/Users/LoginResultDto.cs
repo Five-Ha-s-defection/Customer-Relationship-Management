@@ -10,9 +10,13 @@ namespace CustomerRelationshipManagement.RBACDtos.Users
         /// <summary>
         /// 登录成功返回的token
         /// </summary>
-        public string? Token { get; set; }
+        public string AccessToken { get; set; }
         /// <summary>
-        /// token的过期时间
+        /// 刷新token
+        /// </summary>
+        public string RefreshToken { get; set; }
+        /// <summary>
+        /// token的过期时间(单位:秒)
         /// </summary>
         public DateTime ExpireTime { get; set; }
         /// <summary>

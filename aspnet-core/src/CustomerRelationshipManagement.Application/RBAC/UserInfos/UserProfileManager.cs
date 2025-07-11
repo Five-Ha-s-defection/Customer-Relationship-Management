@@ -26,7 +26,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
     [ApiExplorerSettings(GroupName = "v1")]
     //加入jwt不需要验证的特性
     [AllowAnonymous]
-    public class UserProfileManager:DomainService
+    public class UserProfileManager : DomainService
     {
         private readonly IRepository<UserInfo, Guid> userRep;
         private readonly IRepository<UserRoleInfo, Guid> userRoleRepo;
@@ -37,7 +37,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         private readonly IRepository<MenuInfo> menuRepo;
         private readonly IObjectMapper objectMapper;
 
-        public UserProfileManager(IRepository<UserInfo, Guid> userRep,CurrentUser currentUser, IRepository<UserRoleInfo, Guid> userRoleRepo, IRepository<RoleInfo, Guid> roleRepo, IRepository<RolePermissionInfo, Guid> rolePermissionRepo, IRepository<PermissionInfo, Guid> permissionRepo, IRepository<UserPermissionInfo, Guid> userPermissionRepo, IRepository<MenuInfo> menuRepo,IObjectMapper objectMapper)
+        public UserProfileManager(IRepository<UserInfo, Guid> userRep, CurrentUser currentUser, IRepository<UserRoleInfo, Guid> userRoleRepo, IRepository<RoleInfo, Guid> roleRepo, IRepository<RolePermissionInfo, Guid> rolePermissionRepo, IRepository<PermissionInfo, Guid> permissionRepo, IRepository<UserPermissionInfo, Guid> userPermissionRepo, IRepository<MenuInfo> menuRepo, IObjectMapper objectMapper)
         {
             this.userRep = userRep;
             this.userRoleRepo = userRoleRepo;
@@ -110,12 +110,14 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                         .Where(m => m.ParentId == parentId)
                         .Select(x => new MenuDto
                         {
+                            Id = x.Id,
+                            ParentId = x.ParentId,
                             MenuName = x.MenuName,
                             Path = x.Path,
                             Component = x.Component,
                             Icon = x.Icon,
                             PermissionCode = x.PermissionCode,
-                            Hidden = !x.IsVisible,
+                            IsVisible = !x.IsVisible,
                             Sort = x.Sort,
                             Children = BuildMenuTree(allMenus, x.Id)
                         })
@@ -130,7 +132,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 userInfoDto.Permissions = permissionCodes;
                 userInfoDto.Menus = menuTree;
 
-               return userInfoDto;
+                return userInfoDto;
 
             }
             catch (Exception ex)

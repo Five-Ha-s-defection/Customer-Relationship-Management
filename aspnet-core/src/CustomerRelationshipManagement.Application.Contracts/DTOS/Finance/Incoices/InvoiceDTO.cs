@@ -129,8 +129,10 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
         public string BillingPhone { get; set; } = string.Empty;
 
 
-
-
+        /// <summary>
+        /// 收款金额
+        /// </summary>
+        public decimal? PaymentAmount { get; set;}
         /// <summary>
         /// 客户名称
         /// </summary>

@@ -16,6 +16,8 @@ using CustomerRelationshipManagement.RBAC.Roles;
 using CustomerRelationshipManagement.RBAC.UserRoles;
 using System.Linq;
 using System.Collections.Generic;
+using Lazy.Captcha.Core;
+using CustomerRelationshipManagement.Captchas;
 
 namespace CustomerRelationshipManagement.RBAC.UserInfos
 {
@@ -31,13 +33,13 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
         private readonly IJwtHelper _jwtHelper;
         private readonly IDatabase _redisDb;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IRepository<UserRoleInfo> userRoleRepoistory;
+        private readonly ICaptchaServer captchaServer;
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="userInfoRepository"></param>
-        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager,IJwtHelper jwtHelper, IConnectionMultiplexer redis, IHttpContextAccessor httpContextAccessor,IRepository<UserRoleInfo> userRoleRepoistory)
+        public LoginServices(IRepository<UserInfo, Guid> userInfoRepository, IPasswordHasher<UserInfo> passwordHasher,UserProfileManager userProfileManager,IJwtHelper jwtHelper, IConnectionMultiplexer redis, IHttpContextAccessor httpContextAccessor,ICaptchaServer captchaServer)
         {
             this.userInfoRepository = userInfoRepository;
             this.passwordHasher = passwordHasher;
@@ -45,7 +47,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
             _jwtHelper = jwtHelper;
             _redisDb = redis.GetDatabase();
             _httpContextAccessor = httpContextAccessor;
-            this.userRoleRepoistory = userRoleRepoistory;
+            this.captchaServer = captchaServer;
         }
         /// <summary>
         /// 登录
@@ -74,7 +76,13 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 {
                     throw new UserFriendlyException("用户已被禁用");
                 }
-
+                // 验证码验证
+                var catcha = captchaServer.Validate2(loginDto.captchaKey, loginDto.captchaCode);
+                // 验证码错误
+                if (!catcha)
+                {
+                    return ApiResult<LoginResultDto>.Fail("验证码错误", ResultCode.CaptchaError);
+                }
 
                 // 登录成功，返回用户信息和令牌
                 
@@ -99,7 +107,7 @@ namespace CustomerRelationshipManagement.RBAC.UserInfos
                 //返回数据
                 return ApiResult<LoginResultDto>.Success(ResultCode.Success, new LoginResultDto
                 {
-                       Token=token,
+                       AccessToken=token,
                       User=profile,
                       ExpireTime=expireTime,
                 });

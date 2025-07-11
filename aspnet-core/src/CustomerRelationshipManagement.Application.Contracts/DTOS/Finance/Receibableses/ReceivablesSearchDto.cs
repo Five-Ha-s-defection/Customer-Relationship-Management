@@ -47,7 +47,7 @@ namespace CustomerRelationshipManagement.DTOS.Finance.Receibableses
         /// <summary>
         /// 应收款时间
         /// </summary>
-        public DateTime? ReceivableDate { get; set; }
+        public string? ReceivableDate { get; set; }
 
     }
 }

@@ -1,4 +1,6 @@
-﻿using Lazy.Captcha.Core;
+﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.Captchas;
+using Lazy.Captcha.Core;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,9 @@ using Volo.Abp.Application.Services;
 
 namespace CustomerRelationshipManagement.Captchas
 {
+    /// <summary>
+    /// 验证码服务
+    /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
     public class CaptchaServer : ApplicationService,ICaptchaServer
     {
@@ -25,25 +30,18 @@ namespace CustomerRelationshipManagement.Captchas
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult Captcha(string id)
+        public async Task<ApiResult<CaptchaDto>> GetCaptchaAsync(string id)
         {
-            try
+            //生成验证码
+            var info = captcha.Generate(id);
+            //转为base64
+            var base64 = Convert.ToBase64String(info.Bytes);
+            // 返回结果
+
+            return ApiResult<CaptchaDto>.Success(ResultCode.Success, new CaptchaDto
             {
-                var info = captcha.Generate(id);
-                // 有多处验证码且过期时间不一样，可传第二个参数覆盖默认配置。
-                //var info = _captcha.Generate(id,120);
-                var stream = new MemoryStream(info.Bytes);
-                return new FileStreamResult(stream, "image/jpeg");
-               
-            }
-            catch (Exception ex)
-            { 
-                return new ContentResult()
-                {
-                    Content = ex.Message,
-                    StatusCode = 500
-                };
-            }
+                Img = "data:image/png;base64," + base64,
+            });
         }
         /// <summary>
         /// 多次校验（https://gitee.com/pojianbing/lazy-captcha/issues/I4XHGM）
@@ -55,7 +53,8 @@ namespace CustomerRelationshipManagement.Captchas
         [HttpGet]
         public bool Validate2(string id, string code)
         {
-            return captcha.Validate(id, code, false);
+           
+            return captcha.Validate(id, code,false);
         }
     }
 }
