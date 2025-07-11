@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CustomerRelationshipManagement.Migrations
 {
     [DbContext(typeof(CustomerRelationshipManagementDbContext))]
-    partial class CustomerRelationshipManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250711022037_添加客户分配领取状态字段到客户表")]
+    partial class 添加客户分配领取状态字段到客户表
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -148,10 +151,6 @@ namespace CustomerRelationshipManagement.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("AbandonReason")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -550,10 +549,6 @@ namespace CustomerRelationshipManagement.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("AbandonReason")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<Guid>("CarFrameNumberId")
                         .HasColumnType("char(36)");

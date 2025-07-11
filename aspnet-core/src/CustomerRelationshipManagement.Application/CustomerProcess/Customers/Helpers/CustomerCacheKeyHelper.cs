@@ -27,6 +27,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers.Helpers
                    $"CustomerTypeId{(dto.CustomerTypeId != Guid.Empty ? dto.CustomerTypeId.ToString() : "null")}_" +
                    $"CustomerSourceId{(dto.CustomerSourceId != Guid.Empty ? dto.CustomerSourceId.ToString() : "null")}_" +
                    $"CustomerRegionId{(dto.CustomerRegionId != Guid.Empty ? dto.CustomerRegionId.ToString() : "null")}_" +
+                   $"CustomerPoolStatus{(dto.CustomerPoolStatus != null ? dto.CustomerPoolStatus : "null")}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"TimeType_{dto.TimeType?.ToString() ?? "null"}_" +

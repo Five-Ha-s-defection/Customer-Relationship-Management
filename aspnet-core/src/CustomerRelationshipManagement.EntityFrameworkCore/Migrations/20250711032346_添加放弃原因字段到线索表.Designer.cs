@@ -4,6 +4,7 @@ using CustomerRelationshipManagement.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace CustomerRelationshipManagement.Migrations
 {
     [DbContext(typeof(CustomerRelationshipManagementDbContext))]
-    partial class CustomerRelationshipManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250711032346_添加放弃原因字段到线索表")]
+    partial class 添加放弃原因字段到线索表
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -550,10 +553,6 @@ namespace CustomerRelationshipManagement.Migrations
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
-
-                    b.Property<string>("AbandonReason")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<Guid>("CarFrameNumberId")
                         .HasColumnType("char(36)");

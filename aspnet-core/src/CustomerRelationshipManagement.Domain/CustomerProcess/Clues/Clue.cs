@@ -101,5 +101,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         /// 2 已放弃
         /// </summary>
         public int CluePoolStatus { get; set; } = 0;
+
+        /// <summary>
+        /// 放弃原因
+        /// </summary>
+        public string AbandonReason{ get; set; }
     }
 }

@@ -92,6 +92,19 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         /// 联系人Id（外键）
         /// </summary>
         public Guid ContactId { get; set; }
+
+        /// <summary>
+        /// 客户分配/领取状态
+        /// 0 未领取/未分配
+        /// 1 已领取/已分配
+        /// 2 已放弃
+        /// </summary>
+        public int CustomerPoolStatus { get; set; } = 0;
+
+        /// <summary>
+        /// 放弃原因
+        /// </summary>
+        public string AbandonReason { get; set; }
     }
 
 }

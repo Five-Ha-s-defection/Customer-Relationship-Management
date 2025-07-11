@@ -19,10 +19,10 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues
         public Guid UserId { get; set; }
 
         //============================================================================
-        /// <summary>  
-        /// 用户名  
-        /// </summary>  
-        public string UserName { get; set; }
+        /// <summary>
+        /// 真实姓名
+        /// </summary>
+        public string RealName { get; set; }
 
         /// <summary>
         /// 姓名
