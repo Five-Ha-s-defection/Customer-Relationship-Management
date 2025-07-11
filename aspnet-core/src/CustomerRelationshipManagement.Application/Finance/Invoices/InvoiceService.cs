@@ -319,7 +319,9 @@ namespace CustomerRelationshipManagement.Finance.Invoices
             return await exportAppService.ExportToExcelAsync(exportData);
         }
 
-
+        /// <summary>
+        /// 审批发票
+        /// </summary>
         public async Task<ApiResult> Approve(Guid id, Guid approverId, bool isPass, string comment)
         {
             using (var uow = _unitOfWorkManager.Begin())
@@ -416,7 +418,11 @@ namespace CustomerRelationshipManagement.Finance.Invoices
                 return ApiResult<InvoiceDTO>.Success(ResultCode.Success, ObjectMapper.Map<Invoice, InvoiceDTO>(invoice));
             }
         }
-
+        /// <summary>
+        /// 根据对应的收款ID获取发票信息
+        /// </summary>
+        /// <param name="PaymentId"></param>
+        /// <returns></returns>
         public async Task<ApiResult<List<PaymentInvoiceDto>>> GetLogs(Guid? PaymentId)
         {
             var invoice = await repository.GetQueryableAsync();
