@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Nest;
+using Polly;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
@@ -69,11 +71,9 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         // 注册 HttpClient（如果你还没加）
         context.Services.AddHttpClient();
 
+        //获取配置信息
         var configuration = context.Services.GetConfiguration();
         var hostingEnvironment = context.Services.GetHostingEnvironment();
-
-
-
 
         ConfigureAuthentication(context);
         ConfigureBundles();
@@ -82,6 +82,25 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
+        ConfigureElasticSearch(context);
+    }
+
+    /// <summary>
+    /// ElasticSearch 全文检索配置
+    /// </summary>
+    /// <param name="context"></param>
+    private void ConfigureElasticSearch(ServiceConfigurationContext context)
+    {        
+        // 读取配置
+        var configuration = context.Services.GetConfiguration();
+        var uri = configuration["ElasticSearch:Uri"];
+        
+        // 创建连接设置
+        var settings = new ConnectionSettings(new Uri(uri)).DefaultIndex(configuration["Elasticsearch:Index"]);
+
+        // 创建 ElasticClient 并注册为单例
+        var client = new ElasticClient(settings);
+        context.Services.AddSingleton<IElasticClient>(client);
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
