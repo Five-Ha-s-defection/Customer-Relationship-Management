@@ -1,7 +1,9 @@
 using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.RBACDtos.Menus;
+using CustomerRelationshipManagement.SearchMenus.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +23,18 @@ namespace CustomerRelationshipManagement.RBAC.Menus
     {
         // 菜单仓储，用于数据库操作
         private readonly IRepository<MenuInfo, Guid> _menuRepository;
+        // 菜单搜索服务，用于索引同步
+        private readonly IMenuSearchService _menuSearchService;
 
         /// <summary>
-        /// 构造函数，注入仓储
+        /// 构造函数，注入仓储和搜索服务
         /// </summary>
-        public MenuAppService(IRepository<MenuInfo, Guid> menuRepository)
+        public MenuAppService(
+            IRepository<MenuInfo, Guid> menuRepository,
+            IMenuSearchService menuSearchService)
         {
             _menuRepository = menuRepository;
+            _menuSearchService = menuSearchService;
         }
 
         /// <summary>
@@ -46,6 +53,17 @@ namespace CustomerRelationshipManagement.RBAC.Menus
                 
                 // 插入数据库
                 await _menuRepository.InsertAsync(menu);
+                
+                // 同步到ElasticSearch索引
+                try
+                {
+                    await _menuSearchService.IndexMenuAsync(menu.Id);
+                }
+                catch (Exception ex)
+                {
+                    // 索引同步失败不影响主业务流程，只记录日志
+                    Logger.LogWarning($"菜单索引同步失败: {ex.Message}");
+                }
                 
                 return ApiResult.Success(ResultCode.Success);
             }
@@ -73,6 +91,17 @@ namespace CustomerRelationshipManagement.RBAC.Menus
                 menu = ObjectMapper.Map(input, menu);
                 await _menuRepository.UpdateAsync(menu);
                 
+                // 同步到ElasticSearch索引
+                try
+                {
+                    await _menuSearchService.IndexMenuAsync(menu.Id);
+                }
+                catch (Exception ex)
+                {
+                    // 索引同步失败不影响主业务流程，只记录日志
+                    Logger.LogWarning($"菜单索引同步失败: {ex.Message}");
+                }
+                
                 return ApiResult.Success(ResultCode.Success);
             }
             catch (Exception ex)
@@ -97,6 +126,17 @@ namespace CustomerRelationshipManagement.RBAC.Menus
                 
                 // 删除菜单
                 await _menuRepository.DeleteAsync(menu);
+                
+                // 从ElasticSearch索引中删除
+                try
+                {
+                    await _menuSearchService.DeleteMenuIndexAsync(menu.Id);
+                }
+                catch (Exception ex)
+                {
+                    // 索引删除失败不影响主业务流程，只记录日志
+                    Logger.LogWarning($"菜单索引删除失败: {ex.Message}");
+                }
                 
                 return ApiResult.Success(ResultCode.Success);
             }

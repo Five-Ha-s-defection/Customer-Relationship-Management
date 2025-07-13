@@ -31,7 +31,7 @@ namespace CustomerRelationshipManagement.Paging
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [CacheName("PageInfo")]
-    public class PageInfoCount<T>
+    public class PageInfoCount<T>: PagingInfo
     {
         /// <summary>
         /// 总数
