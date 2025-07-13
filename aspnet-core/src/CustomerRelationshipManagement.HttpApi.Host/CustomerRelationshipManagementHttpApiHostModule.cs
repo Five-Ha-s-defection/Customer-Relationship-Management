@@ -82,7 +82,7 @@ public class CustomerRelationshipManagementHttpApiHostModule : AbpModule
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
         ConfigureSwaggerServices(context, configuration);
-        ConfigureElasticSearch(context);
+        //ConfigureElasticSearch(context);
     }
 
     /// <summary>

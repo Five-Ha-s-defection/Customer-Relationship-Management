@@ -1,5 +1,6 @@
 ﻿using CustomerRelationshipManagement.DTOS.SparkAi;
 using CustomerRelationshipManagement.DTOS.UploadDto;
+using CustomerRelationshipManagement.ElasticSearch;
 using CustomerRelationshipManagement.RBAC.RefreshToken;
 using CustomerRelationshipManagement.RBAC.UserInfos;
 using CustomerRelationshipManagement.RBAC.Users;
@@ -49,6 +50,11 @@ public class CustomerRelationshipManagementApplicationModule : AbpModule
         // 绑定 SparkAI 配置
         context.Services.Configure<SparkAiOptions>(configuration.GetSection("SparkAI"));
 
+        // 绑定 ElasticSearch 配置
+        context.Services.Configure<ElasticSearchOptions>(configuration.GetSection("ElasticSearch"));
+
+        // 注册 ElasticSearch 客户端提供者
+        context.Services.AddSingleton<ElasticSearchClientProvider>();
 
     }
 }
