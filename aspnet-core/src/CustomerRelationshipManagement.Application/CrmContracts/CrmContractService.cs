@@ -65,6 +65,7 @@ namespace CustomerRelationshipManagement.CrmContracts
             this.receivablesrepository = receivablesrepository;
             this.crmContractandProductrepository = crmContractandProductrepository;
             this.customerrepository = customerrepository;
+            this.paymentrepository = paymentrepository;
             this.userInforepository = userInforepository;
             this.connectionMultiplexer = connectionMultiplexer;
             this.cache = cache;

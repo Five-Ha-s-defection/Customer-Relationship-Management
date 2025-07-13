@@ -35,16 +35,16 @@ public class Program
                 
             await builder.AddApplicationAsync<CustomerRelationshipManagementHttpApiHostModule>();
             // 跨域
-            builder.Services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(policy =>//  默认策略
-                {
-                    policy.WithOrigins("http://localhost:3000") // 前端地址
-                          .AllowAnyHeader()//  允许所有请求头
-                          .AllowAnyMethod()//  允许所有方法
-                          .AllowCredentials(); // 如果使用 cookie/token 认证
-                });
-            });
+            //builder.Services.AddCors(options =>
+            //{
+            //    options.AddDefaultPolicy(policy =>//  默认策略
+            //    {
+            //        policy.WithOrigins("http://localhost:3000") // 前端地址
+            //              .AllowAnyHeader()//  允许所有请求头
+            //              .AllowAnyMethod()//  允许所有方法
+            //              .AllowCredentials(); // 如果使用 cookie/token 认证
+            //    });
+            //});
 
 
             var app = builder.Build();
