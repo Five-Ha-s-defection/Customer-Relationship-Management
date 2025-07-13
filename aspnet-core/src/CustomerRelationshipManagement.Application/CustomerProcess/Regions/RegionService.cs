@@ -1,5 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
+using CustomerRelationshipManagement.CustomerProcess.CustomerRegions;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Regions;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IRegions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
-namespace CustomerRelationshipManagement.CustomerProcess.CustomerRegions
+namespace CustomerRelationshipManagement.CustomerProcess.Regions
 {
     /// <summary>
     /// 客户地区服务

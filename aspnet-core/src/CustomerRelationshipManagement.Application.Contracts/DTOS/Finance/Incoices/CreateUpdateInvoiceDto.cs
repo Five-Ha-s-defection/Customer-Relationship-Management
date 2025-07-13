@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CustomerRelationshipManagement.Finance.Invoices
+namespace CustomerRelationshipManagement.DTOS.Finance.Incoices
 {
     public class CreateUpdateInvoiceDto
     {

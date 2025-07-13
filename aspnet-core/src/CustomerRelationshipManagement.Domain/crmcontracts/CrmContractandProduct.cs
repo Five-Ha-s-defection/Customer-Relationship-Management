@@ -26,16 +26,16 @@ namespace CustomerRelationshipManagement.crmcontracts
         /// <summary>
         /// 购买数量
         /// </summary>
-        public int BuyProductNum { get; set; } = 0;
+        public int BuyProductNum { get; set; }
 
         /// <summary>
         /// 售价
         /// </summary>
-        public decimal SellPrice { get; set; } = 0;
+        public decimal SellPrice { get; set; }
 
         /// <summary>
         /// 合计
         /// </summary>
-        public decimal SumPrice { get; set; } = 0;
+        public decimal SumPrice { get; set; }
     }
 }

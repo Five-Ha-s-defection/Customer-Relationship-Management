@@ -16,20 +16,28 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys.He
         /// </summary>
         public static string BuildReadableKey(SearchBusinessOpportunityDto dto)
         {
-            string safe(string? input) => string.IsNullOrWhiteSpace(input) ? "null" : input.Trim();
-            string joinList(List<Guid>? list) => list == null || list.Count == 0 ? "null" : string.Join("-", list);
-
             return $"BusinessOpportunity_" +
                    $"PageIndex_{dto.PageIndex}_PageSize_{dto.PageSize}_" +
                    $"Type_{dto.type}_" +
-                   $"AssignedTo_{dto.AssignedTo?.ToString() ?? "null"}_" +
-                   $"SalesProgress_{joinList(dto.SalesProgressList)}_" +
+                   $"AssignedTo_{(string.IsNullOrWhiteSpace(dto.AssignedTo.ToString()) ? "null" : dto.AssignedTo)}_" +
                    $"Start_{dto.StartTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"End_{dto.EndTime?.ToString("yyyyMMddHHmmss") ?? "null"}_" +
                    $"TimeType_{dto.TimeType?.ToString() ?? "null"}_" +
                    $"OrderBy_{dto.OrderBy?.ToString() ?? "null"}_" +
                    $"OrderDesc_{dto.OrderDesc}_" +
-                    $"Keyword_{(string.IsNullOrWhiteSpace(dto.Keyword) ? "All" : dto.Keyword)}" ;
+                   $"Keyword_{(string.IsNullOrWhiteSpace(dto.Keyword) ? "All" : dto.Keyword)}_" +
+                   $"SalesProgressList_{(dto.SalesProgressList?.Any() == true ? string.Join("-", dto.SalesProgressList) : "null")}_" +
+                   $"CreatedBy_{dto.CreatedBy ?? Guid.Empty}_" +
+                   $"UserIds_{(dto.UserIds?.Any() == true ? string.Join("-", dto.UserIds) : "null")}_" +
+                   $"CreatedByIds_{(dto.CreatedByIds?.Any() == true ? string.Join("-", dto.CreatedByIds) : "null")}_" +
+                   $"CustomerId_{dto.CustomerId ?? Guid.Empty}_" +
+                   $"BusinessOpportunityCode_{(string.IsNullOrWhiteSpace(dto.BusinessOpportunityCode) ? "null" : dto.BusinessOpportunityCode)}_" +
+                   $"PriorityId_{dto.PriorityId ?? Guid.Empty}_" +
+                   $"BusinessOpportunityName_{(string.IsNullOrWhiteSpace(dto.BusinessOpportunityName) ? "null" : dto.BusinessOpportunityName)}_" +
+                   $"SalesProgressId_{dto.SalesProgressId ?? Guid.Empty}_" +
+                   $"Budget_{dto.Budget ?? 0}_" +
+                   $"ExpectedDate_{dto.ExpectedDate?.ToString("yyyyMMdd") ?? "null"}_" +
+                   $"MatchMode_{dto.MatchMode}_";
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
-using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ISourceServices;
+using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ISources;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;

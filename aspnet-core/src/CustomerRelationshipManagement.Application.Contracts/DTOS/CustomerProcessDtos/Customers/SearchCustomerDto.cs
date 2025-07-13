@@ -131,5 +131,14 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// 匹配模式：0=全部满足(AND)，1=部分满足(OR)（单选）
         /// </summary>
         public int MatchMode { get; set; } = 0;
+
+        //=============================区分客户和客户池==================================================================
+        /// <summary>
+        /// 客户分配/领取状态
+        /// 0 未领取/未分配
+        /// 1 已领取/已分配
+        /// 2 已放弃
+        /// </summary>
+        public int? CustomerPoolStatus { get; set; } 
     }
 }

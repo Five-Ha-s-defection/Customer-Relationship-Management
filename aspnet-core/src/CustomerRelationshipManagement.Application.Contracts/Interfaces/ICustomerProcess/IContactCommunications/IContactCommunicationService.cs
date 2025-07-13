@@ -33,7 +33,7 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IContactCom
         /// 无查询条件、无分页，显示所有联系沟通列表
         /// </summary>
         /// <returns></returns>
-        Task<ApiResult<List<ContactCommunicationDto>>> GetAllContactCommunications(Guid? clueId = null);
+        Task<ApiResult<List<ContactCommunicationDto>>> GetAllContactCommunications(Guid id, int targetType);
 
         /// <summary>
         /// 获取联系沟通详情信息

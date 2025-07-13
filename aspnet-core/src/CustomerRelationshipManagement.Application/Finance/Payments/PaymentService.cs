@@ -1,21 +1,17 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
-using CustomerRelationshipManagement.Dtos.CrmContractDtos;
+using CustomerRelationshipManagement.DTOS.Export;
+using CustomerRelationshipManagement.DTOS.Finance.Incoices;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
-using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.Finance.PaymentMethods;
 using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Interfaces.IFinance.Payments;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
 using CustomerRelationshipManagement.Record;
-using CustomerRelationshipManagement.RecordDto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
-using Newtonsoft.Json;
-using NPOI.POIFS.Properties;
-using Org.BouncyCastle.Crypto;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -24,6 +20,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Uow;
 
@@ -41,6 +38,8 @@ namespace CustomerRelationshipManagement.Finance.Payments
 
         private readonly IRepository<OperationLog, Guid> operationLogrepository;
 
+        private readonly IExportAppService exportAppService;
+
         private readonly IDistributedCache<PageInfoCount<PaymentDTO>> cache;
 
 
@@ -48,7 +47,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
 
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public PaymentService(IRepository<Payment, Guid> repository, IDistributedCache<PageInfoCount<PaymentDTO>> cache, IRepository<Receivables, Guid> receivablesRepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<PaymentMethod, Guid> paymentmethodeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables, IConnectionMultiplexer connectionMultiplexer, IRepository<OperationLog, Guid> operationLogrepository, IUnitOfWorkManager unitOfWorkManager)
+        public PaymentService(IRepository<Payment, Guid> repository, IDistributedCache<PageInfoCount<PaymentDTO>> cache, IRepository<Receivables, Guid> receivablesRepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<PaymentMethod, Guid> paymentmethodeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables, IConnectionMultiplexer connectionMultiplexer, IRepository<OperationLog, Guid> operationLogrepository, IUnitOfWorkManager unitOfWorkManager, IExportAppService exportAppService)
         {
             this.repository = repository;
             this.cache = cache;
@@ -60,6 +59,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
             this.connectionMultiplexer = connectionMultiplexer;
             this.operationLogrepository = operationLogrepository;
             _unitOfWorkManager = unitOfWorkManager;
+            this.exportAppService = exportAppService;
         }
         /// <summary>
         /// 新增收款
@@ -82,7 +82,18 @@ namespace CustomerRelationshipManagement.Finance.Payments
                     payment.PaymentCode = $"R{payment.PaymentCode}";
                 }
                 await repository.InsertAsync(payment);
-                
+
+                //更新应收
+                if (payment.ReceivableId != Guid.Empty)
+                {
+                    var receivables = await receivablesRepository.GetAsync(payment.ReceivableId);
+                    if (receivables != null)
+                    {
+                        receivables.PaymentId = payment.Id;
+                        await receivablesRepository.UpdateAsync(receivables);
+                    }
+                }
+
                 var record = new OperationLog
                 {
                     BizType = "payment",
@@ -93,19 +104,6 @@ namespace CustomerRelationshipManagement.Finance.Payments
                 await operationLogrepository.InsertAsync(record);
                 // 清除对应的缓存
                 await ClearAbpCacheAsync();
-
-                //更新应收
-                if (createUpdatePaymentDTO.ReceivableId != Guid.Empty)
-                {
-                    var receivables = await receivablesRepository.GetAsync(createUpdatePaymentDTO.ReceivableId);
-                    if(receivables != null)
-                    {
-                        receivables.PaymentId = payment.Id;
-                        await receivablesRepository.UpdateAsync(receivables);
-                        // 清除对应的缓存
-                        await ClearAbpCacheAsync();
-                    }
-                }
 
                 await uow.CompleteAsync(); // 提交事务
 
@@ -205,6 +203,8 @@ namespace CustomerRelationshipManagement.Finance.Payments
                 await operationLogrepository.InsertAsync(record);
 
                 await uow.CompleteAsync(); // 提交事务
+
+                await ClearAbpCacheAsync();
                 return ApiResult.Success(ResultCode.Success);
             }
         }
@@ -215,9 +215,8 @@ namespace CustomerRelationshipManagement.Finance.Payments
         /// <returns></returns>
         public async Task<ApiResult<PageInfoCount<PaymentDTO>>> GetPayment(PaymentSearchDTO searchDTO)
         {
-            // 清除对应的缓存
-            await ClearAbpCacheAsync();
-            string cacheKey = $"GetPayment";
+            string cacheKey = $"GetPayment:{searchDTO.PaymentCode}:{searchDTO.PaymentStatus}:{searchDTO.StartTime}:{searchDTO.EndTime}:{searchDTO.UserId}:{searchDTO.CreatorId}:{searchDTO.CustomerId}:{searchDTO.ContractId}:{searchDTO.PaymentMethod}:{string.Join(",", searchDTO.ApproverIds)}:{string.Join(",", searchDTO.ApproveComments)}:{string.Join(",", searchDTO.ApproveTimes)}:{searchDTO.CurrentStep}:{searchDTO.PageIndex}:{searchDTO.PageSize}";
+
             var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
             {
                 var payments = await repository.GetQueryableAsync();
@@ -278,7 +277,7 @@ namespace CustomerRelationshipManagement.Finance.Payments
                     .WhereIf(searchDTO.StartTime.HasValue, x => x.PaymentDate >= searchDTO.StartTime.Value)
                     .WhereIf(searchDTO.EndTime.HasValue, x => x.PaymentDate <= searchDTO.EndTime.Value.AddDays(1))
                     .WhereIf(searchDTO.UserId.HasValue, x => x.UserId == searchDTO.UserId.Value)
-                    .WhereIf(searchDTO.CustomerId.HasValue, x => x.CustomerId == searchDTO.CustomerId.Value)
+                    .WhereIf(searchDTO.CustomerId.HasValue && searchDTO.CustomerId != Guid.Empty,x => x.CustomerId == searchDTO.CustomerId.Value)
                     .WhereIf(searchDTO.ContractId.HasValue, x => x.ContractId == searchDTO.ContractId.Value)
                     .WhereIf(searchDTO.CreatorId.HasValue, x => x.CreatorId == searchDTO.CreatorId.Value)
                    .WhereIf(!string.IsNullOrEmpty(searchDTO.PaymentDate), a => a.PaymentDate >= DateTime.Parse(searchDTO.PaymentDate) && a.PaymentDate < DateTime.Parse(searchDTO.PaymentDate).AddDays(1))
@@ -348,6 +347,88 @@ namespace CustomerRelationshipManagement.Finance.Payments
             return ApiResult<PageInfoCount<PaymentDTO>>.Success(ResultCode.Success, redislist);
 
         }
+
+        /// <summary>
+        /// 导出收款信息
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IRemoteStreamContent> GetExportAsyncExcel()
+        {
+            var payments = await repository.GetQueryableAsync();
+            var receivables = await receivablesRepository.GetQueryableAsync();
+            var userinfo = await userinforeceivables.GetQueryableAsync();
+            var customer = await customerrepository.GetQueryableAsync();
+            var crmcontract = await crmcontractreceivables.GetQueryableAsync();
+            var paymentmethod = await paymentmethodeceivables.GetQueryableAsync();
+
+            // 联合查询
+            var query = from p in payments
+                        join r in receivables on p.ReceivableId equals r.Id into pr
+                        from r in pr.DefaultIfEmpty() // left join，如果要inner join去掉DefaultIfEmpty
+                        join c in userinfo on p.UserId equals c.Id into rc
+                        from c in rc.DefaultIfEmpty()
+                        join d in customer on p.CustomerId equals d.Id into rd
+                        from d in rd.DefaultIfEmpty()
+                        join e in crmcontract on p.ContractId equals e.Id into re
+                        from e in re.DefaultIfEmpty()
+                        join f in paymentmethod on p.PaymentMethod equals f.Id into pf
+                        from f in pf.DefaultIfEmpty()
+                        join creator in userinfo on r.CreatorId equals creator.Id into creatorJoin
+                        from creator in creatorJoin.DefaultIfEmpty()
+                        select new PaymentDTO
+                        {
+                            Id = p.Id,
+                            PaymentCode = p.PaymentCode,
+                            Amount = p.Amount,
+                            PaymentMethod = p.PaymentMethod,
+                            PaymentMethodName = f.PaymentMethodName,
+                            PaymentDate = p.PaymentDate,
+                            ApproverIds = p.ApproverIds,
+                            CurrentStep = p.CurrentStep,
+                            ApproveComments = p.ApproveComments,
+                            ApproveTimes = p.ApproveTimes,
+                            PaymentStatus = p.PaymentStatus,
+                            Remark = p.Remark,
+                            UserId = p.UserId,
+                            RealName = c.RealName,
+                            CustomerId = p.CustomerId,
+                            ContractId = p.ContractId,
+                            ReceivableId = p.ReceivableId,
+                            ReceivablePay = r.ReceivablePay,
+                            ContractName = e.ContractName,
+                            CustomerName = d.CustomerName,
+                            CreatorId = p.CreatorId,
+                            CreatorRealName = creator.RealName,
+                            CreationTime = p.CreationTime,
+                            CurrentAuditorName = "",
+                        };
+            var exportData = new ExportDataDto<PaymentDTO>
+            {
+                FileName = "收款",
+                Items = query.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    { "Id", "收款ID" },
+                    { "PaymentCode", "收款编号" },
+                    { "PaymentStatus", "收款审核状态" },
+                    { "ReceivablePay", "应收款" },
+                    { "Amount", "实际收款金额" },
+                    { "PaymentMethodName", "收款方式" },
+                    { "PaymentDate", "收款时间" },
+                    { "CustomerId", "所属客户ID" },
+                    { "CustomerName", "客户名称" },
+                    { "ContractId", "关联合同ID" },
+                    { "ContractName", "合同名称" },
+                    { "UserId", "负责人ID" },
+                    { "RealName", "负责人名称" },
+                    { "CreationTime", "创建时间" },
+                    { "AuditorNames", "审核人" },
+                    { "CreatorRealName", "创建人名称" },
+                }
+            };
+            return await exportAppService.ExportToExcelAsync(exportData);
+        }
+
         /// <summary>
         /// 修改收款
         /// </summary>

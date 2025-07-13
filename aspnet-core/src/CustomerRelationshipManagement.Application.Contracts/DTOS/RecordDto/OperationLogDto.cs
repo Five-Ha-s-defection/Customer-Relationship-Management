@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Dtos;
 
-namespace CustomerRelationshipManagement.RecordDto
+namespace CustomerRelationshipManagement.DTOS.RecordDto
 {
     public class OperationLogDto: CreationAuditedEntityDto<Guid>
     {

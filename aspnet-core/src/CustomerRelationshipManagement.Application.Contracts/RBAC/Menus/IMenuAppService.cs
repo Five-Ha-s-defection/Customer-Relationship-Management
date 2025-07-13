@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 
-namespace CustomerRelationshipManagement.Application.Contracts.RBAC.Menus
+namespace CustomerRelationshipManagement.RBAC.Menus
 {
     /// <summary>
     /// 菜单管理应用服务接口

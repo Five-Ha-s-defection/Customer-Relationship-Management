@@ -1,6 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
+using CustomerRelationshipManagement.DTOS.RecordDto;
 using CustomerRelationshipManagement.Record;
-using CustomerRelationshipManagement.RecordDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;

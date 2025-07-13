@@ -1,9 +1,9 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Cars;
-using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerRegions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Regions;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBACDtos.Users;
@@ -90,5 +90,18 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers
         /// </summary>
         /// <returns></returns>
         Task<ApiResult<List<CustomerTypeDto>>> GetCustomerType();
+
+        /// <summary>
+        /// 处理线索分配、领取、放弃操作
+        /// </summary>
+        Task<ApiResult<CreateUpdateCustomerDto>> HandleCustomerActionAsync(CustomerActionDto dto);
+
+        /// <summary>
+        /// 显示用户列表（用来分配线索）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        Task<ApiResult<PageInfoCount<DTOS.CustomerProcessDtos.Customers.GetUserRoleDto>>> ShowUserListAsync([FromQuery] DTOS.CustomerProcessDtos.Customers.SearchUserDto dto);
     }
 }

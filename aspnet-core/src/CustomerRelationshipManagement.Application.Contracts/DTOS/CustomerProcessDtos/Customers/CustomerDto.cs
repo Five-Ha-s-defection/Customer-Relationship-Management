@@ -18,9 +18,9 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
 
         //========================================================================================
         /// <summary>
-        /// 负责人姓名
+        /// 真实姓名
         /// </summary>
-        public string UserName { get; set; }
+        public string RealName { get; set; }
 
         /// <summary>
         /// 客户名称
@@ -163,5 +163,14 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         ///// 邮箱
         ///// </summary>
         //public string Email { get; set; }
+
+        //=============================区分客户和客户池==================================================================
+        /// <summary>
+        /// 客户分配/领取状态
+        /// 0 未领取/未分配
+        /// 1 已领取/已分配
+        /// 2 已放弃
+        /// </summary>
+        public int CustomerPoolStatus { get; set; } = 0;
     }
 }

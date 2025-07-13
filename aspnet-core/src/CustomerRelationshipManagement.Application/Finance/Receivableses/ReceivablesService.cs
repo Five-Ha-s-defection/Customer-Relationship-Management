@@ -1,12 +1,9 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.crmcontracts;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
-using CustomerRelationshipManagement.DTOS.Finance.Incoices;
-using CustomerRelationshipManagement.DTOS.Finance.Payments;
+using CustomerRelationshipManagement.DTOS.Export;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
-using CustomerRelationshipManagement.Finance.Invoices;
 using CustomerRelationshipManagement.Finance.Payments;
-using CustomerRelationshipManagement.Helper;
 using CustomerRelationshipManagement.Interfaces.IFinance.Receivableses;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
@@ -16,12 +13,12 @@ using Microsoft.Extensions.Caching.Distributed;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Uow;
 
@@ -48,6 +45,8 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         private readonly IRepository<OperationLog, Guid> operationLogrepository;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
+        private readonly IExportAppService exportAppService;
+
         /// <summary>
         /// Redis缓存服务接口
         /// </summary>
@@ -60,7 +59,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// </summary>
         /// <param name="repository">应收款数据仓储</param>
         /// <param name="redisCacheService">Redis缓存服务</param>
-        public ReceivablesService(IRepository<Receivables, Guid> repository, IDistributedCache<PageInfoCount<ReceivablesDTO>> cache, IDistributedCache<ReceivablesDTO> cacheById, IRepository<Payment, Guid> paymentrepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables, IConnectionMultiplexer connectionMultiplexer, IRepository<OperationLog, Guid> operationLogrepository, IUnitOfWorkManager unitOfWorkManager)
+        public ReceivablesService(IRepository<Receivables, Guid> repository, IDistributedCache<PageInfoCount<ReceivablesDTO>> cache, IDistributedCache<ReceivablesDTO> cacheById, IRepository<Payment, Guid> paymentrepository, IRepository<UserInfo, Guid> userinforeceivables, IRepository<Customer, Guid> customerrepository, IRepository<CrmContract, Guid> crmcontractreceivables, IConnectionMultiplexer connectionMultiplexer, IRepository<OperationLog, Guid> operationLogrepository, IUnitOfWorkManager unitOfWorkManager, IExportAppService exportAppService)
         {
             this.repository = repository;
             _cache = cache;
@@ -72,6 +71,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
             this.connectionMultiplexer = connectionMultiplexer;
             this.operationLogrepository = operationLogrepository;
             _unitOfWorkManager = unitOfWorkManager;
+            this.exportAppService = exportAppService;
         }
 
         /// <summary>
@@ -126,9 +126,9 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// <returns>分页查询结果</returns>
         public async Task<ApiResult<PageInfoCount<ReceivablesDTO>>> GetPageAsync([FromQuery] ReceivablesSearchDto receivablesSearchDto)
         {
-            await ClearAbpCacheAsync();
             // 构建缓存键名
-            string cacheKey ="Getreceivables";
+            string cacheKey = $"Getreceivables:{receivablesSearchDto.ReceivableCode}:{receivablesSearchDto.StartTime}:{receivablesSearchDto.EndTime}:{receivablesSearchDto.UserId}:{receivablesSearchDto.CreatorId}:{receivablesSearchDto.CustomerId}:{receivablesSearchDto.ContractId}:{receivablesSearchDto.ReceivableDate}:{receivablesSearchDto.PageIndex}:{receivablesSearchDto.PageSize}";
+
 
             // 使用Redis缓存获取或添加数据
             var redislist = await _cache.GetOrAddAsync(cacheKey, async () =>
@@ -166,9 +166,10 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                                 UserId = r.UserId,
                                 RealName = c != null ? c.RealName : string.Empty,
                                 PaymentId = r.PaymentId,
-                                Amount = p != null ? p.Amount : 0m,
+                                Amount = p != null && p.PaymentStatus == 2 ? p.Amount : 0m,
                                 CreatorId = r.CreatorId,
                                 CreatorRealName = creator.UserName,
+                                PaymentStatus = p != null ? p.PaymentStatus : 0,
 
                             };
 
@@ -179,7 +180,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                     .WhereIf(receivablesSearchDto.UserId.HasValue, x => x.UserId == receivablesSearchDto.UserId.Value)
                     .WhereIf(receivablesSearchDto.CustomerId.HasValue, x => x.CustomerId == receivablesSearchDto.CustomerId.Value)
                     .WhereIf(receivablesSearchDto.ContractId.HasValue, x => x.ContractId == receivablesSearchDto.ContractId.Value)
-                    .WhereIf(receivablesSearchDto.CreatorId.HasValue, x => x.CreatorId == receivablesSearchDto.CreatorId.Value)
+                   .WhereIf(receivablesSearchDto.CreatorId.HasValue && receivablesSearchDto.CreatorId != Guid.Empty, x => x.CreatorId == receivablesSearchDto.CreatorId.Value)
                     .WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableDate), a => a.ReceivableDate >= DateTime.Parse(receivablesSearchDto.ReceivableDate) && a.ReceivableDate < DateTime.Parse(receivablesSearchDto.ReceivableDate).AddDays(1))
                     .WhereIf(!string.IsNullOrEmpty(receivablesSearchDto.ReceivableCode), x => x.ReceivableCode.Contains(receivablesSearchDto.ReceivableCode));
 
@@ -326,7 +327,7 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
         /// 导出应收款信息
         /// </summary>
         /// <returns></returns>
-        public async Task<IActionResult> GetExportReceivablesAsyncExcel()
+        public async Task<IRemoteStreamContent> GetExportAsyncExcel()
         {
             // 从数据库查询所有产品
             // 获取查询对象
@@ -363,36 +364,27 @@ namespace CustomerRelationshipManagement.Finance.Receivableses
                             CreationTime = r.CreationTime,
                             CreatorRealName = creator.UserName,
                         };
-            var data = query.ToList();
-
-            var headers = new List<string>
+            var exportData = new ExportDataDto<ReceivablesDTO>
             {
-                "应收款编号",
-                "应收款金额",
-                "应收款时间",
-                "所属客户",
-                "关联合同",
-                "负责人"
+                FileName = "应收款",
+                Items = query.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    { "Id", "应收款ID" },
+                    { "ReceivableCode", "应收款编号" },
+                    { "ReceivablePay", "应收款金额" },
+                    { "ReceivableDate", "应收款时间" },
+                    { "CustomerId", "所属客户ID" },
+                    { "CustomerName", "客户名称" },
+                    { "ContractId", "关联合同ID" },
+                    { "ContractName", "合同名称" },
+                    { "UserId", "负责人ID" },
+                    { "RealName", "负责人名称" },
+                    { "CreationTime", "创建时间" },
+                    { "CreatorRealName", "创建人名称" },
+                }
             };
-            // 定义每列对应的属性选择器（可自定义格式）
-            var selectors = new List<Func<ReceivablesDTO, object>>
-            {
-                p => p.ReceivableCode,
-                p => p.ReceivablePay,
-                p => p.ReceivableDate.ToString("yyyy-MM-dd"),
-                p => p.CustomerName,
-                p => p.ContractName,
-                p => p.RealName
-            };
-
-            // 调用通用导出方法，生成Excel字节流
-            var fileBytes = ExcelExportHelper.ExportToExcel(data, headers, selectors, "应收款信息");
-
-            // 返回文件流，浏览器会自动下载
-            return new FileContentResult(fileBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-            {
-                FileDownloadName = "应收款信息.xlsx"
-            };
+            return await exportAppService.ExportToExcelAsync(exportData);
         }
 
         /// <summary>

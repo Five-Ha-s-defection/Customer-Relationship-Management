@@ -149,6 +149,10 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("AbandonReason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -168,6 +172,9 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<string>("CluePhone")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("CluePoolStatus")
+                        .HasColumnType("int");
 
                     b.Property<string>("ClueQQ")
                         .IsRequired()
@@ -544,6 +551,10 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("char(36)");
 
+                    b.Property<string>("AbandonReason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<Guid>("CarFrameNumberId")
                         .HasColumnType("char(36)");
 
@@ -595,6 +606,9 @@ namespace CustomerRelationshipManagement.Migrations
                     b.Property<string>("CustomerPhone")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("CustomerPoolStatus")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("CustomerRegionId")
                         .HasColumnType("char(36)");

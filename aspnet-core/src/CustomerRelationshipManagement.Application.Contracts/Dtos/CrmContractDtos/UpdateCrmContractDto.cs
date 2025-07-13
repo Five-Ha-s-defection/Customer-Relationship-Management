@@ -71,7 +71,7 @@ namespace CustomerRelationshipManagement.Dtos.CrmContractDtos
         /// 审核人ID
         /// </summary>
         [Required]
-        public IList<Guid> AuditorIds { get; set; }
+        public IList<Guid> AuditorId { get; set; }
 
         /// <summary>
         /// 合同扫描件(图片)
