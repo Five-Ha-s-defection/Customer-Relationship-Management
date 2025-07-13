@@ -1,28 +1,13 @@
 ﻿using CustomerRelationshipManagement.DTOS.ChatGLMAi;
-using CustomerRelationshipManagement.DTOS.Finance.FinanceAi;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
-using Volo.Abp;
-using Volo.Abp.Application.Services;
-using Volo.Abp.DependencyInjection;
-using Websocket.Client;
 
 namespace CustomerRelationshipManagement.ChatGLMAi
 {

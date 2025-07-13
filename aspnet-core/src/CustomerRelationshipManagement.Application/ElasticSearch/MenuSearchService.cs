@@ -1,9 +1,7 @@
 using CustomerRelationshipManagement.ApiResults;
-using CustomerRelationshipManagement.Application.Contracts.RBAC.Menus;
 using CustomerRelationshipManagement.ElasticSearch.Models;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Menus;
-using CustomerRelationshipManagement.RBACDtos.Menus;
 using CustomerRelationshipManagement.SearchMenus.Dto;
 using CustomerRelationshipManagement.SearchMenus.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -14,8 +12,6 @@ using Nest;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
