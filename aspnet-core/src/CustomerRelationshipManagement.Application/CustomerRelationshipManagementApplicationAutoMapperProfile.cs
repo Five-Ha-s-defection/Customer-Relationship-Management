@@ -53,7 +53,6 @@ using CustomerRelationshipManagement.RBACDtos.Permissions;
 using CustomerRelationshipManagement.RBACDtos.Roles;
 using CustomerRelationshipManagement.RBACDtos.Users;
 using CustomerRelationshipManagement.Record;
-using CustomerRelationshipManagement.RecordDto;
 using CustomerRelationshipManagement.SearchMenus.Dto;
 
 namespace CustomerRelationshipManagement;
