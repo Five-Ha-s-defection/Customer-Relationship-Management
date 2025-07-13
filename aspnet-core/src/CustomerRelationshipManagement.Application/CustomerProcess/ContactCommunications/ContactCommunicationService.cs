@@ -13,6 +13,9 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.ContactCommunicati
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerContacts;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomReplys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
+using CustomerRelationshipManagement.DTOS.Export;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Export;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IContactCommunications;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Users;
@@ -27,6 +30,7 @@ using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 
 namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
@@ -35,7 +39,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
     /// 联系沟通服务
     /// </summary>
     [ApiExplorerSettings(GroupName = "v1")]
-    public class ContactCommunicationService:ApplicationService,IContactCommunicationService
+    public class ContactCommunicationService : ApplicationService, IContactCommunicationService
     {
         private readonly IRepository<ContactCommunication> contactCommunicationRepository;
         private readonly IRepository<Customer> customerRepository;
@@ -47,8 +51,9 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
         private readonly ILogger<ContactCommunicationService> logger;
         private readonly IDistributedCache<PageInfoCount<ContactCommunicationDto>> cache;
         private readonly IConnectionMultiplexer connectionMultiplexer;
+        private readonly IExportAppService exportAppService;
 
-        public ContactCommunicationService(IRepository<ContactCommunication> contactCommunicationRepository, IRepository<Customer> customerRepository, IRepository<Clue> cluerepository, IRepository<BusinessOpportunity> businessopportunityrepository, ILogger<ContactCommunicationService> logger, IDistributedCache<PageInfoCount<ContactCommunicationDto>> cache, IConnectionMultiplexer connectionMultiplexer, IRepository<CommunicationType> communicationTypeRepository, IRepository<UserInfo> userRepository, IRepository<CustomReply> replyRepository)
+        public ContactCommunicationService(IRepository<ContactCommunication> contactCommunicationRepository, IRepository<Customer> customerRepository, IRepository<Clue> cluerepository, IRepository<BusinessOpportunity> businessopportunityrepository, ILogger<ContactCommunicationService> logger, IDistributedCache<PageInfoCount<ContactCommunicationDto>> cache, IConnectionMultiplexer connectionMultiplexer, IRepository<CommunicationType> communicationTypeRepository, IRepository<UserInfo> userRepository, IRepository<CustomReply> replyRepository, IExportAppService exportAppService)
         {
             this.contactCommunicationRepository = contactCommunicationRepository;
             this.customerRepository = customerRepository;
@@ -60,6 +65,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
             this.communicationTypeRepository = communicationTypeRepository;
             this.userRepository = userRepository;
             this.replyRepository = replyRepository;
+            this.exportAppService = exportAppService;
         }
 
         /// <summary>
@@ -91,7 +97,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
             try
             {
                 // 只能选择客户或线索中的一个，且必须选择一个
-                if ((dto.CustomerId == null && dto.ClueId == null && dto.BusinessOpportunityId==null) || (dto.CustomerId != null && dto.ClueId != null && dto.BusinessOpportunityId!=null))
+                if ((dto.CustomerId == null && dto.ClueId == null && dto.BusinessOpportunityId == null) || (dto.CustomerId != null && dto.ClueId != null && dto.BusinessOpportunityId != null))
                 {
                     return ApiResult<ContactCommunicationDto>.Fail("只能选择客户、线索、商机中的一个，且必须选择一个", ResultCode.Fail);
                 }
@@ -118,7 +124,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ApiResult<PageInfoCount<ContactCommunicationDto>>> GetContactCommunicationList([FromQuery]SearchContactCommunicationDto dto)
+        public async Task<ApiResult<PageInfoCount<ContactCommunicationDto>>> GetContactCommunicationList([FromQuery] SearchContactCommunicationDto dto)
         {
             try
             {
@@ -127,12 +133,19 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
                 //使用Redis缓存获取或添加数据
                 var redislist = await cache.GetOrAddAsync(cacheKey, async () =>
                 {
+                    //获取客户数据
                     var customerlist = await customerRepository.GetQueryableAsync();
+                    //获取线索数据
                     var cluelist = await cluerepository.GetQueryableAsync();
+                    //获取用户数据
                     var userlist = await userRepository.GetQueryableAsync();
+                    //获取自定义回复
                     var replylist = await replyRepository.GetQueryableAsync();
+                    //获取商机数据
                     var businessopportunitylist = await businessopportunityrepository.GetQueryableAsync();
+                    //获取联系沟通方式
                     var communicationtypelist = await communicationTypeRepository.GetQueryableAsync();
+                    //获取联系沟通记录表 
                     var contactCommunicationlist = await contactCommunicationRepository.GetQueryableAsync();
                     var list = from communication in contactCommunicationlist
                                join cus in customerlist on communication.CustomerId equals cus.Id into cusGroup
@@ -149,25 +162,25 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
                                from user in userGroup.DefaultIfEmpty()
                                select new ContactCommunicationDto
                                {
-                                   Id =communication.Id,
-                                   CustomerId=communication.CustomerId,
-                                   CustomerName=cus.CustomerName,
-                                   ClueId=communication.ClueId,
-                                   ClueName=clue.ClueName,
-                                   BusinessOpportunityId=communication.BusinessOpportunityId,
-                                   BusinessOpportunityName=bus.BusinessOpportunityName,
-                                   CreatorId=communication.CreatorId,
-                                   CreationTime=communication.CreationTime,
-                                   Content=communication.Content,
-                                   AttachmentUrl=communication.AttachmentUrl,
-                                   ExpectedDateId=communication.ExpectedDateId,
-                                   CommunicationTypeName=communicationtype.CommunicationTypeName,
-                                   NextContactTime=communication.NextContactTime,
-                                   FollowUpStatus=communication.FollowUpStatus,
-                                   Comments=communication.Comments,
-                                   CustomReplyId=communicationtype.CustomReplyId,
-                                   CustomReplyName=reply.CustomReplyName,
-                                   IsServe=communication.IsServe,
+                                   Id = communication.Id,
+                                   CustomerId = communication.CustomerId,
+                                   CustomerName = cus.CustomerName,
+                                   ClueId = communication.ClueId,
+                                   ClueName = clue.ClueName,
+                                   BusinessOpportunityId = communication.BusinessOpportunityId,
+                                   BusinessOpportunityName = bus.BusinessOpportunityName,
+                                   CreatorId = communication.CreatorId,
+                                   CreationTime = communication.CreationTime,
+                                   Content = communication.Content,
+                                   AttachmentUrl = communication.AttachmentUrl,
+                                   ExpectedDateId = communication.ExpectedDateId,
+                                   CommunicationTypeName = communicationtype.CommunicationTypeName,
+                                   NextContactTime = communication.NextContactTime,
+                                   FollowUpStatus = communication.FollowUpStatus,
+                                   Comments = communication.Comments,
+                                   CustomReplyId = communicationtype.CustomReplyId,
+                                   CustomReplyName = reply.CustomReplyName,
+                                   IsServe = communication.IsServe,
                                };
                     // 联系对象类型筛选
                     switch (dto.ContactTargetType)
@@ -489,5 +502,100 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
                 throw;
             }
         }
+
+
+        /// <summary>
+        /// 导出所有联系人信息记录
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IRemoteStreamContent> ExportAllCommunicationToAsync()
+        {
+            var customerlist = await customerRepository.GetQueryableAsync();
+            //获取线索数据
+            var cluelist = await cluerepository.GetQueryableAsync();
+            //获取用户数据
+            var userlist = await userRepository.GetQueryableAsync();
+            //获取自定义回复
+            var replylist = await replyRepository.GetQueryableAsync();
+            //获取商机数据
+            var businessopportunitylist = await businessopportunityrepository.GetQueryableAsync();
+            //获取联系沟通方式
+            var communicationtypelist = await communicationTypeRepository.GetQueryableAsync();
+            //获取联系沟通记录表 
+            var contactCommunicationlist = await contactCommunicationRepository.GetQueryableAsync();
+            var list = from communication in contactCommunicationlist
+                       join cus in customerlist on communication.CustomerId equals cus.Id into cusGroup
+                       from cus in cusGroup.DefaultIfEmpty()
+                       join clue in cluelist on communication.ClueId equals clue.Id into clueGroup
+                       from clue in clueGroup.DefaultIfEmpty()
+                       join bus in businessopportunitylist on communication.BusinessOpportunityId equals bus.Id into busGroup
+                       from bus in busGroup.DefaultIfEmpty()
+                       join communicationtype in communicationtypelist on communication.ExpectedDateId equals communicationtype.Id into typeGroup
+                       from communicationtype in typeGroup.DefaultIfEmpty()
+                       join reply in replylist on communicationtype.CustomReplyId equals reply.Id into replyGroup
+                       from reply in replyGroup.DefaultIfEmpty()
+                       join user in userlist on cus.UserId equals user.Id into userGroup
+                       from user in userGroup.DefaultIfEmpty()
+                       select new ContactCommunicationDto
+                       {
+                           Id = communication.Id,
+                           CustomerId = communication.CustomerId,
+                           CustomerName = cus.CustomerName,
+                           ClueId = communication.ClueId,
+                           ClueName = clue.ClueName,
+                           BusinessOpportunityId = communication.BusinessOpportunityId,
+                           BusinessOpportunityName = bus.BusinessOpportunityName,
+                           CreatorId = communication.CreatorId,
+                           CreationTime = communication.CreationTime,
+                           Content = communication.Content,
+                           AttachmentUrl = communication.AttachmentUrl,
+                           ExpectedDateId = communication.ExpectedDateId,
+                           CommunicationTypeName = communicationtype.CommunicationTypeName,
+                           NextContactTime = communication.NextContactTime,
+                           FollowUpStatus = communication.FollowUpStatus,
+                           Comments = communication.Comments,
+                           CustomReplyId = communicationtype.CustomReplyId,
+                           CustomReplyName = reply.CustomReplyName,
+                           IsServe = communication.IsServe,
+                           UserId = cus != null ? cus.UserId : Guid.Empty,
+                           UserName = user != null ? user.UserName : null,
+                       };
+
+            var exportData = new ExportDataDto<ContactCommunicationDto>
+            {
+                FileName = "联系人信息记录",
+                Items = list.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+                {
+                     { "Id", "联系人信息ID" },
+                     { "CustomerId", "客户ID" },
+                     { "CustomerName", "客户名称" },
+                     { "ClueId", "线索ID" },
+                     { "ClueName", "线索名称" },
+                     { "BusinessOpportunityId", "商机ID" },
+                     { "BusinessOpportunityName", "商机名称" },
+                     { "CreatorId", "创建时的ID" },
+                     { "CreationTime", "创建时间" },
+                     { "Content", "不知道什么东西" },
+                     { "AttachmentUrl", "上传附件" },
+                      { "ExpectedDateId", "沟通类型ID" },
+                     { "CommunicationTypeName", "沟通类型名称" },
+                     { "NextContactTime", "下次联系时间" },
+                     { "FollowUpStatus", "跟进状态" },
+                      { "Comments", "评论" },
+                     { "CustomReplyId", "自定义回复ID" },
+                     { "CustomReplyName", "自定义回复内容" },
+                     { "IsServe", "保存为模版" },
+                      { "UserId", "角色ID" },
+                       { "UserName", "角色名称" },
+
+
+                }
+            };
+            return await exportAppService.ExportToExcelAsync(exportData);
+        }
+
+
     }
 }
