@@ -69,10 +69,12 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //线索表
         CreateMap<Clue, ClueDto>().ReverseMap();
         CreateMap<Clue, CreateUpdateClueDto>().ReverseMap();
+        CreateMap<Clue, UpdClueDto>().ReverseMap();
 
         //客户表
         CreateMap<Customer, CustomerDto>().ReverseMap();
         CreateMap<Customer, CreateUpdateCustomerDto>().ReverseMap();
+        CreateMap<Customer, UpdCustomerDto>().ReverseMap();
 
         //车架号表
         CreateMap<CarFrameNumber, CarDto>().ReverseMap();

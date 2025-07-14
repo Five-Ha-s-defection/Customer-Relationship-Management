@@ -171,6 +171,6 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// 1 已领取/已分配
         /// 2 已放弃
         /// </summary>
-        public int CustomerPoolStatus { get; set; } = 0;
+        public int CustomerPoolStatus { get; set; } 
     }
 }

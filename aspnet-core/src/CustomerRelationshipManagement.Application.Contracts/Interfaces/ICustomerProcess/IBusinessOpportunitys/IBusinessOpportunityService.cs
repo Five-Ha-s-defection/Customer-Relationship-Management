@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Content;
 
 namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IBusinessOpportunitys
 {
@@ -61,5 +62,11 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IBusinessOp
         /// <typeparam name="BusinessOpportunity"></typeparam>
         /// <returns></returns>
         Task<ApiResult<BusinessOpportunityDto>> DelBusinessOpportunity(Guid id);
+
+        /// <summary>
+        /// 导出所有商机
+        /// </summary>
+        /// <returns></returns>
+        Task<IRemoteStreamContent> ExportAllProductCategoryToAsync();
     }
 }
