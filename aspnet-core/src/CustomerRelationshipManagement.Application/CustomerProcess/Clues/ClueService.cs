@@ -6,6 +6,9 @@ using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
+using CustomerRelationshipManagement.DTOS.Export;
+using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Export;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Roles;
@@ -16,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using NPOI.SS.Formula.Functions;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -25,6 +29,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Users;
 
@@ -52,9 +57,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         private readonly IDistributedCache<PageInfoCount<ClueDto>> cache;
         private readonly IConnectionMultiplexer connectionMultiplexer;
         private readonly ICurrentUser _currentUser;
+        private readonly IExportAppService exportAppService;
 
 
-        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository, IConnectionMultiplexer connectionMultiplexer, ICurrentUser currentUser, IRepository<RoleInfo> roleRepository, IRepository<UserRoleInfo> userRoleRepository)
+        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository, IConnectionMultiplexer connectionMultiplexer, ICurrentUser currentUser, IRepository<RoleInfo> roleRepository, IRepository<UserRoleInfo> userRoleRepository, IExportAppService exportAppService)
         {
             this.repository = repository;
             this.logger = logger;
@@ -66,6 +72,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             _currentUser = currentUser;
             this.roleRepository = roleRepository;
             this.userRoleRepository = userRoleRepository;
+            this.exportAppService = exportAppService;
         }
 
         /// <summary>
@@ -302,7 +309,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                     return pageInfo;
                 }, () => new DistributedCacheEntryOptions
                 {
-                    SlidingExpiration = TimeSpan.FromSeconds(5)     //设置缓存过期时间为5分钟
+                    SlidingExpiration = TimeSpan.FromMinutes(1)     //设置缓存过期时间为1分钟
                 });
 
                 return ApiResult<PageInfoCount<ClueDto>>.Success(ResultCode.Success,redislist);
@@ -355,6 +362,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 }
                 clue.IsDeleted = true; // 设置为已删除状态
                 await repository.UpdateAsync(clue);
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
                 return ApiResult<ClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, ClueDto>(clue));
             }
             catch (Exception ex)
@@ -370,18 +379,41 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         /// <param name="dto">要修改的线索信息</param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<ApiResult<CreateUpdateClueDto>> UpdClue(Guid id,CreateUpdateClueDto dto)
+        public async Task<ApiResult<UpdClueDto>> UpdClue(Guid id, UpdClueDto dto)
         {
             try
             {
-                var clue=await repository.GetAsync(x=>x.Id==id);
+                var clue = await repository.GetAsync(x => x.Id == id);
                 if (clue == null)
                 {
-                   return ApiResult<CreateUpdateClueDto>.Fail("未找到要修改的线索", ResultCode.NotFound);
+                    return ApiResult<UpdClueDto>.Fail("未找到要修改的线索", ResultCode.NotFound);
                 }
-                var clueDto=ObjectMapper.Map(dto,clue);
+                
+                // 先保存原始的CluePoolStatus值
+                var originalCluePoolStatus = clue.CluePoolStatus;
+                
+                // 根据原始的CluePoolStatus值给dto.CluePoolStatus赋值
+                if (originalCluePoolStatus == 1)
+                {
+                    dto.CluePoolStatus = 1;
+                }
+                else if (originalCluePoolStatus == 0)
+                {
+                    dto.CluePoolStatus = 0;
+                }
+                else if (originalCluePoolStatus == 2)
+                {
+                    dto.CluePoolStatus = 2;
+                }
+                
+                // 最后设置clue.CluePoolStatus为1
+                clue.CluePoolStatus = 1;
+                
+                var clueDto = ObjectMapper.Map(dto, clue);
                 await repository.UpdateAsync(clueDto);
-                return ApiResult<CreateUpdateClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, CreateUpdateClueDto>(clueDto));
+                //清除缓存，确保数据一致性
+                await ClearAbpCacheAsync();
+                return ApiResult<UpdClueDto>.Success(ResultCode.Success, ObjectMapper.Map<Clue, UpdClueDto>(clueDto));
             }
             catch (Exception ex)
             {
@@ -566,7 +598,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
 
             // 映射为 DTO 并返回给前端
             var resultDto = ObjectMapper.Map<Clue, CreateUpdateClueDto>(updatedClue);
-
+            //清除缓存，确保数据一致性
+            await ClearAbpCacheAsync();
             return ApiResult<CreateUpdateClueDto>.Success(ResultCode.Success, resultDto);
         }
 
@@ -629,6 +662,78 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             {
                 throw new UserFriendlyException("用户列表获取失败：" + ex.Message);
             }
+        }
+
+        /// <summary>
+        /// 导出所有线索
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IRemoteStreamContent> ExportAllClue([FromQuery] int? cluePoolStatus)
+        {
+            var cluelist = await repository.GetQueryableAsync();
+            var sourcelist = await sourceRepository.GetQueryableAsync();
+            var userlist = await userRepository.GetQueryableAsync();
+            var industrylist = await industryRepository.GetQueryableAsync();
+            var list = from clu in cluelist
+                       join source in sourcelist on clu.ClueSourceId equals source.Id into sourceGroup
+                       from source in sourceGroup.DefaultIfEmpty()
+                       join user in userlist on clu.UserId equals user.Id into userGroup
+                       from user in userGroup.DefaultIfEmpty()
+                       join industry in industrylist on clu.IndustryId equals industry.Id into industryGroup
+                       from industry in industryGroup.DefaultIfEmpty()
+                       join creator in userlist on clu.CreatorId equals creator.Id into creatorGroup
+                       from creator in creatorGroup.DefaultIfEmpty()
+                           // 根据 CustomerPoolStatus 进行筛选
+                       where (cluePoolStatus == null ||
+                              (cluePoolStatus == 1 && clu.CluePoolStatus == 1) ||
+                              ((cluePoolStatus == 0 || cluePoolStatus == 2) &&
+                               (clu.CluePoolStatus == 0 || clu.CluePoolStatus == 2))) && clu.IsDeleted == false  // 未删除的数据
+                       select new ClueDto
+                       {
+                           Id                       = clu.Id,
+                           UserId                   = clu.UserId,
+                           RealName                 = user.RealName,
+                           ClueName                 = clu.ClueName,
+                           CluePhone                = clu.CluePhone,
+                           ClueSourceId             = clu.ClueSourceId,
+                           ClueSourceName           = source.ClueSourceName,
+                           ClueEmail                = clu.ClueEmail,
+                           ClueWechat               = clu.ClueWechat,
+                           ClueQQ                   = clu.ClueQQ,
+                           CompanyName              = clu.CompanyName,
+                           IndustryId               = clu.IndustryId,
+                           IndustryName             = industry.IndustryName,
+                           Address                  = clu.Address,
+                           Remark                   = clu.Remark,
+                           Status                   = clu.Status,
+                           LastFollowTime           = clu.LastFollowTime,
+                           NextContactTime          = clu.NextContactTime,
+                           CreatorId                = clu.CreatorId,
+                           CreateName               = creator.RealName,
+                           CreationTime             = clu.CreationTime,
+                           ClueCode                 = clu.ClueCode,
+                       };
+            var exportData = new ExportDataDto<ClueDto>
+            {
+                FileName = "客户管理--线索",
+                Items = list.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    {"Status","状态" },
+                    {"ClueName","姓名" },
+                    {"CluePhone","电话" },
+                    {"ClueSourceName","线索来源" },
+                    {"ClueEmail","邮箱" },
+                    {"CompanyName","公司名称" },
+                    {"LastFollowTime","最后跟进" },
+                    {"NextContactTime","下次联系" },
+                    {"CreationTime","创建时间" },
+                    {"RealName","负责人" },
+                    {"CreateName","创建人" },
+                }
+            };
+            return await exportAppService.ExportToExcelAsync(exportData);
         }
 
     }

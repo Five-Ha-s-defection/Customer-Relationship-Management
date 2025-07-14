@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Content;
 
 namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers
 {
@@ -53,7 +54,7 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers
         /// <param name="id">要修改的客户ID</param>
         /// <param name="dto">客户信息</param>
         /// <returns></returns>
-        Task<ApiResult<CreateUpdateCustomerDto>> UpdCustomer(Guid id, CreateUpdateCustomerDto dto);
+        Task<ApiResult<UpdCustomerDto>> UpdCustomer(Guid id, UpdCustomerDto dto);
 
         /// <summary>
         /// 获取用户下拉框数据
@@ -104,5 +105,11 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers
         /// <returns></returns>
         /// <exception cref="UserFriendlyException"></exception>
         Task<ApiResult<PageInfoCount<DTOS.CustomerProcessDtos.Customers.GetUserRoleDto>>> ShowUserListAsync([FromQuery] DTOS.CustomerProcessDtos.Customers.SearchUserDto dto);
+
+        /// <summary>
+        /// 导出所有客户
+        /// </summary>
+        /// <returns></returns>
+        Task<IRemoteStreamContent> ExportAllCustomer([FromQuery] int? customerPoolStatus);
     }
 }

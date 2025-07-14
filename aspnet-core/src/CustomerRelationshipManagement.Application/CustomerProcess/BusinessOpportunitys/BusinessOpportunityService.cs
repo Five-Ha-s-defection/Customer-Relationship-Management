@@ -2,14 +2,18 @@
 using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys.Helps;
 using CustomerRelationshipManagement.CustomerProcess.Clues;
+using CustomerRelationshipManagement.CustomerProcess.Clues.Helpers;
 using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.Prioritys;
 using CustomerRelationshipManagement.CustomerProcess.SalesProgresses;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.BusinessOpportunitys;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Prioritys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.SalesProgresses;
+using CustomerRelationshipManagement.DTOS.Export;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Export;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.IBusinessOpportunitys;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.ProductCategory.Products;
@@ -26,6 +30,8 @@ using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
 
@@ -46,8 +52,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
         private readonly IRepository<UserInfo> userrepository;
         private readonly IConnectionMultiplexer connectionMultiplexer;
         private readonly IDistributedCache cache;
+        private readonly IDistributedCache<PageInfoCount<BusinessOpportunityDto>> bcache;
         private readonly ILogger<BusinessOpportunityService> logger;
-        public BusinessOpportunityService(IRepository<BusinessOpportunity> businessopportunityrepository, ILogger<BusinessOpportunityService> logger, IRepository<Customer> customerrepository, IRepository<Priority> priorityrepository, IRepository<SalesProgress> salesprogressrepository, IRepository<Product> productrepository, IRepository<Clue> cluerepository, IRepository<UserInfo> userrepository, IDistributedCache cache, IConnectionMultiplexer connectionMultiplexer)
+        private readonly IExportAppService exportAppService;
+        public BusinessOpportunityService(IRepository<BusinessOpportunity> businessopportunityrepository, ILogger<BusinessOpportunityService> logger, IRepository<Customer> customerrepository, IRepository<Priority> priorityrepository, IRepository<SalesProgress> salesprogressrepository, IRepository<Product> productrepository, IRepository<Clue> cluerepository, IRepository<UserInfo> userrepository, IDistributedCache cache, IConnectionMultiplexer connectionMultiplexer, IExportAppService exportAppService, IDistributedCache<PageInfoCount<BusinessOpportunityDto>> bcache)
         {
             this.businessopportunityrepository = businessopportunityrepository;
             this.logger = logger;
@@ -59,6 +67,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
             this.userrepository = userrepository;
             this.cache = cache;
             this.connectionMultiplexer = connectionMultiplexer;
+            this.exportAppService = exportAppService;
+            this.bcache = bcache;
         }
 
 
@@ -245,177 +255,166 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
         {
             try
             {
+                //构建缓存键名
                 string cacheKey = BusinessOpportunityCacheKeyHelper.BuildReadableKey(dto);
-                // 1. 读取缓存
-                var bytes = await cache.GetAsync(cacheKey);
-                PageInfoCount<BusinessOpportunityDto> redislist = null;
-                if (bytes != null)
+                //使用Redis缓存获取或添加数据
+                var redislist = await bcache.GetOrAddAsync(cacheKey, async () =>
                 {
-                    // 2. 反序列化
-                    var json = Encoding.UTF8.GetString(bytes);
-                    redislist = JsonConvert.DeserializeObject<PageInfoCount<BusinessOpportunityDto>>(json);
-                }
-
-                if (redislist == null)
-                {
-                    // 3. 查询数据库
-                    redislist = await GetBusinessOpportunityList(dto);
-
-                    // 4. 序列化并写入缓存
-                    var jsonStr = JsonConvert.SerializeObject(redislist);
-                    var bytesToCache = Encoding.UTF8.GetBytes(jsonStr);
-                    await cache.SetAsync(cacheKey, bytesToCache, new DistributedCacheEntryOptions
+                    var userlist = await userrepository.GetQueryableAsync();
+                    var cluelist = await cluerepository.GetQueryableAsync();
+                    var customerlist = await customerrepository.GetQueryableAsync();
+                    var productlist = await productrepository.GetQueryableAsync();
+                    var businessopportunitylist = await businessopportunityrepository.GetQueryableAsync();
+                    var prioritylist = await priorityrepository.GetQueryableAsync();
+                    var salesprogresslist = await salesprogressrepository.GetQueryableAsync();
+                    var list = from bus in businessopportunitylist
+                               join cus in customerlist on bus.CustomerId equals cus.Id into cusGroup
+                               from cus in cusGroup.DefaultIfEmpty()
+                               join clu in cluelist on cus.ClueId equals clu.Id into clueGroup
+                               from clu in clueGroup.DefaultIfEmpty()
+                               join user in userlist on cus.UserId equals user.Id into userGroup
+                               from user in userGroup.DefaultIfEmpty()
+                               join creator in userlist on bus.CreatorId equals creator.Id into creatorGroup
+                               from creator in creatorGroup.DefaultIfEmpty()
+                               join priority in prioritylist on bus.PriorityId equals priority.Id into priorityGroup
+                               from priority in priorityGroup.DefaultIfEmpty()
+                               join sale in salesprogresslist on bus.SalesProgressId equals sale.Id into saleGroup
+                               from sale in saleGroup.DefaultIfEmpty()
+                               join product in productlist on bus.ProductId equals product.Id into productGroup
+                               from product in productGroup.DefaultIfEmpty()
+                               select new BusinessOpportunityDto
+                               {
+                                   Id = bus.Id,
+                                   PriorityId = bus.PriorityId,
+                                   PriorityName = priority != null ? priority.PriorityName : null,
+                                   BusinessOpportunityName = bus.BusinessOpportunityName,
+                                   CustomerId = bus.CustomerId,
+                                   CustomerName = cus.CustomerName,
+                                   SalesProgressId = bus.SalesProgressId,
+                                   SalesProgressName = sale != null ? sale.SalesProgressName : null,
+                                   LastFollowTime = clu != null ? clu.LastFollowTime : null,
+                                   NextContactTime = clu != null ? clu.NextContactTime : null,
+                                   CreationTime = bus.CreationTime,
+                                   CreatorId = bus.CreatorId,
+                                   CreateName = creator == null ? "" : creator.UserName,
+                                   UserId = cus.UserId,
+                                   UserName = user == null ? "" : user.UserName,
+                                   BusinessOpportunityCode = bus.BusinessOpportunityCode,
+                                   Budget = bus.Budget,
+                                   ExpectedDate = bus.ExpectedDate,
+                                   Remark = bus.Remark,
+                                   ProductId = bus.ProductId,
+                                   ProductBrand = product != null ? product.ProductBrand : null
+                               };
+                    // 查看范围过滤
+                    if (dto.type == 1 && dto.AssignedTo.HasValue) // 我负责的
                     {
-                        SlidingExpiration = TimeSpan.FromMinutes(5)
-                    });
-                }
+                        list = list.Where(x => x.UserId == dto.AssignedTo.Value);
+                    }
+                    else if (dto.type == 2 && dto.AssignedTo.HasValue) // 我创建的
+                    {
+                        list = list.Where(x => x.CreatorId == dto.AssignedTo.Value);
+                    }
+                    // 如果type=0，不做过滤，默认显示所有商机
+                    else if (dto.type == 0)
+                    {
+                        // 不做额外的过滤，显示所有商机
+                        // 这里可以不加任何条件，或根据其他业务需求设置默认筛选
+                    }
+
+                    // 查询条件
+                    if (!string.IsNullOrEmpty(dto.Keyword))
+                    {
+                        list = list.Where(x => x.BusinessOpportunityCode.Contains(dto.Keyword)
+                                       || x.BusinessOpportunityName.Contains(dto.Keyword));
+                    }
+                    // 根据销售进度查询
+                    if (dto.SalesProgressList != null && dto.SalesProgressList.Any())
+                    {
+                        list = list.Where(x => dto.SalesProgressList.Contains(x.SalesProgressId));
+                    }
+                    // 时间筛选
+                    if (dto.StartTime.HasValue && dto.EndTime.HasValue && dto.TimeType.HasValue)
+                    {
+                        list = dto.TimeType switch
+                        {
+                            TimeField.CreateTime => list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime),
+                            TimeField.NextContact => list.Where(x => x.NextContactTime >= dto.StartTime && x.NextContactTime <= dto.EndTime),
+                            TimeField.LastFollow => list.Where(x => x.LastFollowTime >= dto.StartTime && x.LastFollowTime <= dto.EndTime),
+                            _ => list
+                        };
+                    }
+
+                    // 高级筛选字段处理
+                    if (dto.MatchMode == 0) // 全部满足(AND)
+                    {
+                        if (dto.UserIds != null && dto.UserIds.Count > 0)
+                            list = list.Where(x => dto.UserIds.Contains(x.UserId));
+                        if (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0)
+                            list = list.Where(x => x.CreatorId.HasValue && dto.CreatedByIds.Contains(x.CreatorId.Value));
+                        if (dto.CustomerId != null && dto.CustomerId != Guid.Empty)
+                            list = list.Where(x => x.CustomerId == dto.CustomerId);
+                        if (!string.IsNullOrEmpty(dto.BusinessOpportunityCode))
+                            list = list.Where(x => x.BusinessOpportunityCode != null && x.BusinessOpportunityCode.Contains(dto.BusinessOpportunityCode));
+                        if (dto.PriorityId != null && dto.PriorityId != Guid.Empty)
+                            list = list.Where(x => x.PriorityId == dto.PriorityId);
+                        if (!string.IsNullOrEmpty(dto.BusinessOpportunityName))
+                            list = list.Where(x => x.BusinessOpportunityName != null && x.BusinessOpportunityName.Contains(dto.BusinessOpportunityName));
+                        if (dto.SalesProgressId != null && dto.SalesProgressId != Guid.Empty)
+                            list = list.Where(x => x.SalesProgressId == dto.SalesProgressId);
+                        if (dto.Budget > 0)
+                            list = list.Where(x => x.Budget <= dto.Budget);
+                        if (dto.ExpectedDate != default)
+                            list = list.Where(x => x.ExpectedDate <= dto.ExpectedDate);
+                    }
+                    else // 部分满足(OR)
+                    {
+                        list = list.Where(x =>
+                            (dto.UserIds != null && dto.UserIds.Count > 0 && dto.UserIds.Contains(x.UserId)) ||
+                            (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0 && x.CreatorId.HasValue && dto.CreatedByIds.Contains(x.CreatorId.Value)) ||
+                            (dto.CustomerId != null && dto.CustomerId != Guid.Empty && x.CustomerId == dto.CustomerId) ||
+                            (dto.PriorityId != null && dto.PriorityId != Guid.Empty && x.PriorityId == dto.PriorityId) ||
+                            (!string.IsNullOrEmpty(dto.BusinessOpportunityCode) && x.BusinessOpportunityCode != null && x.BusinessOpportunityCode.Contains(dto.BusinessOpportunityCode)) ||
+                            (!string.IsNullOrEmpty(dto.BusinessOpportunityName) && x.BusinessOpportunityName != null && x.BusinessOpportunityName.Contains(dto.BusinessOpportunityName)) ||
+                             ((dto.ExpectedDate != default) && x.ExpectedDate <= dto.ExpectedDate) ||
+                                    (dto.Budget > 0 && x.Budget <= dto.Budget) ||
+                            (dto.SalesProgressId != null && dto.SalesProgressId != Guid.Empty && x.SalesProgressId == dto.SalesProgressId));
+                    }
+
+                    // 排序
+                    if (dto.OrderBy.HasValue)
+                    {
+                        list = (dto.OrderBy.Value, dto.OrderDesc) switch
+                        {
+                            (TimeField.CreateTime, true) => list.OrderByDescending(x => x.CreationTime),
+                            (TimeField.CreateTime, false) => list.OrderBy(x => x.CreationTime),
+                            (TimeField.NextContact, true) => list.OrderByDescending(x => x.NextContactTime),
+                            (TimeField.NextContact, false) => list.OrderBy(x => x.NextContactTime),
+                            (TimeField.LastFollow, true) => list.OrderByDescending(x => x.LastFollowTime),
+                            (TimeField.LastFollow, false) => list.OrderBy(x => x.LastFollowTime),
+                            _ => list.OrderByDescending(x => x.LastFollowTime)
+                        };
+                    }
+                    //用ABP框架的分页
+                    var res = list.PageResult(dto.PageIndex, dto.PageSize);
+                    //构建分页结果对象
+                    return new PageInfoCount<BusinessOpportunityDto>
+                    {
+                        TotalCount = res.RowCount,
+                        PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / dto.PageSize),
+                        Data = res.Queryable.ToList()
+                    };
+                }, () => new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromMinutes(1)     //设置缓存过期时间为1分钟
+                });
+
                 return ApiResult<PageInfoCount<BusinessOpportunityDto>>.Success(ResultCode.Success, redislist);
             }
             catch (Exception)
             {
                 throw;
             }
-        }
-
-        // 私有方法，封装原有LINQ查询和数据处理逻辑
-        private async Task<PageInfoCount<BusinessOpportunityDto>> GetBusinessOpportunityList(SearchBusinessOpportunityDto dto)
-        {
-            var userlist = await userrepository.GetQueryableAsync();
-            var cluelist = await cluerepository.GetQueryableAsync();
-            var customerlist = await customerrepository.GetQueryableAsync();
-            var productlist = await productrepository.GetQueryableAsync();
-            var businessopportunitylist = await businessopportunityrepository.GetQueryableAsync();
-            var prioritylist = await priorityrepository.GetQueryableAsync();
-            var salesprogresslist = await salesprogressrepository.GetQueryableAsync();
-            var list = from bus in businessopportunitylist
-                       join cus in customerlist on bus.CustomerId equals cus.Id
-                       join clu in cluelist on cus.ClueId equals clu.Id into clueGroup
-                       from clu in clueGroup.DefaultIfEmpty()
-                       join user in userlist on cus.UserId equals user.Id into userGroup
-                       from user in userGroup.DefaultIfEmpty()
-                       join creator in userlist on bus.CreatorId equals creator.Id into creatorGroup
-                       from creator in creatorGroup.DefaultIfEmpty()
-                       join priority in prioritylist on bus.PriorityId equals priority.Id into priorityGroup
-                       from priority in priorityGroup.DefaultIfEmpty()
-                       join sale in salesprogresslist on bus.SalesProgressId equals sale.Id into saleGroup
-                       from sale in saleGroup.DefaultIfEmpty()
-                       join product in productlist on bus.ProductId equals product.Id into productGroup
-                       from product in productGroup.DefaultIfEmpty()
-                       select new BusinessOpportunityDto
-                       {
-                           Id = bus.Id,
-                           PriorityId = bus.PriorityId,
-                           PriorityName = priority != null ? priority.PriorityName : null,
-                           BusinessOpportunityName = bus.BusinessOpportunityName,
-                           CustomerId = bus.CustomerId,
-                           CustomerName = cus.CustomerName,
-                           SalesProgressId = bus.SalesProgressId,
-                           SalesProgressName = sale != null ? sale.SalesProgressName : null,
-                           LastFollowTime = clu != null ? clu.LastFollowTime : null,
-                           NextContactTime = clu != null ? clu.NextContactTime : null,
-                           CreationTime = bus.CreationTime,
-                           CreatorId = bus.CreatorId,
-                           CreateName = creator == null ? "" : creator.UserName,
-                           UserId = cus.UserId,
-                           UserName = user == null ? "" : user.UserName,
-                           BusinessOpportunityCode = bus.BusinessOpportunityCode,
-                           Budget = bus.Budget,
-                           ExpectedDate = bus.ExpectedDate,
-                           Remark = bus.Remark,
-                           ProductId = bus.ProductId,
-                           ProductBrand = product != null ? product.ProductBrand : null
-                       };
-            // 查看范围过滤
-            if (dto.type == 1 && dto.AssignedTo.HasValue) // 我负责的
-            {
-                list = list.Where(x => x.UserId == dto.AssignedTo.Value);
-            }
-            else if (dto.type == 2 && dto.AssignedTo.HasValue) // 我创建的
-            {
-                list = list.Where(x => x.CreatorId == dto.AssignedTo.Value);
-            }
-            // 查询条件
-            if (!string.IsNullOrEmpty(dto.Keyword))
-            {
-                list = list.Where(x => x.BusinessOpportunityCode.Contains(dto.Keyword)
-                               || x.BusinessOpportunityName.Contains(dto.Keyword));
-            }
-            // 根据销售进度查询
-            if (dto.SalesProgressList != null && dto.SalesProgressList.Any())
-            {
-                list = list.Where(x => dto.SalesProgressList.Contains(x.SalesProgressId));
-            }
-            // 时间筛选
-            if (dto.StartTime.HasValue && dto.EndTime.HasValue && dto.TimeType.HasValue)
-            {
-                list = dto.TimeType switch
-                {
-                    TimeField.CreateTime => list.Where(x => x.CreationTime >= dto.StartTime && x.CreationTime <= dto.EndTime),
-                    TimeField.NextContact => list.Where(x => x.NextContactTime >= dto.StartTime && x.NextContactTime <= dto.EndTime),
-                    TimeField.LastFollow => list.Where(x => x.LastFollowTime >= dto.StartTime && x.LastFollowTime <= dto.EndTime),
-                    _ => list
-                };
-            }
-
-            // 高级筛选字段处理
-            if (dto.MatchMode == 0) // 全部满足(AND)
-            {
-                if (dto.UserIds != null && dto.UserIds.Count > 0)
-                    list = list.Where(x => dto.UserIds.Contains(x.UserId));
-                if (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0)
-                    list = list.Where(x => x.CreatorId.HasValue && dto.CreatedByIds.Contains(x.CreatorId.Value));
-                if (dto.CustomerId != null && dto.CustomerId != Guid.Empty)
-                    list = list.Where(x => x.CustomerId == dto.CustomerId);
-                if (!string.IsNullOrEmpty(dto.BusinessOpportunityCode))
-                    list = list.Where(x => x.BusinessOpportunityCode != null && x.BusinessOpportunityCode.Contains(dto.BusinessOpportunityCode));
-                if (dto.PriorityId != null && dto.PriorityId != Guid.Empty)
-                    list = list.Where(x => x.PriorityId == dto.PriorityId);
-                if (!string.IsNullOrEmpty(dto.BusinessOpportunityName))
-                    list = list.Where(x => x.BusinessOpportunityName != null && x.BusinessOpportunityName.Contains(dto.BusinessOpportunityName));
-                if (dto.SalesProgressId != null && dto.SalesProgressId != Guid.Empty)
-                    list = list.Where(x => x.SalesProgressId == dto.SalesProgressId);
-                if (dto.Budget > 0)
-                    list = list.Where(x => x.Budget <= dto.Budget);
-                if (dto.ExpectedDate != default)
-                    list = list.Where(x => x.ExpectedDate <= dto.ExpectedDate);
-            }
-            else // 部分满足(OR)
-            {
-                list = list.Where(x =>
-                    (dto.UserIds != null && dto.UserIds.Count > 0 && dto.UserIds.Contains(x.UserId)) ||
-                    (dto.CreatedByIds != null && dto.CreatedByIds.Count > 0 && x.CreatorId.HasValue && dto.CreatedByIds.Contains(x.CreatorId.Value)) ||
-                    (dto.CustomerId != null && dto.CustomerId != Guid.Empty && x.CustomerId == dto.CustomerId) ||
-                    (dto.PriorityId != null && dto.PriorityId != Guid.Empty && x.PriorityId == dto.PriorityId) ||
-                    (!string.IsNullOrEmpty(dto.BusinessOpportunityCode) && x.BusinessOpportunityCode != null && x.BusinessOpportunityCode.Contains(dto.BusinessOpportunityCode)) ||
-                    (!string.IsNullOrEmpty(dto.BusinessOpportunityName) && x.BusinessOpportunityName != null && x.BusinessOpportunityName.Contains(dto.BusinessOpportunityName)) || 
-                     ((dto.ExpectedDate != default) && x.ExpectedDate <= dto.ExpectedDate) ||
-                            (dto.Budget > 0 && x.Budget <= dto.Budget) ||
-                    (dto.SalesProgressId != null && dto.SalesProgressId != Guid.Empty && x.SalesProgressId == dto.SalesProgressId));
-            }
-
-            // 排序
-            if (dto.OrderBy.HasValue)
-            {
-                list = (dto.OrderBy.Value, dto.OrderDesc) switch
-                {
-                    (TimeField.CreateTime, true) => list.OrderByDescending(x => x.CreationTime),
-                    (TimeField.CreateTime, false) => list.OrderBy(x => x.CreationTime),
-                    (TimeField.NextContact, true) => list.OrderByDescending(x => x.NextContactTime),
-                    (TimeField.NextContact, false) => list.OrderBy(x => x.NextContactTime),
-                    (TimeField.LastFollow, true) => list.OrderByDescending(x => x.LastFollowTime),
-                    (TimeField.LastFollow, false) => list.OrderBy(x => x.LastFollowTime),
-                    _ => list.OrderByDescending(x => x.LastFollowTime)
-                };
-            }
-            //用ABP框架的分页
-            var res = list.PageResult(dto.PageIndex, dto.PageSize);
-            //构建分页结果对象
-            return new PageInfoCount<BusinessOpportunityDto>
-            {
-                TotalCount = res.RowCount,
-                PageCount = (int)Math.Ceiling(res.RowCount * 1.0 / dto.PageSize),
-                Data = res.Queryable.ToList()
-            };
         }
 
 
@@ -498,6 +497,79 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
                 logger.LogError("修改线索信息出错！" + ex.Message);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// 导出所有商机
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IRemoteStreamContent> ExportAllProductCategoryToAsync()
+        {
+            var userlist = await userrepository.GetQueryableAsync();
+            var cluelist = await cluerepository.GetQueryableAsync();
+            var customerlist = await customerrepository.GetQueryableAsync();
+            var productlist = await productrepository.GetQueryableAsync();
+            var businessopportunitylist = await businessopportunityrepository.GetQueryableAsync();
+            var prioritylist = await priorityrepository.GetQueryableAsync();
+            var salesprogresslist = await salesprogressrepository.GetQueryableAsync();
+            var list = from bus in businessopportunitylist
+                       join cus in customerlist on bus.CustomerId equals cus.Id
+                       join clu in cluelist on cus.ClueId equals clu.Id into clueGroup
+                       from clu in clueGroup.DefaultIfEmpty()
+                       join user in userlist on cus.UserId equals user.Id into userGroup
+                       from user in userGroup.DefaultIfEmpty()
+                       join creator in userlist on bus.CreatorId equals creator.Id into creatorGroup
+                       from creator in creatorGroup.DefaultIfEmpty()
+                       join priority in prioritylist on bus.PriorityId equals priority.Id into priorityGroup
+                       from priority in priorityGroup.DefaultIfEmpty()
+                       join sale in salesprogresslist on bus.SalesProgressId equals sale.Id into saleGroup
+                       from sale in saleGroup.DefaultIfEmpty()
+                       join product in productlist on bus.ProductId equals product.Id into productGroup
+                       from product in productGroup.DefaultIfEmpty()
+                       select new BusinessOpportunityDto
+                       {
+                           Id = bus.Id,
+                           PriorityId = bus.PriorityId,
+                           PriorityName = priority != null ? priority.PriorityName : null,
+                           BusinessOpportunityName = bus.BusinessOpportunityName,
+                           CustomerId = bus.CustomerId,
+                           CustomerName = cus.CustomerName,
+                           SalesProgressId = bus.SalesProgressId,
+                           SalesProgressName = sale != null ? sale.SalesProgressName : null,
+                           LastFollowTime = clu != null ? clu.LastFollowTime : null,
+                           NextContactTime = clu != null ? clu.NextContactTime : null,
+                           CreationTime = bus.CreationTime,
+                           CreatorId = bus.CreatorId,
+                           CreateName = creator == null ? "" : creator.UserName,
+                           UserId = cus.UserId,
+                           UserName = user == null ? "" : user.UserName,
+                           BusinessOpportunityCode = bus.BusinessOpportunityCode,
+                           Budget = bus.Budget,
+                           ExpectedDate = bus.ExpectedDate,
+                           Remark = bus.Remark,
+                           ProductId = bus.ProductId,
+                           ProductBrand = product != null ? product.ProductBrand : null
+                       };
+
+            var exportData = new ExportDataDto<BusinessOpportunityDto>
+            {
+                FileName = "客户管理--商机",
+                Items = list.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    { "PriorityName", "优先级" },
+                    { "BusinessOpportunityName", "商机名称" },
+                    { "CustomerName", "所属客户" },
+                    { "SalesProgressName", "销售进度" },
+                    { "LastFollowTime", "最后跟进" },
+                    { "NextContactTime", "下次联系" },
+                    { "CreationTime", "创建时间" },
+                    { "UserName", "负责人" },
+                    { "CreateName", "创建人" },
+                }
+            };
+            return await exportAppService.ExportToExcelAsync(exportData);
         }
     }
 }

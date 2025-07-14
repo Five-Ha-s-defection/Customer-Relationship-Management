@@ -14,6 +14,7 @@ using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.CustomerTypes;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Levels;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
+using CustomerRelationshipManagement.DTOS.Export;
 using CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers;
 using CustomerRelationshipManagement.Paging;
 using CustomerRelationshipManagement.RBAC.Roles;
@@ -35,8 +36,10 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Users;
+using static NPOI.HSSF.Util.HSSFColor;
 
 namespace CustomerRelationshipManagement.CustomerProcess.Customers
 {
@@ -62,7 +65,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         private readonly ICurrentUser _currentUser;
         private readonly IRepository<RoleInfo> roleRepository;
         private readonly IRepository<UserRoleInfo> userRoleRepository;
-        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository, IRepository<CustomerContact> contactRepository, IHttpContextAccessor httpContextAccessor, ICurrentUser currentUser, IRepository<RoleInfo> roleRepository, IRepository<UserRoleInfo> userRoleRepository)
+        private readonly IExportAppService exportAppService;
+        public CustomerService(IRepository<Customer> repository, ILogger<CustomerService> logger, IDistributedCache<PageInfoCount<CustomerDto>> cache, IRepository<Clue> clueRepository, IRepository<UserInfo> userRepository, IRepository<CarFrameNumber> carRepository, IRepository<CustomerLevel> levelRepository, IRepository<ClueSource> sourceRepository, IRepository<CustomerRegion> regionRepository, IConnectionMultiplexer connectionMultiplexer, IRepository<CustomerType> typeRepository, IRepository<CustomerContact> contactRepository, IHttpContextAccessor httpContextAccessor, ICurrentUser currentUser, IRepository<RoleInfo> roleRepository, IRepository<UserRoleInfo> userRoleRepository, IExportAppService exportAppService)  
         {
             this.repository = repository;
             this.logger = logger;
@@ -80,6 +84,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             _currentUser = currentUser;
             this.roleRepository = roleRepository;
             this.userRoleRepository = userRoleRepository;
+            this.exportAppService = exportAppService;
         }
 
         /// <summary>
@@ -187,10 +192,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                                where (
                                  dto.CustomerPoolStatus == null ||
                                  (dto.CustomerPoolStatus == 1 && cus.CustomerPoolStatus == 1) ||
-                                 ((dto.CustomerPoolStatus == 0 || dto.CustomerPoolStatus == 2) && (cus.CustomerPoolStatus == 0 || cus.CustomerPoolStatus == 2))
+                                 ((dto.CustomerPoolStatus == 0 || dto.CustomerPoolStatus == 2) && (cus.CustomerPoolStatus == 0 || cus.CustomerPoolStatus == 2))&&cus.IsDeleted==false
                              )
-                               // join contact in contactlist on cus.Id equals contact.CustomerId into contactGroup
-                               // from contact in contactGroup.DefaultIfEmpty()
                                select new CustomerDto
                                {
                                    Id = cus.Id,
@@ -221,9 +224,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                                    CustomerLevelName = level != null ? level.CustomerLevelName : null,
                                    CustomerAddress = cus.CustomerAddress,
                                    CustomerRemark = cus.CustomerRemark,
-                                   // ContactName= contact != null ? contact.ContactName : null, // 联系人相关，已注释
-                                   // Mobile= contact != null ? contact.Mobile : null, // 联系人相关，已注释
-                                   // Email= contact != null ? contact.Email : null, // 联系人相关，已注释
+                                   CustomerPoolStatus = cus.CustomerPoolStatus, // 确保有这个字段
                                };
                     // type: 0=全部，1=我负责的，2=我创建的
                     if (dto.type == 1 && dto.AssignedTo.HasValue)
@@ -288,12 +289,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                             list = list.Where(x => x.CustomerRegionId == dto.CustomerRegionId);
                         if (!string.IsNullOrEmpty(dto.CustomerAddress))
                             list = list.Where(x => x.CustomerAddress.Contains(dto.CustomerAddress));
-                        // if (!string.IsNullOrEmpty(dto.ContactName))
-                        //     list = list.Where(x => x.ContactName.Contains(dto.ContactName)); // 联系人相关，已注释
-                        // if (!string.IsNullOrEmpty(dto.Mobile))
-                        //     list = list.Where(x => x.Mobile.Contains(dto.Mobile)); // 联系人相关，已注释
-                        // if (!string.IsNullOrEmpty(dto.Email))
-                        //     list = list.Where(x => x.Email.Contains(dto.Email)); // 联系人相关，已注释
                     }
                     else // 部分满足(OR)
                     {
@@ -312,9 +307,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                             (dto.CustomerSourceId != Guid.Empty && x.CustomerSourceId == dto.CustomerSourceId) ||
                             (dto.CustomerRegionId != Guid.Empty && x.CustomerRegionId == dto.CustomerRegionId) ||
                             (!string.IsNullOrEmpty(dto.CustomerAddress) && x.CustomerAddress.Contains(dto.CustomerAddress))
-                         // (!string.IsNullOrEmpty(dto.ContactName) && x.ContactName.Contains(dto.ContactName)) || // 联系人相关，已注释
-                         // (!string.IsNullOrEmpty(dto.Mobile) && x.Mobile.Contains(dto.Mobile)) || // 联系人相关，已注释
-                         // (!string.IsNullOrEmpty(dto.Email) && x.Email.Contains(dto.Email)) || // 联系人相关，已注释
                          );
                     }
 
@@ -339,6 +331,16 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
 
                     //用ABP框架的分页
                     var res = list.PageResult(dto.PageIndex, dto.PageSize);
+                    // 打印数据库查出来的customerPoolStatus
+                    foreach (var item in res.Queryable)
+                    {
+                        Console.WriteLine($"[ShowCustomer] DB查出customerPoolStatus: {item.CustomerPoolStatus}, Id: {item.Id}");
+                    }
+                    // 打印返回给前端的customerPoolStatus
+                    foreach (var item in res.Queryable.ToList())
+                    {
+                        Console.WriteLine($"[ShowCustomer] 返回前端customerPoolStatus: {item.CustomerPoolStatus}, Id: {item.Id}");
+                    }
                     //数据为空时不缓存
                     if (res.RowCount == 0)
                     {
@@ -429,20 +431,41 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         /// <param name="dto">客户信息</param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<ApiResult<CreateUpdateCustomerDto>> UpdCustomer(Guid id, CreateUpdateCustomerDto dto)
+        public async Task<ApiResult<UpdCustomerDto>> UpdCustomer(Guid id, UpdCustomerDto dto)
         {
             try
             {
                 var customer = await repository.GetAsync(x => x.Id == id);
                 if (customer == null)
                 {
-                    return ApiResult<CreateUpdateCustomerDto>.Fail("未找到要修改的客户", ResultCode.NotFound);
+                    return ApiResult<UpdCustomerDto>.Fail("未找到要修改的客户", ResultCode.NotFound);
                 }
+
+                // 先保存原始的CustomerPoolStatus值
+                var originalCluePoolStatus = customer.CustomerPoolStatus;
+
+                // 根据原始的CluePoolStatus值给dto.CustomerPoolStatus赋值
+                if (originalCluePoolStatus == 1)
+                {
+                    dto.CustomerPoolStatus = 1;
+                }
+                else if (originalCluePoolStatus == 0)
+                {
+                    dto.CustomerPoolStatus = 0;
+                }
+                else if (originalCluePoolStatus == 2)
+                {
+                    dto.CustomerPoolStatus = 2;
+                }
+
+                // 最后设置customer.CustomerPoolStatus为1
+                customer.CustomerPoolStatus = 1;
+
                 var customerDto = ObjectMapper.Map(dto, customer);
                 await repository.UpdateAsync(customerDto);
                 //清除缓存，确保数据一致性
                 await ClearAbpCacheAsync();
-                return ApiResult<CreateUpdateCustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, CreateUpdateCustomerDto>(customerDto));
+                return ApiResult<UpdCustomerDto>.Success(ResultCode.Success, ObjectMapper.Map<Customer, UpdCustomerDto>(customerDto));
             }
             catch (Exception ex)
             {
@@ -711,6 +734,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
             {
                 throw new BusinessException("Customer.NotFound", "未找到对应的客户");
             }
+            Console.WriteLine($"[HandleCustomerActionAsync] DB查出customerPoolStatus: {customer.CustomerPoolStatus}, Id: {customer.Id}");
 
             // 获取当前登录用户的 ID
             // _currentUser 由 ABP 框架自动提供，代表当前已登录用户的信息，常用于应用服务中判断用户身份、ID、租户等。
@@ -770,6 +794,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
 
             // 映射为 DTO 并返回给前端
             var resultDto = ObjectMapper.Map<Customer, CreateUpdateCustomerDto>(updatedClue);
+            Console.WriteLine($"[HandleCustomerActionAsync] 返回前端customerPoolStatus: {resultDto.CustomerPoolStatus}, Id: {updatedClue.Id}");
 
             //清除缓存，确保数据一致性
             await ClearAbpCacheAsync();
@@ -836,5 +861,97 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
                 throw new UserFriendlyException("用户列表获取失败：" + ex.Message);
             }
         }
+
+        /// <summary>
+        /// 导出所有客户
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IRemoteStreamContent> ExportAllCustomer([FromQuery] int? customerPoolStatus)
+        {
+                var customerlist = await repository.GetQueryableAsync();
+                var cluelist = await clueRepository.GetQueryableAsync();
+                var userlist = await userRepository.GetQueryableAsync();
+                var carlist = await carRepository.GetQueryableAsync();
+                var levelist = await levelRepository.GetQueryableAsync();
+                var regionlist = await regionRepository.GetQueryableAsync();
+                var typelist = await typeRepository.GetQueryableAsync();
+                var sourceList = await sourceRepository.GetQueryableAsync();
+                var list = from cus in customerlist
+                           join clu in cluelist on cus.ClueId equals clu.Id into clueGroup
+                           from clu in clueGroup.DefaultIfEmpty()
+                           join user in userlist on cus.UserId equals user.Id into userGroup
+                           from user in userGroup.DefaultIfEmpty()
+                           join car in carlist on cus.CarFrameNumberId equals car.Id into carGroup
+                           from car in carGroup.DefaultIfEmpty()
+                           join level in levelist on cus.CustomerLevelId equals level.Id into levelGroup
+                           from level in levelGroup.DefaultIfEmpty()
+                           join region in regionlist on cus.CustomerRegionId equals region.Id into regionGroup
+                           from region in regionGroup.DefaultIfEmpty()
+                           join type in typelist on cus.CustomerTypeId equals type.Id into typeGroup
+                           from type in typeGroup.DefaultIfEmpty()
+                           join source in sourceList on cus.CustomerSourceId equals source.Id into sourceGroup
+                           from source in sourceGroup.DefaultIfEmpty()
+                           join creator in userlist on cus.CreatorId equals creator.Id into creatorGroup
+                           from creator in creatorGroup.DefaultIfEmpty()
+                           // 根据 CustomerPoolStatus 进行筛选
+                           where (customerPoolStatus == null ||
+                                  (customerPoolStatus == 1 && cus.CustomerPoolStatus == 1) ||
+                                  ((customerPoolStatus == 0 || customerPoolStatus == 2) &&
+                                   (cus.CustomerPoolStatus == 0 || cus.CustomerPoolStatus == 2))) && cus.IsDeleted == false  // 未删除的数据
+                           select new CustomerDto
+                           {
+                               Id                         = cus.Id,
+                               UserId                     = cus.UserId,
+                               RealName                   = user != null ? user.RealName : null,
+                               CustomerName               = cus.CustomerName,
+                               CheckAmount                = cus.CheckAmount,
+                               CustomerPhone              = cus.CustomerPhone,
+                               CustomerSourceId           = cus.CustomerSourceId,
+                               ClueSourceName             = source != null ? source.ClueSourceName : null,
+                               ClueId                     = cus.ClueId,
+                               LastFollowTime             = clu != null ? clu.LastFollowTime : null,
+                               NextContactTime            = clu != null ? clu.NextContactTime : null,
+                               CreationTime               = cus.CreationTime,
+                               CreatorId                  = creator != null ? creator.Id : Guid.Empty,
+                               CreateName                 = creator != null ? creator.RealName : null,
+                               ClueWechat                 = clu != null ? clu.ClueWechat : null,
+                               CustomerEmail              = cus.CustomerEmail,
+                               CustomerCode               = cus.CustomerCode,
+                               CustomerExpireTime         = cus.CustomerExpireTime,
+                               CarFrameNumberId           = cus.CarFrameNumberId,
+                               CarFrameNumberName         = car != null ? car.CarFrameNumberName : null,
+                               CustomerRegionId           = cus.CustomerRegionId,
+                               CustomerRegionName         = region != null ? region.CustomerRegionName : null,
+                               CustomerTypeId             = cus.CustomerTypeId,
+                               CustomerTypeName           = type != null ? type.CustomerTypeName : null,
+                               CustomerLevelId            = cus.CustomerLevelId,
+                               CustomerLevelName          = level != null ? level.CustomerLevelName : null,
+                               CustomerAddress            = cus.CustomerAddress,
+                               CustomerRemark             = cus.CustomerRemark,
+                           };
+            var exportData = new ExportDataDto<CustomerDto>
+            {
+                FileName = "客户管理--客户",
+                Items = list.ToList(),
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    {"CustomerName","客户姓名" },
+                    {"CustomerEmail","邮箱" },
+                    {"CustomerExpireTime","日期" },
+                    {"CheckAmount","体检金额" },
+                    {"CustomerLevelName","客户级别" },
+                    {"CustomerPhone","联系电话" },
+                    {"ClueSourceName","客户来源" },
+                    {"LastFollowTime","最后跟进" },
+                    {"NextContactTime","下次联系" },
+                    {"CreationTime","创建时间" },
+                    {"RealName","负责人" },
+                    {"CreateName","创建人" }, 
+                }
+            };
+            return await exportAppService.ExportToExcelAsync(exportData);
+        }
+
     }
 }

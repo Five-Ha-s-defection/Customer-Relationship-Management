@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Content;
 
 
 namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
@@ -53,7 +54,7 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        Task<ApiResult<CreateUpdateClueDto>> UpdClue(Guid id, CreateUpdateClueDto dto);
+        Task<ApiResult<UpdClueDto>> UpdClue(Guid id, UpdClueDto dto);
 
         /// <summary>
         /// 获取来源下拉框数据
@@ -79,5 +80,11 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
         /// <returns></returns>
         /// <exception cref="UserFriendlyException"></exception>
         Task<ApiResult<PageInfoCount<GetUserRoleDto>>> ShowUserListAsync([FromQuery] SearchUserDto dto);
+
+        /// <summary>
+        /// 导出所有线索
+        /// </summary>
+        /// <returns></returns>
+        Task<IRemoteStreamContent> ExportAllClue([FromQuery] int? cluePoolStatus);
     }
 }
