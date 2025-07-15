@@ -331,16 +331,6 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
 
                     //用ABP框架的分页
                     var res = list.PageResult(dto.PageIndex, dto.PageSize);
-                    // 打印数据库查出来的customerPoolStatus
-                    foreach (var item in res.Queryable)
-                    {
-                        Console.WriteLine($"[ShowCustomer] DB查出customerPoolStatus: {item.CustomerPoolStatus}, Id: {item.Id}");
-                    }
-                    // 打印返回给前端的customerPoolStatus
-                    foreach (var item in res.Queryable.ToList())
-                    {
-                        Console.WriteLine($"[ShowCustomer] 返回前端customerPoolStatus: {item.CustomerPoolStatus}, Id: {item.Id}");
-                    }
                     //数据为空时不缓存
                     if (res.RowCount == 0)
                     {

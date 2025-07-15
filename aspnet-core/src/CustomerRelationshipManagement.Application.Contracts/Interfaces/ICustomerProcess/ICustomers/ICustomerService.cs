@@ -32,7 +32,7 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.ICustomers
         /// </summary>
         /// <param name="dto">要查询的信息</param>
         /// <returns></returns>
-        Task<ApiResult<PageInfoCount<CustomerDto>>> ShowCustomer([FromQuery] SearchCustomerDto dto);
+        Task<ApiResult<PageInfoCount<CustomerDto>>> ShowCustomer([FromQuery] DTOS.CustomerProcessDtos.Customers.SearchCustomerDto dto);
 
         /// <summary>
         /// 获取客户详情信息

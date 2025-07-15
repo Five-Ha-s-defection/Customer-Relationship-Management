@@ -2,8 +2,11 @@
 using CustomerRelationshipManagement.Clues;
 using CustomerRelationshipManagement.CustomerProcess.Clues.Helpers;
 using CustomerRelationshipManagement.CustomerProcess.ClueSources;
+using CustomerRelationshipManagement.CustomerProcess.CustomerContacts;
+using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.CustomerProcess.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.DTOS.Export;
@@ -53,6 +56,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         private readonly IRepository<RoleInfo> roleRepository;
         private readonly IRepository<UserRoleInfo> userRoleRepository;
         private readonly IRepository<Industry> industryRepository;
+        private readonly IRepository<Customer> customerRepository;
+        private readonly IRepository<CustomerContact> contactRepository;
         private readonly ILogger<ClueService> logger;
         private readonly IDistributedCache<PageInfoCount<ClueDto>> cache;
         private readonly IConnectionMultiplexer connectionMultiplexer;
@@ -60,7 +65,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         private readonly IExportAppService exportAppService;
 
 
-        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository, IConnectionMultiplexer connectionMultiplexer, ICurrentUser currentUser, IRepository<RoleInfo> roleRepository, IRepository<UserRoleInfo> userRoleRepository, IExportAppService exportAppService)
+        public ClueService(IRepository<Clue> repository, ILogger<ClueService> logger, IDistributedCache<PageInfoCount<ClueDto>> cache, IRepository<ClueSource> sourceRepository, IRepository<UserInfo> userRepository, IRepository<Industry> industryRepository, IConnectionMultiplexer connectionMultiplexer, ICurrentUser currentUser, IRepository<RoleInfo> roleRepository, IRepository<UserRoleInfo> userRoleRepository, IExportAppService exportAppService, IRepository<Customer> customerRepository, IRepository<CustomerContact> contactRepository)
         {
             this.repository = repository;
             this.logger = logger;
@@ -73,6 +78,8 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
             this.roleRepository = roleRepository;
             this.userRoleRepository = userRoleRepository;
             this.exportAppService = exportAppService;
+            this.customerRepository = customerRepository;
+            this.contactRepository = contactRepository;
         }
 
         /// <summary>
@@ -168,6 +175,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                                    dto.CluePoolStatus == null ||
                                    (dto.CluePoolStatus == 1 && clu.CluePoolStatus == 1) ||
                                    ((dto.CluePoolStatus == 0 || dto.CluePoolStatus == 2) && (clu.CluePoolStatus == 0 || clu.CluePoolStatus == 2))
+                                   && clu.IsDeleted == false
                                )
                                select new ClueDto
                                {
@@ -610,7 +618,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         /// <returns></returns>
         /// <exception cref="UserFriendlyException"></exception>
         [HttpGet]
-        public async Task<ApiResult<PageInfoCount<GetUserRoleDto>>> ShowUserListAsync([FromQuery] SearchUserDto dto)
+        public async Task<ApiResult<PageInfoCount<DTOS.CustomerProcessDtos.Clues.GetUserRoleDto>>> ShowUserListAsync([FromQuery] DTOS.CustomerProcessDtos.Clues.SearchUserDto dto)
         {
             try
             {
@@ -623,7 +631,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                             from ur in urGroup.DefaultIfEmpty()
                             join role in roleQuery on ur.RoleId equals role.Id into roleGroup
                             from role in roleGroup.DefaultIfEmpty()
-                            select new GetUserRoleDto
+                            select new DTOS.CustomerProcessDtos.Clues.GetUserRoleDto
                             {
                                 UserRoleId = ur.Id,
                                 UserId = user.Id,
@@ -649,14 +657,14 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 var totalCount = query.Count();
                 var pagedList = query.Skip((dto.PageIndex - 1) * dto.PageSize).Take(dto.PageSize).ToList();
 
-                var pageInfo = new PageInfoCount<GetUserRoleDto>
+                var pageInfo = new PageInfoCount<DTOS.CustomerProcessDtos.Clues.GetUserRoleDto>
                 {
                     TotalCount = totalCount,
                     PageCount = (int)Math.Ceiling(totalCount * 1.0 / dto.PageSize),
                     Data = pagedList
                 };
 
-                return ApiResult<PageInfoCount<GetUserRoleDto>>.Success(ResultCode.Success, pageInfo);
+                return ApiResult<PageInfoCount<DTOS.CustomerProcessDtos.Clues.GetUserRoleDto>>.Success(ResultCode.Success, pageInfo);
             }
             catch (Exception ex)
             {
@@ -734,6 +742,182 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
                 }
             };
             return await exportAppService.ExportToExcelAsync(exportData);
+        }
+
+        /// <summary>
+        /// 线索转客户
+        /// </summary>
+        /// <param name="clueId">线索ID</param>
+        /// <param name="conversionDto">线索转换客户DTO</param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        [HttpPost]
+        public async Task<CustomerDto> ConvertClueToCustomerAsync(Guid clueId, Guid customerId, ClueConversionDto conversionDto)
+        {
+            var clue = await repository.GetAsync(x => x.Id == clueId);
+            if (clue == null)
+            {
+                throw new UserFriendlyException("线索不存在！");
+            }
+
+            Customer customer = null;
+
+            switch (conversionDto.ConversionType)
+            {
+                // 新建客户逻辑：增强版
+                case ConversionType.CreateNewCustomer:
+                    customer = new Customer
+                    {
+                        UserId = clue.UserId,
+                        CustomerName = clue.ClueName,
+                        CustomerPhone = clue.CluePhone,
+                        CustomerEmail = clue.ClueEmail,
+                        CustomerRemark = clue.Remark,
+                        ClueId = clue.Id,
+                        CustomerCode = GenerateCustomerCode(),
+                        CustomerPoolStatus = 1,
+
+                        // 新增字段填充
+                        CustomerLevelId = conversionDto.CustomerLevelId,
+                        CustomerRegionId = conversionDto.CustomerRegionId,
+                        CustomerTypeId = conversionDto.CustomerTypeId,
+                        CustomerSourceId = conversionDto.CustomerSourceId,
+                        CarFrameNumberId = conversionDto.CarFrameNumberId,
+                        CheckAmount = conversionDto.CheckAmount,
+                        CustomerExpireTime = conversionDto.CustomerExpireTime,
+                        CustomerAddress = clue.Address
+                    };
+
+                    // 创建联系人（可选）
+                    if (conversionDto.CreateContact && conversionDto.ContactInfo != null)
+                    {
+                        var contact = new CustomerContact
+                        {
+                            CustomerId = customer.Id, // 注意：先赋值，后插入
+                            ContactName = conversionDto.ContactInfo.ContactName,
+                            ContactRelationId = conversionDto.ContactInfo.ContactRelationId,
+                            RoleId = conversionDto.ContactInfo.RoleId,
+                            Salutation = conversionDto.ContactInfo.Salutation,
+                            Position = conversionDto.ContactInfo.Position,
+                            Mobile = conversionDto.ContactInfo.Mobile,
+                            QQ = conversionDto.ContactInfo.QQ,
+                            Email = conversionDto.ContactInfo.Email,
+                            Wechat = conversionDto.ContactInfo.Wechat,
+                            Remark = conversionDto.ContactInfo.Remark,
+                            IsPrimary = conversionDto.ContactInfo.IsPrimary
+                        };
+
+                        await contactRepository.InsertAsync(contact);
+                        customer.ContactId = contact.Id;
+                    }
+
+                    await customerRepository.InsertAsync(customer);
+                    break;
+
+                // 关联已有客户
+                case ConversionType.LinkToExistingCustomer:
+                    var existCustomer = await customerRepository.GetAsync(x => x.Id == customerId);
+                    if (existCustomer == null)
+                    {
+                        throw new UserFriendlyException("客户不存在");
+                    }
+
+                    // 关联客户
+                    clue.CustomerId = existCustomer.Id;
+                    await repository.UpdateAsync(clue);
+                    customer = existCustomer;
+
+                    // 如果有联系人信息，则为该客户添加联系人
+                    if (conversionDto.CreateContact && conversionDto.ContactInfo != null)
+                    {
+                        var contact = new CustomerContact
+                        {
+                            CustomerId = existCustomer.Id, // 直接使用已有客户ID
+                            ContactName = conversionDto.ContactInfo.ContactName,
+                            ContactRelationId = conversionDto.ContactInfo.ContactRelationId,
+                            RoleId = conversionDto.ContactInfo.RoleId,
+                            Salutation = conversionDto.ContactInfo.Salutation,
+                            Position = conversionDto.ContactInfo.Position,
+                            Mobile = conversionDto.ContactInfo.Mobile,
+                            QQ = conversionDto.ContactInfo.QQ,
+                            Email = conversionDto.ContactInfo.Email,
+                            Wechat = conversionDto.ContactInfo.Wechat,
+                            Remark = conversionDto.ContactInfo.Remark,
+                            IsPrimary = conversionDto.ContactInfo.IsPrimary
+                        };
+
+                        await contactRepository.InsertAsync(contact);
+                    }
+                    break;
+            }
+
+            return ObjectMapper.Map<Customer, CustomerDto>(customer);
+        }
+
+        // 生成客户编号的逻辑
+        private string GenerateCustomerCode()
+        {
+            var now = DateTime.Now;
+            var random = new Random();
+            string randomStr;
+            if (random.Next(2) == 0)
+            {
+                randomStr = random.Next(1000, 10000).ToString("D4");
+            }
+            else
+            {
+                randomStr = random.Next(0x1000, 0x10000).ToString("X4");
+            }
+            return $"C-{now:yyyyMMddHHmm}-{randomStr}";
+        }
+
+
+        /// <summary>
+        /// 显示客户列表（用来选择关联客户）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        [HttpGet]
+        public async Task<ApiResult<List<CustomerDto>>> ShowCustomerListAsync([FromQuery] DTOS.CustomerProcessDtos.Clues.SearchCustomerDto dto)
+        {
+            try
+            {
+                // 获取客户查询数据
+                var customerQuery = await customerRepository.GetQueryableAsync();
+
+                // 查询客户信息（简单查询客户表）
+                var query = from customer in customerQuery
+                            select new CustomerDto
+                            {
+                                Id = customer.Id,
+                                CustomerCode = customer.CustomerCode,
+                                CustomerName = customer.CustomerName,
+                                CustomerPhone = customer.CustomerPhone,
+                                CreationTime=customer.CreationTime,
+                            };
+
+                // 关键词搜索（按客户名称或手机号）
+                if (!string.IsNullOrWhiteSpace(dto.Keyword))
+                {
+                    query = query.Where(x =>
+                        x.CustomerName.Contains(dto.Keyword) || // 按客户名称搜索
+                        x.CustomerPhone.Contains(dto.Keyword));  // 按手机号搜索
+                }
+
+                // 排序（按创建时间）
+                query = query.OrderByDescending(x => x.CreationTime); 
+
+                // 获取所有符合条件的数据
+                var resultList = await query.ToListAsync();
+
+                // 返回查询结果
+                return ApiResult<List<CustomerDto>>.Success(ResultCode.Success, resultList);
+            }
+            catch (Exception ex)
+            {
+                throw new UserFriendlyException("客户列表获取失败：" + ex.Message);
+            }
         }
 
     }

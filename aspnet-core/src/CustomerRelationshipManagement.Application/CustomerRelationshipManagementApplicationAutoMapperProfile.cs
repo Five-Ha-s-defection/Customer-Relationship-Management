@@ -104,6 +104,7 @@ public class CustomerRelationshipManagementApplicationAutoMapperProfile : Profil
         //商机表
         CreateMap<BusinessOpportunity, BusinessOpportunityDto>().ReverseMap();
         CreateMap<BusinessOpportunity, CreateUpdateBusinessOpportunityDto>().ReverseMap();
+        CreateMap<BusinessOpportunity, UpdBusinessDto>().ReverseMap();
 
         //商机表
         CreateMap<BusinessOpportunity, BusinessOpportunityDto>().ReverseMap();

@@ -106,5 +106,10 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues
         /// 放弃原因
         /// </summary>
         public string AbandonReason{ get; set; }
+
+        /// <summary>
+        /// 客户ID——线索转换
+        /// </summary>
+        public Guid? CustomerId { get; set; }
     }
 }

@@ -40,13 +40,13 @@ namespace CustomerRelationshipManagement.CustomerProcess.Clues.Helpers
         /// <summary>
         /// 构建短缓存Key（哈希版）
         /// </summary>
-        public static string BuildHashKey(SearchCustomerDto dto)
+        public static string BuildHashKey(SearchClueDto dto)
         {
             string rawKey = $"{dto.StartTime}_{dto.EndTime}_{dto.TimeType}_{dto.OrderBy}_{dto.OrderDesc}_{dto.Keyword}_{dto.PageIndex}_{dto.PageSize}";
             using var md5 = MD5.Create();
             var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(rawKey));
             string hash = BitConverter.ToString(hashBytes).Replace("-", "");
-            return $"CustomerRedis_{hash}";
+            return $"ClueRedis_{hash}";
         }
     }
 }

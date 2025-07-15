@@ -477,20 +477,20 @@ namespace CustomerRelationshipManagement.CustomerProcess.BusinessOpportunitys
         /// <param name="dto">商机信息</param>
         /// <returns></returns>
         [HttpPut]
-        public async Task<ApiResult<CreateUpdateBusinessOpportunityDto>> UpdCustomer(Guid id, CreateUpdateBusinessOpportunityDto dto)
+        public async Task<ApiResult<UpdBusinessDto>> UpdCustomer(Guid id, UpdBusinessDto dto)
         {
             try
             {
                 var businessopportunity = await businessopportunityrepository.GetAsync(x => x.Id == id);
                 if (businessopportunity == null)
                 {
-                    return ApiResult<CreateUpdateBusinessOpportunityDto>.Fail("未找到要修改的商机", ResultCode.NotFound);
+                    return ApiResult<UpdBusinessDto>.Fail("未找到要修改的商机", ResultCode.NotFound);
                 }
                 var businessopportunityDto = ObjectMapper.Map(dto, businessopportunity);
                 await businessopportunityrepository.UpdateAsync(businessopportunity);
                 //清除缓存，确保数据一致性
                 await ClearAbpCacheAsync();
-                return ApiResult<CreateUpdateBusinessOpportunityDto>.Success(ResultCode.Success, ObjectMapper.Map<BusinessOpportunity, CreateUpdateBusinessOpportunityDto>(businessopportunity));
+                return ApiResult<UpdBusinessDto>.Success(ResultCode.Success, ObjectMapper.Map<BusinessOpportunity, UpdBusinessDto>(businessopportunity));
             }
             catch (Exception ex)
             {

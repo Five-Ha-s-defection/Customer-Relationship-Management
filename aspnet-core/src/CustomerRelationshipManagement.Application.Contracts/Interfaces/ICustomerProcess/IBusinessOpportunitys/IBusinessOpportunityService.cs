@@ -68,5 +68,13 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IBusinessOp
         /// </summary>
         /// <returns></returns>
         Task<IRemoteStreamContent> ExportAllProductCategoryToAsync();
+
+        /// <summary>
+        /// 修改商机信息
+        /// </summary>
+        /// <param name="id">要修改的商机ID</param>
+        /// <param name="dto">商机信息</param>
+        /// <returns></returns>
+        Task<ApiResult<UpdBusinessDto>> UpdCustomer(Guid id, UpdBusinessDto dto);
     }
 }

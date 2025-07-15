@@ -1,5 +1,6 @@
 ﻿using CustomerRelationshipManagement.ApiResults;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Industrys;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Sources;
 using CustomerRelationshipManagement.Paging;
@@ -79,12 +80,29 @@ namespace CustomerRelationshipManagement.Interfaces.ICustomerProcess.IClues
         /// <param name="dto"></param>
         /// <returns></returns>
         /// <exception cref="UserFriendlyException"></exception>
-        Task<ApiResult<PageInfoCount<GetUserRoleDto>>> ShowUserListAsync([FromQuery] SearchUserDto dto);
+        Task<ApiResult<PageInfoCount<DTOS.CustomerProcessDtos.Clues.GetUserRoleDto>>> ShowUserListAsync([FromQuery] DTOS.CustomerProcessDtos.Clues.SearchUserDto dto);
 
         /// <summary>
         /// 导出所有线索
         /// </summary>
         /// <returns></returns>
         Task<IRemoteStreamContent> ExportAllClue([FromQuery] int? cluePoolStatus);
+
+        /// <summary>
+        /// 线索转客户
+        /// </summary>
+        /// <param name="clueId">线索ID</param>
+        /// <param name="conversionDto">线索转换客户DTO</param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        Task<CustomerDto> ConvertClueToCustomerAsync(Guid clueId, Guid customerId, ClueConversionDto conversionDto);
+
+        /// <summary>
+        /// 显示客户列表（用来选择关联客户）
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
+        /// <exception cref="UserFriendlyException"></exception>
+        Task<ApiResult<List<CustomerDto>>> ShowCustomerListAsync([FromQuery] DTOS.CustomerProcessDtos.Clues.SearchCustomerDto dto);
     }
 }

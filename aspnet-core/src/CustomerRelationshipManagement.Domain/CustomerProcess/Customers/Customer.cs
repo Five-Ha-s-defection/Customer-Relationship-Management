@@ -11,7 +11,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
     /// <summary>
     /// 客户表
     /// </summary>
-    public class Customer:FullAuditedAggregateRoot<Guid>
+    public class Customer : FullAuditedAggregateRoot<Guid>
     {
         /// <summary>
         /// 客户负责人(外键)
@@ -21,7 +21,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         /// <summary>
         /// 客户名称
         /// </summary>
-        public string CustomerName { get; set; }=string.Empty;
+        public string CustomerName { get; set; } = string.Empty;
 
         /// <summary>
         /// 体检金额
@@ -71,7 +71,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.Customers
         /// <summary>
         /// 客户地址
         /// </summary>
-        public string? CustomerAddress { get; set; }= string.Empty;
+        public string? CustomerAddress { get; set; } = string.Empty;
 
         /// <summary>
         /// 备注
