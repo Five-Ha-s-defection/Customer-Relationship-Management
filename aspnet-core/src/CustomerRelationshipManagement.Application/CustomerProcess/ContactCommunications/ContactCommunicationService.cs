@@ -160,29 +160,54 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
                                from reply in replyGroup.DefaultIfEmpty()
                                join user in userlist on cus.UserId equals user.Id into userGroup
                                from user in userGroup.DefaultIfEmpty()
+                                   //select new ContactCommunicationDto
+                                   //{
+                                   //    Id =communication.Id,
+                                   //    CustomerId=communication.CustomerId,
+                                   //    CustomerName=cus.CustomerName,
+                                   //    ClueId=communication.ClueId,
+                                   //    ClueName=clue.ClueName,
+                                   //    BusinessOpportunityId=communication.BusinessOpportunityId,
+                                   //    BusinessOpportunityName=bus.BusinessOpportunityName,
+                                   //    CreatorId=communication.CreatorId,
+                                   //    CreationTime=communication.CreationTime,
+                                   //    Content=communication.Content,
+                                   //    AttachmentUrl=communication.AttachmentUrl,
+                                   //    ExpectedDateId=communication.ExpectedDateId,
+                                   //    CommunicationTypeName=communicationtype.CommunicationTypeName,
+                                   //    NextContactTime=communication.NextContactTime,
+                                   //    FollowUpStatus=communication.FollowUpStatus,
+                                   //    Comments=communication.Comments,
+                                   //    CustomReplyId=communicationtype.CustomReplyId,
+                                   //    CustomReplyName=reply.CustomReplyName,
+                                   //    IsServe=communication.IsServe,
+                                   //    UserId=user.Id,
+                                   //    UserName=user.UserName
+                                   //};
+
                                select new ContactCommunicationDto
                                {
-                                   Id =communication.Id,
-                                   CustomerId=communication.CustomerId,
-                                   CustomerName=cus.CustomerName,
-                                   ClueId=communication.ClueId,
-                                   ClueName=clue.ClueName,
-                                   BusinessOpportunityId=communication.BusinessOpportunityId,
-                                   BusinessOpportunityName=bus.BusinessOpportunityName,
-                                   CreatorId=communication.CreatorId,
-                                   CreationTime=communication.CreationTime,
-                                   Content=communication.Content,
-                                   AttachmentUrl=communication.AttachmentUrl,
-                                   ExpectedDateId=communication.ExpectedDateId,
-                                   CommunicationTypeName=communicationtype.CommunicationTypeName,
-                                   NextContactTime=communication.NextContactTime,
-                                   FollowUpStatus=communication.FollowUpStatus,
-                                   Comments=communication.Comments,
-                                   CustomReplyId=communicationtype.CustomReplyId,
-                                   CustomReplyName=reply.CustomReplyName,
-                                   IsServe=communication.IsServe,
-                                   UserId=user.Id,
-                                   UserName=user.UserName
+                                   Id = communication.Id,
+                                   CustomerId = communication.CustomerId,
+                                   CustomerName = cus != null ? cus.CustomerName : null,
+                                   ClueId = communication.ClueId,
+                                   ClueName = clue != null ? clue.ClueName : null,
+                                   BusinessOpportunityId = communication.BusinessOpportunityId,
+                                   BusinessOpportunityName = bus != null ? bus.BusinessOpportunityName : null,
+                                   CreatorId = communication.CreatorId,
+                                   CreationTime = communication.CreationTime,
+                                   Content = communication.Content,
+                                   AttachmentUrl = communication.AttachmentUrl,
+                                   ExpectedDateId = communication.ExpectedDateId,
+                                   CommunicationTypeName = communicationtype != null ? communicationtype.CommunicationTypeName : null,
+                                   NextContactTime = communication.NextContactTime,
+                                   FollowUpStatus = communication.FollowUpStatus,
+                                   Comments = communication.Comments,
+                                   CustomReplyId = communicationtype != null ? communicationtype.CustomReplyId : Guid.Empty,
+                                   CustomReplyName = reply != null ? reply.CustomReplyName : null,
+                                   IsServe = communication.IsServe,
+                                   UserId = user != null ? user.Id : Guid.Empty,
+                                   UserName = user != null ? user.UserName : null
                                };
                     // 联系对象类型筛选
                     switch (dto.ContactTargetType)
@@ -374,7 +399,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
                 }
                 return ApiResult<ContactCommunicationDto>.Success(ResultCode.Success, ObjectMapper.Map<ContactCommunication, ContactCommunicationDto>(contactCommunication));
 
-            }
+            } 
             catch (Exception)
             {
 
@@ -388,7 +413,7 @@ namespace CustomerRelationshipManagement.CustomerProcess.ContactCommunications
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<ApiResult<ContactCommunicationDto>> DelcontactCommunication(Guid id)
+        public async Task<ApiResult<ContactCommunicationDto>> DelcontactCommunication(Guid id)  
         {
             try
             {
