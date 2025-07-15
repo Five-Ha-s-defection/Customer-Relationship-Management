@@ -6,9 +6,11 @@ using CustomerRelationshipManagement.CustomerProcess.Customers;
 using CustomerRelationshipManagement.Dtos.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.CrmContractDtos;
 using CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Clues;
+using CustomerRelationshipManagement.DTOS.Export;
 using CustomerRelationshipManagement.DTOS.Finance.Payments;
 using CustomerRelationshipManagement.DTOS.Finance.Receibableses;
 using CustomerRelationshipManagement.DTOS.ProductManagementDto;
+using CustomerRelationshipManagement.Export;
 using CustomerRelationshipManagement.Finance.Payments;
 using CustomerRelationshipManagement.Finance.Receivableses;
 using CustomerRelationshipManagement.Interfaces.ICrmContracts;
@@ -33,6 +35,7 @@ using System.Threading.Tasks;
 using System.Transactions;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Caching;
+using Volo.Abp.Content;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectMapping;
@@ -57,9 +60,11 @@ namespace CustomerRelationshipManagement.CrmContracts
         private readonly IConnectionMultiplexer connectionMultiplexer;
         private readonly IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache;
 
+        private readonly IExportAppService exportAppService;
+
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, IRepository<Customer, Guid> customerrepository, IRepository<UserInfo, Guid> userInforepository, IConnectionMultiplexer connectionMultiplexer, IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache, IRepository<Product, Guid> productrepository, IRepository<Payment, Guid> paymentrepository, IRepository<OperationLog, Guid> operationLogrepository, IUnitOfWorkManager unitOfWorkManager)
+        public CrmContractService(IRepository<CrmContract, Guid> repository, IRepository<Receivables, Guid> receivablesrepository, IRepository<CrmContractandProduct, Guid> crmContractandProductrepository, IRepository<Customer, Guid> customerrepository, IRepository<UserInfo, Guid> userInforepository, IConnectionMultiplexer connectionMultiplexer, IDistributedCache<PageInfoCount<ShowCrmContractDto>> cache, IRepository<Product, Guid> productrepository, IRepository<Payment, Guid> paymentrepository, IRepository<OperationLog, Guid> operationLogrepository, IUnitOfWorkManager unitOfWorkManager, IExportAppService exportAppService)
         {
             this.repository = repository;
             this.receivablesrepository = receivablesrepository;
@@ -73,6 +78,7 @@ namespace CustomerRelationshipManagement.CrmContracts
             this.paymentrepository = paymentrepository;
             this.operationLogrepository = operationLogrepository;
             _unitOfWorkManager = unitOfWorkManager;
+            this.exportAppService = exportAppService;
         }
 
         /// <summary>
@@ -611,6 +617,123 @@ namespace CustomerRelationshipManagement.CrmContracts
             query = query.Where(x => x.CrmContractId == CrmContractId);
             return ApiResult<List<ContractProductDto>>.Success(ResultCode.Success, query.ToList());
         }
+
+        public async Task<IRemoteStreamContent> GetExportAsyncExcel()
+        {
+            // 获取合同原始数据
+            var query = await repository.GetQueryableAsync();
+            var contractList = query.ToList();
+
+            // 映射为 DTO
+            var crmcontractdto = ObjectMapper.Map<IList<CrmContract>, IList<ShowCrmContractDto>>(contractList);
+
+            // 一次性获取所有相关数据
+            var customerList = await customerrepository.GetQueryableAsync();
+            var Userinfo = await userInforepository.GetQueryableAsync();
+            var receivablesList = await receivablesrepository.GetQueryableAsync();
+            var paymentList = await paymentrepository.GetQueryableAsync();
+
+            //根据负责人id获取负责人姓名
+                foreach (var item in crmcontractdto)
+                {
+                    var username = (await Userinfo.FirstOrDefaultAsync(a => a.Id == item.UserId))?.RealName;
+                    item.UserName = username ?? "";
+                }
+
+                //根据创建人ids获取创建人姓名
+                foreach (var item in crmcontractdto)
+                {
+                    var CreateUserName = (await Userinfo.FirstOrDefaultAsync(a => a.Id == item.CreatorId))?.RealName;
+                    item.CreateUserName = CreateUserName ?? "";
+                }
+
+                //根据所属客户id获取所属客户的名称
+                foreach (var item in crmcontractdto)
+                {
+
+                    var CustomerName = (await customerList.FirstOrDefaultAsync(a => a.Id == item.CustomerId))?.CustomerName;
+                    item.CustomerName = CustomerName ?? "";
+                }
+                var receiveinfo = await receivablesrepository.GetQueryableAsync();
+
+                //根据id获取应收款
+                foreach (var item in crmcontractdto)
+                {
+                    var Accountsreceivable = (await receiveinfo.FirstOrDefaultAsync(a => a.ContractId == item.Id))?.ReceivablePay;
+                    item.Accountsreceivable = Accountsreceivable ?? 0;
+                }
+
+                var paymentinfo = await paymentrepository.GetQueryableAsync();
+
+                //根据id获取已收款
+                foreach (var item in crmcontractdto)
+                {
+                    var PaymentInfoStatus = (await paymentinfo.FirstOrDefaultAsync(a => a.ContractId == item.Id))?.PaymentStatus;
+                    item.PaymentInfoStatus = PaymentInfoStatus ?? 0;
+                    decimal? Paymentreceived = null;
+                    if(item.PaymentInfoStatus == 2)
+                    {
+                        Paymentreceived = (await paymentinfo.FirstOrDefaultAsync(a => a.ContractId == item.Id))?.Amount;
+                    }
+                    item.Paymentreceived = Paymentreceived ?? 0;
+                }
+                //根据创建人ids获取审核人姓名
+                foreach (var item in crmcontractdto)
+                {
+                    item.AuditorNames = string.Join(",", Userinfo.Where(u => item.AuditorId.Contains(u.Id)).Select(u => u.RealName));
+                    if (item.AuditorId != null && item.AuditorId.Count > 0)
+                    {
+                        item.AuditorNames = string.Join(",", Userinfo.Where(u => item.AuditorId.Contains(u.Id)).Select(u => u.RealName));
+                        // 只显示当前审核人
+                        if (item.CurrentStep >= 0 && item.CurrentStep < item.AuditorId.Count)
+                        {
+                            //通过索引从审批人 ID 列表中获取当前步骤的审批人 ID
+                            var currentAuditorId = item.AuditorId[item.CurrentStep];
+                            var currentAuditor = Userinfo.FirstOrDefault(u => u.Id == currentAuditorId);
+                            item.CurrentAuditorName = currentAuditor?.RealName ?? "";
+                        }
+                        else
+                        {
+                            item.CurrentAuditorName = "";
+                        }
+                    }
+                    else
+                    {
+                        item.AuditorNames = string.Empty;
+                        item.CurrentAuditorName = "";
+                    }
+                }
+
+            // 准备导出数据
+            var exportData = new ExportDataDto<ShowCrmContractDto>
+            {
+                FileName = "合同",
+                Items = crmcontractdto, // 这里使用 DTO 列表，而不是原始 query
+                ColumnMappings = new Dictionary<string, string>
+                {
+                    { "Id", "合同ID" },
+                    { "PaymentStatus", "状态" },
+                    { "ContractProceeds", "合同收款" },
+                    { "SignDate", "签订日期" },
+                    { "ContractName", "合同名称" },
+                    { "CommencementDate", "生效日期" },
+                    { "ExpirationDate", "截止日期" },
+                    { "Dealer", "经销商" },
+                    { "CustomerName", "客户名称" },
+                    { "UserId", "负责人ID" },
+                    { "UserName", "负责人名称" },
+                    { "CreationTime", "创建时间" },
+                    { "AuditorNames", "审核人" },
+                    { "CurrentAuditorName","当前审核人" },
+                    { "CreateUserName", "创建人名称" },
+                }
+            };
+
+            // 调用导出服务
+            return await exportAppService.ExportToExcelAsync(exportData);
+        }
+
+
         /// <summary>
         /// 清除关于c:PageInfo,k的所有信息
         /// </summary>
