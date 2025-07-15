@@ -400,7 +400,6 @@ namespace CustomerRelationshipManagement.Finance.Payments
                             CreatorId = p.CreatorId,
                             CreatorRealName = creator.RealName,
                             CreationTime = p.CreationTime,
-                            CurrentAuditorName = "",
                         };
             var exportData = new ExportDataDto<PaymentDTO>
             {
@@ -422,7 +421,6 @@ namespace CustomerRelationshipManagement.Finance.Payments
                     { "UserId", "负责人ID" },
                     { "RealName", "负责人名称" },
                     { "CreationTime", "创建时间" },
-                    { "AuditorNames", "审核人" },
                     { "CreatorRealName", "创建人名称" },
                 }
             };
