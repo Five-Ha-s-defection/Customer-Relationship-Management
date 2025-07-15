@@ -143,26 +143,6 @@ namespace CustomerRelationshipManagement.DTOS.CustomerProcessDtos.Customers
         /// </summary>  
         public string CreateName { get; set; }
 
-        //========================================================================================
-        ///// <summary>
-        ///// 所属客户ID（外键）
-        ///// </summary>
-        //public Guid CustomerId { get; set; }
-
-        ///// <summary>
-        ///// 联系人姓名
-        ///// </summary>
-        //public string ContactName { get; set; }
-
-        ///// <summary>
-        ///// 手机
-        ///// </summary>
-        //public string Mobile { get; set; }
-
-        ///// <summary>
-        ///// 邮箱
-        ///// </summary>
-        //public string Email { get; set; }
 
         //=============================区分客户和客户池==================================================================
         /// <summary>
